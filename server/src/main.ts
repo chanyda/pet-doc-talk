@@ -9,6 +9,10 @@ async function bootstrap() {
     const configService = app.get(ConfigService<ConfigType, true>);
 
     app.use(helmet());
+    app.enableCors({
+        origin: configService.get("app.origin", { infer: true }),
+        credentials: true,
+    });
 
     await app.listen(configService.get("app.port", { infer: true }));
 }
