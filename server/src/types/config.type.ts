@@ -4,6 +4,11 @@ export type AppConfigType = {
     origin: string;
 };
 
+export type PrismaConfigType = {
+    databaseUrl: string;
+};
+
 export type ConfigType = {
     app: AppConfigType;
+    prisma: PrismaConfigType;
 };
