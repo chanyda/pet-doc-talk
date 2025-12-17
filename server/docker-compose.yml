@@ -1,0 +1,11 @@
+name: pet-doc-talk
+services:
+    db:
+        image: postgres:18.1
+        container_name: pet-doc-talk-db
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: chany
+            POSTGRES_DB: pet-doc-talk
+            POSTGRES_PASSWORD: "!petDockTalk#"
