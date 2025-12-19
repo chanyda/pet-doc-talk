@@ -1,14 +1,19 @@
-import { IsEmail, IsEnum, IsString, MaxLength } from "class-validator";
+import { IsEmail, IsEnum, IsString, MaxLength, MinLength } from "class-validator";
 import { LoginFrom } from "../auth.enums";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class LoginDto {
+    @ApiProperty()
     @IsEmail()
     email: string;
 
+    @ApiProperty({ description: "The name of user.", minLength: 2, maxLength: 100 })
     @IsString()
+    @MinLength(2)
     @MaxLength(100)
     name: string;
 
+    @ApiProperty({ description: "Social login route.", enum: LoginFrom })
     @IsEnum(LoginFrom)
     loginFrom: LoginFrom;
 }

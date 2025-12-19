@@ -5,6 +5,7 @@ import { ConfigType } from "./types/config.type";
 import helmet from "helmet";
 import { ValidationPipe } from "@nestjs/common";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -18,6 +19,15 @@ async function bootstrap() {
 
     app.useGlobalPipes(new ValidationPipe());
     app.useGlobalInterceptors(new LoggingInterceptor());
+
+    const documentConfig = new DocumentBuilder()
+        .setTitle("API")
+        .setDescription("API docs")
+        .setVersion("1.0")
+        .addBearerAuth()
+        .build();
+    const document = SwaggerModule.createDocument(app, documentConfig);
+    SwaggerModule.setup("docs", app, document);
 
     await app.listen(configService.get("app.port", { infer: true }));
 }
