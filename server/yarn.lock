@@ -998,6 +998,16 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.10.0"
 
+"@nestjs-cls/transactional-adapter-prisma@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@nestjs-cls/transactional-adapter-prisma/-/transactional-adapter-prisma-1.3.2.tgz#e20b81fc5ccd2eeb5219f9e6e150cae903a89e3a"
+  integrity sha512-RLezLsF4l/wPkdeOBShYk2nEgdF2iOHRvtkjJXIBY6s7NBavsVjB42glCHMkC4d8lPDGMQQs33fXMY5FMhlrxg==
+
+"@nestjs-cls/transactional@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@nestjs-cls/transactional/-/transactional-3.1.1.tgz#7bf44d7551c45b7db1db68df811491cf988c44e0"
+  integrity sha512-wP45dYbhMmlxSuEyCpULr7/T67v6vMy0Wh2vDSlvEBm/Dx3FYLlFR+yWeqQWQW+bpGe7wusbip3cNZ9F/4izkQ==
+
 "@nestjs/cli@^11.0.0":
   version "11.0.14"
   resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-11.0.14.tgz#c1b7fd195813cacaa4f90d398d618ae4d71fc2ab"
@@ -4361,6 +4371,11 @@ neo-async@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
+
+nestjs-cls@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/nestjs-cls/-/nestjs-cls-6.1.0.tgz#c2b13d9690f425b5149137fd905ce23c03bf08ca"
+  integrity sha512-n4T2aXy5cQxrB8VIGzUF3JBK8lXbRDaWdDS0g7uDKshvYn8NGWMe46PX1p+sb2SxiC0Gjrsff44hkk0kvpS+Ug==
 
 node-abort-controller@^3.0.1:
   version "3.1.1"
