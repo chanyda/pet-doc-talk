@@ -4,6 +4,8 @@ import appConfig from "./config/app.config";
 import { validate } from "./config/validation/env.validation";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UsersModule } from "./users/users.module";
+import { AuthService } from "./auth/auth.service";
+import { AuthModule } from "./auth/auth.module";
 import prismaConfig from "./config/prisma.config";
 import authConfig from "./config/auth.config";
 import { ClsModule } from "nestjs-cls";
@@ -32,6 +34,8 @@ import { PrismaService } from "./prisma/prisma.service";
         }),
         PrismaModule,
         UsersModule,
+        AuthModule,
     ],
+    providers: [AuthService],
 })
 export class AppModule {}
