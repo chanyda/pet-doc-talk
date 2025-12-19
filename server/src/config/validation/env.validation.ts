@@ -1,24 +1,6 @@
 import { plainToInstance } from "class-transformer";
-import { IsEnum, IsInt, IsString, Max, Min, validateSync } from "class-validator";
-
-enum Environment {
-    Development = "development",
-    Production = "production",
-    Test = "test",
-}
-
-class EnvironmentVariables {
-    @IsEnum(Environment)
-    NODE_ENV: Environment;
-
-    @IsInt()
-    @Min(0)
-    @Max(65535)
-    PORT: number;
-
-    @IsString()
-    ORIGIN: string;
-}
+import { validateSync } from "class-validator";
+import { EnvironmentVariables } from "../dto/env.dto";
 
 export function validate(config: Record<string, unknown>): EnvironmentVariables {
     const validatedConfig = plainToInstance(EnvironmentVariables, config, { enableImplicitConversion: true });

@@ -8,7 +8,14 @@ export type PrismaConfigType = {
     databaseUrl: string;
 };
 
+export type AuthConfigType = {
+    secretKey: string;
+    accessTokenExpTime: string;
+    refreshTokenExpTime: string;
+};
+
 export type ConfigType = {
     app: AppConfigType;
     prisma: PrismaConfigType;
+    auth: AuthConfigType;
 };

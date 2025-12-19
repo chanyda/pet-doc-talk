@@ -5,12 +5,13 @@ import { validate } from "./config/validation/env.validation";
 import { PrismaModule } from "./prisma/prisma.module";
 import { UsersModule } from "./users/users.module";
 import prismaConfig from "./config/prisma.config";
+import authConfig from "./config/auth.config";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [appConfig, prismaConfig],
+            load: [appConfig, prismaConfig, authConfig],
             envFilePath: ".env",
             validate,
         }),
