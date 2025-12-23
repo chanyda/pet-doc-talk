@@ -6,6 +6,7 @@ import { IUser } from "./interfaces/users.interface";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
+import { UserSelect } from "generated/prisma/models";
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -17,9 +18,10 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async findByEmail(email: string): Promise<IUser | null> {
+    async findByEmail(email: string, select?: UserSelect): Promise<IUser | null> {
         return this.txHost.tx.user.findUnique({
             where: { email },
+            select,
         });
     }
 
