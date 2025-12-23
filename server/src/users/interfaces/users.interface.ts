@@ -10,5 +10,4 @@ export interface IUser {
     refreshToken: string;
     createdAt: Date;
     updatedAt: Date;
-    deletedAt?: Date | null;
 }
