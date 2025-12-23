@@ -6,6 +6,7 @@ import { ConfigService } from "@nestjs/config";
 import { GenerateTokenResponseDto, LoginResponseDto } from "./dto/login-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
 import { ConfigType } from "src/types/config.type";
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,9 @@ export class AuthService {
 
         // 로그인하려는 email을 가진 user가 없는 경우, 신규 회원이므로 user를 생성해준다.
         if (!user) {
-            user = await this.userService.create({ ...loginDto, refreshToken: "" });
+            const temporaryNickname = await this.generateTemporaryNickname();
+
+            user = await this.userService.create({ ...loginDto, refreshToken: "", nickname: temporaryNickname });
             isNewUser = true;
         } else {
             // 기존 회원인 경우, 현재 로그인하려는 provider와 기존에 로그인한 provider가 동일한지 체크한다.
@@ -56,5 +59,23 @@ export class AuthService {
         );
 
         return { accessToken, refreshToken };
+    }
+
+    private async generateTemporaryNickname(): Promise<string> {
+        let exists = true;
+        let temporaryNickname = "";
+
+        do {
+            try {
+                temporaryNickname = `user_${nanoid(10)}`;
+
+                const existsNickname = await this.userService.existsByNickname(temporaryNickname);
+                exists = existsNickname;
+            } catch (err) {
+                console.error(err);
+            }
+        } while (exists);
+
+        return temporaryNickname;
     }
 }

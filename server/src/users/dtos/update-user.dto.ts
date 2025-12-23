@@ -8,7 +8,7 @@ export class UpdateUserDto {
     @IsNotEmpty()
     @MinLength(1)
     @MaxLength(20)
-    nickname?: string | null;
+    nickname?: string;
 
     @ApiPropertyOptional()
     @IsOptional()

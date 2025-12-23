@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsInt, IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 
 export class FindMyProfileResponseDto {
@@ -20,10 +20,9 @@ export class FindMyProfileResponseDto {
     @IsString()
     @MinLength(1)
     @MaxLength(20)
-    @IsOptional()
-    nickname?: string | null;
+    nickname: string;
 
-    @ApiProperty({ required: false, type: String })
+    @ApiPropertyOptional({ type: String })
     @IsUrl()
     @IsOptional()
     profileImageUrl?: string | null;

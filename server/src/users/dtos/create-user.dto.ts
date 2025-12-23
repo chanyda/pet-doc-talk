@@ -14,6 +14,13 @@ export class CreateUserDto {
     @IsNotEmpty()
     name: string;
 
+    @ApiProperty({ minLength: 1, maxLength: 20 })
+    @IsString()
+    @MinLength(1)
+    @MaxLength(20)
+    @IsNotEmpty()
+    nickname: string;
+
     @ApiProperty({ description: "Social login route.", enum: LoginFrom })
     @IsEnum(LoginFrom)
     loginFrom: LoginFrom;

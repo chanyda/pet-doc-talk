@@ -25,6 +25,13 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
+    async findByNickname(nickname: string, select?: UserSelect): Promise<IUser | null> {
+        return this.txHost.tx.user.findUnique({
+            where: { nickname },
+            select,
+        });
+    }
+
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
         return this.txHost.tx.user.update({
             where: { id: userId },
