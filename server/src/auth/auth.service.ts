@@ -39,9 +39,9 @@ export class AuthService {
 
     private generateToken(userId: number, email: string): GenerateTokenResponseDto {
         const payload = { userId, email };
-        const secretKey = this.configService.get("auth.secretKey", { infer: true });
-        const accessTokenExpTime = this.configService.get("auth.accessTokenExpTime", { infer: true });
-        const refreshTokenExpTime = this.configService.get("auth.refreshTokenExpTime", { infer: true });
+        const secretKey = this.configService.getOrThrow("auth.secretKey", { infer: true });
+        const accessTokenExpTime = this.configService.getOrThrow("auth.accessTokenExpTime", { infer: true });
+        const refreshTokenExpTime = this.configService.getOrThrow("auth.refreshTokenExpTime", { infer: true });
 
         const accessToken = this.jwtService.sign(payload, {
             secret: secretKey,

@@ -13,7 +13,7 @@ async function bootstrap() {
 
     app.use(helmet());
     app.enableCors({
-        origin: configService.get("app.origin", { infer: true }),
+        origin: configService.getOrThrow("app.origin", { infer: true }),
         credentials: true,
     });
 
@@ -29,6 +29,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, documentConfig);
     SwaggerModule.setup("docs", app, document);
 
-    await app.listen(configService.get("app.port", { infer: true }));
+    await app.listen(configService.getOrThrow("app.port", { infer: true }));
 }
 bootstrap();
