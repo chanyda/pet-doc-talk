@@ -3,16 +3,16 @@ import { LoginDto } from "./dto/login.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import type { StringValue } from "ms";
 import { GenerateTokenResponseDto, LoginResponseDto } from "./dto/login-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
+import { ConfigType } from "src/types/config.type";
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UsersService,
         private jwtService: JwtService,
-        private configService: ConfigService,
+        private configService: ConfigService<ConfigType, true>,
     ) {}
 
     @Transactional()
@@ -39,9 +39,9 @@ export class AuthService {
 
     private generateToken(userId: number, email: string): GenerateTokenResponseDto {
         const payload = { userId, email };
-        const secretKey = this.configService.get<string>("auth.secretKey");
-        const accessTokenExpTime = this.configService.get<StringValue>("auth.accessTokenExpTime");
-        const refreshTokenExpTime = this.configService.get<StringValue>("auth.refreshTokenExpTime");
+        const secretKey = this.configService.get("auth.secretKey", { infer: true });
+        const accessTokenExpTime = this.configService.get("auth.accessTokenExpTime", { infer: true });
+        const refreshTokenExpTime = this.configService.get("auth.refreshTokenExpTime", { infer: true });
 
         const accessToken = this.jwtService.sign(payload, {
             secret: secretKey,

@@ -1,3 +1,5 @@
+import type { StringValue } from "ms";
+
 export type AppConfigType = {
     nodeEnv: string;
     port: number;
@@ -10,8 +12,8 @@ export type PrismaConfigType = {
 
 export type AuthConfigType = {
     secretKey: string;
-    accessTokenExpTime: string;
-    refreshTokenExpTime: string;
+    accessTokenExpTime: StringValue;
+    refreshTokenExpTime: StringValue;
 };
 
 export type ConfigType = {
