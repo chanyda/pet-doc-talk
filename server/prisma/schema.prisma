@@ -17,13 +17,12 @@ model User {
   id              Int    @id @default(autoincrement()) @db.Integer
   email           String    @unique @db.VarChar(255)
   name            String    @db.VarChar(100)
-  nickname        String?   @unique @db.VarChar(20)
+  nickname        String   @unique @db.VarChar(20) 
   loginFrom       LoginFrom
   profileImageUrl String?   @db.VarChar(500)
   refreshToken    String    @db.VarChar(500)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  deletedAt       DateTime?
 }
 
 enum LoginFrom {
