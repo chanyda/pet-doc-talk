@@ -1,28 +1,18 @@
 import type { Config } from "jest";
 
+const esModules = ["nanoid"].join("|");
+
 const config: Config = {
     preset: "ts-jest",
-    testEnvironment: "node",
-    moduleFileExtensions: ["js", "json", "ts"],
     rootDir: "src",
-    testRegex: ".*\\.spec\\.ts$",
     transform: {
-        "^.+\\.(t|j)s$": [
-            "ts-jest",
-            {
-                tsconfig: {
-                    module: "commonjs",
-                },
-            },
-        ],
+        "^.+\\.(t|j)s$": "ts-jest",
     },
-    collectCoverageFrom: ["**/*.(t|j)s"],
-    coverageDirectory: "../coverage",
+    transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
     moduleNameMapper: {
         "^src/(.*)$": "<rootDir>/$1",
+        "^nanoid(/(.*)|$)": "nanoid$1",
     },
-    extensionsToTreatAsEsm: [],
-    globals: {},
 };
 
 export default config;
