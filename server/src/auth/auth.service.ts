@@ -11,21 +11,21 @@ import { nanoid } from "nanoid";
 @Injectable()
 export class AuthService {
     constructor(
-        private userService: UsersService,
+        private usersService: UsersService,
         private jwtService: JwtService,
         private configService: ConfigService<ConfigType, true>,
     ) {}
 
     @Transactional()
     async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-        let user = await this.userService.findByEmail(loginDto.email);
+        let user = await this.usersService.findByEmail(loginDto.email);
         let isNewUser = false;
 
         // 로그인하려는 email을 가진 user가 없는 경우, 신규 회원이므로 user를 생성해준다.
         if (!user) {
             const temporaryNickname = await this.generateTemporaryNickname();
 
-            user = await this.userService.create({ ...loginDto, refreshToken: "", nickname: temporaryNickname });
+            user = await this.usersService.create({ ...loginDto, refreshToken: "", nickname: temporaryNickname });
             isNewUser = true;
         } else {
             // 기존 회원인 경우, 현재 로그인하려는 provider와 기존에 로그인한 provider가 동일한지 체크한다.
@@ -35,7 +35,7 @@ export class AuthService {
         }
 
         const tokens = this.generateToken(user.id, user.email);
-        await this.userService.updateById(user.id, { refreshToken: tokens.refreshToken });
+        await this.usersService.updateById(user.id, { refreshToken: tokens.refreshToken });
 
         return { ...tokens, isNewUser };
     }
@@ -69,7 +69,7 @@ export class AuthService {
             try {
                 temporaryNickname = `user_${nanoid(10)}`;
 
-                const existsNickname = await this.userService.existsByNickname(temporaryNickname);
+                const existsNickname = await this.usersService.existsByNickname(temporaryNickname);
                 exists = existsNickname;
             } catch (err) {
                 console.error(err);
