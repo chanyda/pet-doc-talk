@@ -18,6 +18,13 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
+    async findById(id: number, select?: UserSelect): Promise<IUser | null> {
+        return this.txHost.tx.user.findUnique({
+            where: { id },
+            select,
+        });
+    }
+
     async findByEmail(email: string, select?: UserSelect): Promise<IUser | null> {
         return this.txHost.tx.user.findUnique({
             where: { email },

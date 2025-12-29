@@ -38,7 +38,13 @@ export class UsersService {
         return user;
     }
 
-    updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
+    async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
+        const user = await this.usersRepository.findById(userId);
+
+        if (!user) {
+            throw new NotFoundException("User not exists.");
+        }
+
         return this.usersRepository.updateById(userId, updateUserDto);
     }
 }
