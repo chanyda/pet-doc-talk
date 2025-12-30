@@ -133,7 +133,7 @@ describe("UsersService", () => {
         });
     });
 
-    describe("findProfileByEmail", () => {
+    describe("findProfile", () => {
         const selectUserOptions = {
             id: true,
             email: true,
@@ -142,7 +142,7 @@ describe("UsersService", () => {
             profileImageUrl: true,
         };
 
-        it("이메일에 대한 사용자의 프로필 찾기에 성공하여 정보를 반환한다.", async () => {
+        it("사용자의 프로필 찾기에 성공하여 정보를 반환한다.", async () => {
             const mockUserProfile = {
                 id: TEST_USER_ID,
                 email: TEST_EMAIL,
@@ -151,23 +151,23 @@ describe("UsersService", () => {
                 profileImageUrl: null,
             };
 
-            findByEmailSpy.mockResolvedValue(mockUserProfile);
+            findByIdSpy.mockResolvedValue(mockUserProfile);
 
-            const result = await usersService.findProfileByEmail(TEST_EMAIL);
+            const result = await usersService.findProfile(TEST_USER_ID);
 
             expect(result).toEqual(mockUserProfile);
-            expect(findByEmailSpy).toHaveBeenCalledWith(TEST_EMAIL, selectUserOptions);
-            expect(findByEmailSpy).toHaveBeenCalledTimes(1);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, selectUserOptions);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
 
-        it("이메일에 대한 사용자의 프로필 찾기에 실패하여 오류를 반환한다.", async () => {
-            findByEmailSpy.mockResolvedValue(null);
+        it("사용자의 프로필 찾기에 실패하여 오류를 반환한다.", async () => {
+            findByIdSpy.mockResolvedValue(null);
 
-            await expect(usersService.findProfileByEmail(TEST_EMAIL)).rejects.toThrow(
+            await expect(usersService.findProfile(TEST_USER_ID)).rejects.toThrow(
                 new NotFoundException("User not exists."),
             );
-            expect(findByEmailSpy).toHaveBeenCalledWith(TEST_EMAIL, selectUserOptions);
-            expect(findByEmailSpy).toHaveBeenCalledTimes(1);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, selectUserOptions);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
     });
 

@@ -17,6 +17,6 @@ export class UsersController {
     @ApiOkResponse({ description: "Find profile successful.", type: FindProfileResponseDto })
     @ApiNotFoundResponse({ description: "User not exists." })
     findProfile(@Req() req: AuthRequest): Promise<FindProfileResponseDto> {
-        return this.usersService.findProfileByEmail(req.user.email);
+        return this.usersService.findProfile(req.user.userId);
     }
 }

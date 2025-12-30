@@ -22,8 +22,8 @@ export class UsersService {
         return !!user;
     }
 
-    async findProfileByEmail(email: string): Promise<FindProfileResponseDto> {
-        const user = await this.usersRepository.findByEmail(email, {
+    async findProfile(userId: number): Promise<FindProfileResponseDto> {
+        const user = await this.usersRepository.findById(userId, {
             id: true,
             email: true,
             name: true,
