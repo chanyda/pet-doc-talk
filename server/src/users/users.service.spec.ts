@@ -118,7 +118,7 @@ describe("UsersService", () => {
             const result = await usersService.existsByNickname(TEST_NICKNAME);
 
             expect(result).toBeTruthy();
-            expect(findByNicknameSpy).toHaveBeenCalledWith(TEST_NICKNAME, { id: true });
+            expect(findByNicknameSpy).toHaveBeenCalledWith(TEST_NICKNAME, undefined, { id: true });
             expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
         });
 
@@ -128,7 +128,7 @@ describe("UsersService", () => {
             const result = await usersService.existsByNickname(TEST_NICKNAME);
 
             expect(result).toBeFalsy();
-            expect(findByNicknameSpy).toHaveBeenCalledWith(TEST_NICKNAME, { id: true });
+            expect(findByNicknameSpy).toHaveBeenCalledWith(TEST_NICKNAME, undefined, { id: true });
             expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
         });
     });

@@ -17,8 +17,8 @@ export class UsersService {
         return this.usersRepository.findByEmail(email);
     }
 
-    async existsByNickname(nickname: string): Promise<boolean> {
-        const user = await this.usersRepository.findByNickname(nickname, { id: true });
+    async existsByNickname(nickname: string, userId?: number): Promise<boolean> {
+        const user = await this.usersRepository.findByNickname(nickname, userId, { id: true });
         return !!user;
     }
 

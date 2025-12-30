@@ -18,9 +18,9 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async findById(id: number, select?: UserSelect): Promise<IUser | null> {
+    async findById(userId: number, select?: UserSelect): Promise<IUser | null> {
         return this.txHost.tx.user.findUnique({
-            where: { id },
+            where: { id: userId },
             select,
         });
     }
@@ -32,9 +32,9 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async findByNickname(nickname: string, select?: UserSelect): Promise<IUser | null> {
+    async findByNickname(nickname: string, userId?: number, select?: UserSelect): Promise<IUser | null> {
         return this.txHost.tx.user.findUnique({
-            where: { nickname },
+            where: { nickname, NOT: { id: userId } },
             select,
         });
     }
