@@ -55,11 +55,11 @@ describe("UsersController", () => {
         jest.clearAllMocks();
     });
 
-    describe("findMyProfile", () => {
+    describe("findProfile", () => {
         it("프로필 정보를 가져오기에 성공하여 프로필 정보를 반환한다.", async () => {
             findProfileByEmailSpy.mockResolvedValue(mockProfileDto);
 
-            const result = await usersController.findMyProfile(mockReq);
+            const result = await usersController.findProfile(mockReq);
 
             expect(result).toEqual(mockProfileDto);
             expect(findProfileByEmailSpy).toHaveBeenCalledWith(mockReq.user.email);
@@ -69,7 +69,7 @@ describe("UsersController", () => {
         it("이메일에 대한 프로필 정보가 없어서 오류가 발생한다.", async () => {
             findProfileByEmailSpy.mockRejectedValue(new NotFoundException("User not exists."));
 
-            await expect(usersController.findMyProfile(mockReq)).rejects.toThrow(
+            await expect(usersController.findProfile(mockReq)).rejects.toThrow(
                 new NotFoundException("User not exists."),
             );
             expect(findProfileByEmailSpy).toHaveBeenCalledWith(mockReq.user.email);

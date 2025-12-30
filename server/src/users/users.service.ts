@@ -3,7 +3,7 @@ import { UsersRepository } from "./users.repository";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
-import { FindMyProfileResponseDto } from "./dtos/find-my-profile-response.dto";
+import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
 
 @Injectable()
 export class UsersService {
@@ -22,7 +22,7 @@ export class UsersService {
         return !!user;
     }
 
-    async findProfileByEmail(email: string): Promise<FindMyProfileResponseDto> {
+    async findProfileByEmail(email: string): Promise<FindProfileResponseDto> {
         const user = await this.usersRepository.findByEmail(email, {
             id: true,
             email: true,

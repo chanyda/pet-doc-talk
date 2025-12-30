@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsInt, IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 
-export class FindMyProfileResponseDto {
+export class FindProfileResponseDto {
     @ApiProperty()
     @IsInt()
     id: number;

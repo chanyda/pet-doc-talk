@@ -3,7 +3,7 @@ import { UsersService } from "./users.service";
 import { ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { AuthRequest } from "src/types/request.type";
-import { FindMyProfileResponseDto } from "./dtos/find-my-profile-response.dto";
+import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
 
 @ApiBearerAuth()
 @ApiTags("users")
@@ -14,9 +14,9 @@ export class UsersController {
 
     @Get("me")
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: "Find my profile successful.", type: FindMyProfileResponseDto })
+    @ApiOkResponse({ description: "Find profile successful.", type: FindProfileResponseDto })
     @ApiNotFoundResponse({ description: "User not exists." })
-    findMyProfile(@Req() req: AuthRequest): Promise<FindMyProfileResponseDto> {
+    findProfile(@Req() req: AuthRequest): Promise<FindProfileResponseDto> {
         return this.usersService.findProfileByEmail(req.user.email);
     }
 }
