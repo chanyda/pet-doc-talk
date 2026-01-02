@@ -67,7 +67,7 @@ export class UsersService {
             }
         }
 
-        return await this.usersRepository.updateById(userId, updateProfileDto, {
+        return this.usersRepository.updateById(userId, updateProfileDto, {
             id: true,
             email: true,
             name: true,
