@@ -20,6 +20,11 @@ export class UsersService {
         return this.usersRepository.findByEmail(email);
     }
 
+    async existsByUserId(userId: number): Promise<boolean> {
+        const user = await this.usersRepository.findById(userId, { id: true });
+        return !!user;
+    }
+
     /**
      * @param nickname
      * @param excludeUserId 나를 제외한 사용자들 중 동일한 닉네임이 있는지 체크해야할 때 사용
@@ -48,21 +53,21 @@ export class UsersService {
 
     @Transactional()
     async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<FindProfileResponseDto> {
-        const user = await this.usersRepository.findById(userId, { id: true });
-        if (!user) {
+        const existsUser = await this.existsByUserId(userId);
+        if (!existsUser) {
             throw new NotFoundException("User not exists.");
         }
 
         if (updateProfileDto.nickname) {
             // 닉네임 변경 시 이미 존재하는 닉네임이 있는지 체크해준다.
-            const existsNickname = await this.existsByNickname(updateProfileDto.nickname, user.id);
+            const existsNickname = await this.existsByNickname(updateProfileDto.nickname, userId);
 
             if (existsNickname) {
                 throw new BadRequestException("This nickname is already in use.");
             }
         }
 
-        return await this.usersRepository.updateById(user.id, updateProfileDto, {
+        return await this.usersRepository.updateById(userId, updateProfileDto, {
             id: true,
             email: true,
             name: true,
@@ -73,9 +78,8 @@ export class UsersService {
 
     @Transactional()
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
-        const user = await this.usersRepository.findById(userId);
-
-        if (!user) {
+        const existsUser = await this.existsByUserId(userId);
+        if (!existsUser) {
             throw new NotFoundException("User not exists.");
         }
 
