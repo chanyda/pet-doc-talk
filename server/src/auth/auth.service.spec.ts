@@ -2,9 +2,9 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
-import { LoginFrom } from "./auth.enums";
 import { AuthService } from "./auth.service";
 import { BadRequestException } from "@nestjs/common";
+import { LoginFrom } from "generated/prisma/enums";
 
 // @Transactional() 데코레이터 모킹 (원래 함수를 그대로 반환하도록 함)
 jest.mock("@nestjs-cls/transactional", () => ({

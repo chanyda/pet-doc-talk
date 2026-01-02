@@ -1,6 +1,6 @@
 import { IsEmail, IsEnum, IsString, MaxLength, MinLength } from "class-validator";
-import { LoginFrom } from "../auth.enums";
 import { ApiProperty } from "@nestjs/swagger";
+import { LoginFrom } from "generated/prisma/enums";
 
 export class LoginDto {
     @ApiProperty()

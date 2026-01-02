@@ -1,8 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
-import { LoginFrom } from "src/auth/auth.enums";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { LoginFrom } from "generated/prisma/enums";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {

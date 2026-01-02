@@ -1,8 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { LoginFrom } from "./auth.enums";
 import { BadRequestException } from "@nestjs/common";
+import { LoginFrom } from "generated/prisma/enums";
 
 describe("AuthController", () => {
     let authController: AuthController;
