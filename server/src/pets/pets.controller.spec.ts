@@ -12,6 +12,7 @@ describe("PetsController", () => {
     let petsService: PetsService;
 
     let createSpy: jest.SpyInstance;
+    let findByIdSpy: jest.SpyInstance;
 
     const now = Math.floor(Date.now() / 1000);
     const mockReq: AuthRequest = {
@@ -23,6 +24,8 @@ describe("PetsController", () => {
         },
     } as AuthRequest;
 
+    const TEST_PET_ID = 1;
+
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
             controllers: [PetsController],
@@ -31,6 +34,7 @@ describe("PetsController", () => {
                     provide: PetsService,
                     useValue: {
                         create: jest.fn(),
+                        findById: jest.fn(),
                     },
                 },
             ],
@@ -43,10 +47,45 @@ describe("PetsController", () => {
         petsService = moduleRef.get(PetsService);
 
         createSpy = jest.spyOn(petsService, "create");
+        findByIdSpy = jest.spyOn(petsService, "findById");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findById", () => {
+        it("펫 정보 가져오기에 성공하여 펫 정보를 반환한다.", async () => {
+            const mockPet = {
+                id: TEST_PET_ID,
+                name: "호두",
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                weight: new Decimal(5.85),
+                birthDate: "2025-01-01T00:00:00Z",
+                isNeutered: true,
+                imageUrl: "http://test.com",
+            };
+
+            findByIdSpy.mockResolvedValue(mockPet);
+
+            const result = await petsController.findById(mockReq, TEST_PET_ID);
+
+            expect(result).toEqual(mockPet);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("조회하려는 Pet이 존재하지 않아서 오류를 반환한다.", async () => {
+            findByIdSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
+
+            await expect(petsController.findById(mockReq, TEST_PET_ID)).rejects.toThrow(
+                new NotFoundException("Pet not exists."),
+            );
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("create", () => {
@@ -60,7 +99,7 @@ describe("PetsController", () => {
         describe("펫 생성 성공", () => {
             it("필수로 필요한 정보만으로 펫을 생성하여 펫 정보를 반환한다.", async () => {
                 const mockPet = {
-                    id: 1,
+                    id: TEST_PET_ID,
                     ...requiredCreatePetDto,
                     weight: null,
                     birthDate: null,
@@ -84,7 +123,7 @@ describe("PetsController", () => {
                     birthDate: "2025-01-01T00:00:00Z",
                 };
                 const mockPet = {
-                    id: 1,
+                    id: TEST_PET_ID,
                     ...createPetDto,
                     isNeutered: null,
                     imageUrl: null,
@@ -107,7 +146,7 @@ describe("PetsController", () => {
                     isNeutered: true,
                     imageUrl: "http://test.com",
                 };
-                const mockPet = { id: 1, ...createPetDto };
+                const mockPet = { id: TEST_PET_ID, ...createPetDto };
 
                 createSpy.mockResolvedValue(mockPet);
 
@@ -126,6 +165,8 @@ describe("PetsController", () => {
                 await expect(petsController.create(mockReq, requiredCreatePetDto)).rejects.toThrow(
                     new NotFoundException("User not exists."),
                 );
+                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, requiredCreatePetDto);
+                expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
     });

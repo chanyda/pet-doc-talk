@@ -19,8 +19,23 @@ describe("PetsService", () => {
 
     let existsByUserIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let findByIdSpy: jest.SpyInstance;
 
     const TEST_USER_ID = 1;
+    const TEST_PET_ID = 1;
+
+    // NOTE: 서비스의 private readonly PET_DETAIL_SELECT와 동일한 값이어야 함
+    const PET_DETAIL_SELECT = {
+        id: true,
+        name: true,
+        type: true,
+        gender: true,
+        breed: true,
+        weight: true,
+        birthDate: true,
+        isNeutered: true,
+        imageUrl: true,
+    };
 
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -30,12 +45,14 @@ describe("PetsService", () => {
                     provide: PetsRepository,
                     useValue: {
                         create: jest.fn(),
+                        findById: jest.fn(),
                     },
                 },
                 {
                     provide: UsersService,
                     useValue: {
                         existsByUserId: jest.fn(),
+                        findById: jest.fn(),
                     },
                 },
             ],
@@ -47,10 +64,45 @@ describe("PetsService", () => {
 
         existsByUserIdSpy = jest.spyOn(usersService, "existsByUserId");
         createSpy = jest.spyOn(petsRepository, "create");
+        findByIdSpy = jest.spyOn(petsRepository, "findById");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findById", () => {
+        it("펫 정보 가져오기에 성공하여 펫 정보를 반환한다.", async () => {
+            const mockPet = {
+                id: TEST_PET_ID,
+                name: "호두",
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                weight: new Decimal(5.85),
+                birthDate: "2025-01-01T00:00:00Z",
+                isNeutered: true,
+                imageUrl: "http://test.com",
+            };
+
+            findByIdSpy.mockResolvedValue(mockPet);
+
+            const result = await petsService.findById(TEST_PET_ID, TEST_USER_ID);
+
+            expect(result).toEqual(mockPet);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, PET_DETAIL_SELECT);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("조회하려는 Pet이 존재하지 않아서 오류를 반환한다.", async () => {
+            findByIdSpy.mockResolvedValue(null);
+
+            await expect(petsService.findById(TEST_PET_ID, TEST_USER_ID)).rejects.toThrow(
+                new NotFoundException("Pet not exists."),
+            );
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, PET_DETAIL_SELECT);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("create", () => {
@@ -61,22 +113,10 @@ describe("PetsService", () => {
             breed: "믹스",
         };
 
-        const selectPetOptions = {
-            id: true,
-            name: true,
-            type: true,
-            gender: true,
-            breed: true,
-            weight: true,
-            birthDate: true,
-            isNeutered: true,
-            imageUrl: true,
-        };
-
         describe("펫 생성 성공", () => {
             it("필수로 필요한 정보만으로 펫을 생성하여 펫 정보를 반환한다.", async () => {
                 const mockPet = {
-                    id: 1,
+                    id: TEST_PET_ID,
                     ...requiredCreatePetDto,
                     weight: null,
                     birthDate: null,
@@ -92,7 +132,7 @@ describe("PetsService", () => {
                 expect(result).toEqual(mockPet);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredCreatePetDto, selectPetOptions);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredCreatePetDto, PET_DETAIL_SELECT);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -103,7 +143,7 @@ describe("PetsService", () => {
                     birthDate: "2025-01-01T00:00:00Z",
                 };
                 const mockPet = {
-                    id: 1,
+                    id: TEST_PET_ID,
                     ...createPetDto,
                     isNeutered: null,
                     imageUrl: null,
@@ -117,7 +157,7 @@ describe("PetsService", () => {
                 expect(result).toEqual(mockPet);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, selectPetOptions);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, PET_DETAIL_SELECT);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -130,7 +170,7 @@ describe("PetsService", () => {
                     imageUrl: "http://test.com",
                 };
                 const mockPet = {
-                    id: 1,
+                    id: TEST_PET_ID,
                     ...createPetDto,
                 };
 
@@ -142,7 +182,7 @@ describe("PetsService", () => {
                 expect(result).toEqual(mockPet);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, selectPetOptions);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, PET_DETAIL_SELECT);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });

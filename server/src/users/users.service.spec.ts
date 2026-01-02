@@ -25,6 +25,14 @@ describe("UsersService", () => {
     const TEST_NICKNAME = "Tester";
     const TEST_USER_ID = 1;
 
+    const USER_SELECT = {
+        id: true,
+        email: true,
+        name: true,
+        nickname: true,
+        profileImageUrl: true,
+    };
+
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
             providers: [
@@ -140,14 +148,6 @@ describe("UsersService", () => {
     });
 
     describe("findProfile", () => {
-        const selectUserOptions = {
-            id: true,
-            email: true,
-            name: true,
-            nickname: true,
-            profileImageUrl: true,
-        };
-
         it("사용자의 프로필 찾기에 성공하여 정보를 반환한다.", async () => {
             const mockUserProfile = {
                 id: TEST_USER_ID,
@@ -162,7 +162,7 @@ describe("UsersService", () => {
             const result = await usersService.findProfile(TEST_USER_ID);
 
             expect(result).toEqual(mockUserProfile);
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, selectUserOptions);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
 
@@ -172,7 +172,7 @@ describe("UsersService", () => {
             await expect(usersService.findProfile(TEST_USER_ID)).rejects.toThrow(
                 new NotFoundException("User not exists."),
             );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, selectUserOptions);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
     });
@@ -198,14 +198,6 @@ describe("UsersService", () => {
             profileImageUrl: null,
         };
 
-        const updateSelectUserOption = {
-            id: true,
-            email: true,
-            name: true,
-            nickname: true,
-            profileImageUrl: true,
-        };
-
         describe("프로필 업데이트 성공", () => {
             it("nickname 변경에 성공하여 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = { nickname: "CHANGE_NICKNAME" };
@@ -224,7 +216,7 @@ describe("UsersService", () => {
                     id: true,
                 });
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -241,7 +233,7 @@ describe("UsersService", () => {
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -262,7 +254,7 @@ describe("UsersService", () => {
                     id: true,
                 });
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -278,7 +270,7 @@ describe("UsersService", () => {
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
         });
