@@ -39,10 +39,11 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
+    async updateById(userId: number, updateUserDto: UpdateUserDto, select?: UserSelect): Promise<IUser> {
         return this.txHost.tx.user.update({
             where: { id: userId },
             data: updateUserDto,
+            select,
         });
     }
 }
