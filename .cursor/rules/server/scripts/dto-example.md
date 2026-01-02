@@ -8,7 +8,7 @@ Reference: `server/src/auth/dto/login.dto.ts`, `server/src/users/dtos/create-use
 
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsString, MaxLength, MinLength, IsNotEmpty } from "class-validator";
-import { LoginFrom } from "src/auth/auth.enums";
+import { LoginFrom } from "generated/prisma/enums";
 
 export class Create{Domain}Dto {
     @ApiProperty({ description: "User email address" })
