@@ -32,9 +32,9 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async findByNickname(nickname: string, userId?: number, select?: UserSelect): Promise<IUser | null> {
+    async findByNickname(nickname: string, excludeUserId?: number, select?: UserSelect): Promise<IUser | null> {
         return this.txHost.tx.user.findUnique({
-            where: { nickname, NOT: { id: userId } },
+            where: { nickname, NOT: { id: excludeUserId } },
             select,
         });
     }

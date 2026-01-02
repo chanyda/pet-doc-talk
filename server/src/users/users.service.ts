@@ -20,8 +20,13 @@ export class UsersService {
         return this.usersRepository.findByEmail(email);
     }
 
-    async existsByNickname(nickname: string, userId?: number): Promise<boolean> {
-        const user = await this.usersRepository.findByNickname(nickname, userId, { id: true });
+    /**
+     * @param nickname
+     * @param excludeUserId 나를 제외한 사용자들 중 동일한 닉네임이 있는지 체크해야할 때 사용
+     * @returns
+     */
+    async existsByNickname(nickname: string, excludeUserId?: number): Promise<boolean> {
+        const user = await this.usersRepository.findByNickname(nickname, excludeUserId, { id: true });
         return !!user;
     }
 
