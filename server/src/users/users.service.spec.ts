@@ -342,7 +342,7 @@ describe("UsersService", () => {
             const result = await usersService.updateById(TEST_USER_ID, updateUserDto);
 
             expect(result).toEqual(updateMockUser);
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
             expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateUserDto);
             expect(updateByIdSpy).toHaveBeenCalledTimes(1);
@@ -354,7 +354,7 @@ describe("UsersService", () => {
             await expect(usersService.updateById(TEST_USER_ID, updateUserDto)).rejects.toThrow(
                 new NotFoundException("User not exists."),
             );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
             expect(updateByIdSpy).toHaveBeenCalledTimes(0);
         });
