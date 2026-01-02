@@ -17,4 +17,11 @@ export class PetsRepository implements IPetsRepository {
             select,
         });
     }
+
+    async findById(petId: number, userId: number, select?: PetSelect): Promise<IPet | null> {
+        return this.txHost.tx.pet.findFirst({
+            where: { id: petId, userId },
+            select,
+        });
+    }
 }
