@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "./users.repository";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
 import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
+import { UpdateProfileDto } from "./dtos/update-profile-dto";
 
 @Injectable()
 export class UsersService {
@@ -36,6 +37,30 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<FindProfileResponseDto> {
+        const user = await this.usersRepository.findById(userId, { id: true });
+        if (!user) {
+            throw new NotFoundException("User not exists.");
+        }
+
+        if (updateProfileDto.nickname) {
+            // 닉네임 변경 시 이미 존재하는 닉네임이 있는지 체크해준다.
+            const existsNickname = await this.existsByNickname(updateProfileDto.nickname, user.id);
+
+            if (existsNickname) {
+                throw new BadRequestException("This nickname is already in use.");
+            }
+        }
+
+        return await this.usersRepository.updateById(user.id, updateProfileDto, {
+            id: true,
+            email: true,
+            name: true,
+            nickname: true,
+            profileImageUrl: true,
+        });
     }
 
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
