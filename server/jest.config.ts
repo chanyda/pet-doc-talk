@@ -11,6 +11,7 @@ const config: Config = {
     transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
     moduleNameMapper: {
         "^src/(.*)$": "<rootDir>/$1",
+        "^generated/(.*)$": "<rootDir>/../generated/$1",
         "^nanoid(/(.*)|$)": "nanoid$1",
     },
 };
