@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
 import { LoginFrom } from "src/auth/auth.enums";
-import { NotFoundException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 
 describe("UsersService", () => {
     let usersService: UsersService;
@@ -168,6 +168,143 @@ describe("UsersService", () => {
             );
             expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, selectUserOptions);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("updateProfile", () => {
+        const mockUser = {
+            id: TEST_USER_ID,
+            email: TEST_EMAIL,
+            name: TEST_NAME,
+            nickname: TEST_NICKNAME,
+            loginFrom: LoginFrom.KAKAO,
+            profileImageUrl: null,
+            refreshToken: "",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+
+        const mockUserProfile = {
+            id: mockUser.id,
+            email: mockUser.email,
+            name: mockUser.name,
+            nickname: mockUser.nickname,
+            profileImageUrl: null,
+        };
+
+        const updateSelectUserOption = {
+            id: true,
+            email: true,
+            name: true,
+            nickname: true,
+            profileImageUrl: true,
+        };
+
+        describe("프로필 업데이트 성공", () => {
+            it("nickname 변경에 성공하여 프로필 정보를 반환한다.", async () => {
+                const updateProfileDto = { nickname: "CHANGE_NICKNAME" };
+                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+
+                findByIdSpy.mockResolvedValue(mockUser);
+                findByNicknameSpy.mockResolvedValue(null);
+                updateByIdSpy.mockResolvedValue(updateMockUserProfile);
+
+                const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
+
+                expect(result).toEqual(updateMockUserProfile);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledWith(updateMockUserProfile.nickname, TEST_USER_ID, {
+                    id: true,
+                });
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("profileImageUrl 변경에 성공하여 프로필 정보를 반환한다.", async () => {
+                const updateProfileDto = { profileImageUrl: "http://test.com" };
+                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+
+                findByIdSpy.mockResolvedValue(mockUser);
+                updateByIdSpy.mockResolvedValue(updateMockUserProfile);
+
+                const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
+
+                expect(result).toEqual(updateMockUserProfile);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("profileImageUrl, nickname 변경에 성공하여 프로필 정보를 반환한다.", async () => {
+                const updateProfileDto = { profileImageUrl: "http://test.com", nickname: "CHANGE_NICKNAME" };
+                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+
+                findByIdSpy.mockResolvedValue(mockUser);
+                findByNicknameSpy.mockResolvedValue(null);
+                updateByIdSpy.mockResolvedValue(updateMockUserProfile);
+
+                const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
+
+                expect(result).toEqual(updateMockUserProfile);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledWith(updateMockUserProfile.nickname, TEST_USER_ID, {
+                    id: true,
+                });
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("빈 객체가 넘어온 경우 업데이트할 요소가 없으므로 기존 프로필 정보를 반환한다.", async () => {
+                const updateProfileDto = {};
+
+                findByIdSpy.mockResolvedValue(mockUser);
+                updateByIdSpy.mockResolvedValue(mockUserProfile);
+
+                const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
+
+                expect(result).toEqual(mockUserProfile);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, updateSelectUserOption);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("프로필 업데이트 실패", () => {
+            const updateProfileDto = { nickname: "CHANGE_NICKNAME" };
+
+            it("변경하려는 유저 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue(null);
+
+                await expect(usersService.updateProfile(TEST_USER_ID, updateProfileDto)).rejects.toThrow(
+                    new NotFoundException("User not exists."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(0);
+            });
+
+            it("변경하려는 닉네임을 가진 사용자가 이미 존재하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue(mockUser);
+                findByNicknameSpy.mockResolvedValue({ id: 2 });
+
+                await expect(usersService.updateProfile(TEST_USER_ID, updateProfileDto)).rejects.toThrow(
+                    new BadRequestException("This nickname is already in use."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(findByNicknameSpy).toHaveBeenCalledWith(updateProfileDto.nickname, TEST_USER_ID, { id: true });
+                expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
+                expect(updateByIdSpy).toHaveBeenCalledTimes(0);
+            });
         });
     });
 
