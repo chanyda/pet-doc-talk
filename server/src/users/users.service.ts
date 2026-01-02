@@ -5,11 +5,13 @@ import { UpdateUserDto } from "./dtos/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
 import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
 import { UpdateProfileDto } from "./dtos/update-profile-dto";
+import { Transactional } from "@nestjs-cls/transactional";
 
 @Injectable()
 export class UsersService {
     constructor(private readonly usersRepository: UsersRepository) {}
 
+    @Transactional()
     create(createUserDto: CreateUserDto): Promise<IUser> {
         return this.usersRepository.create(createUserDto);
     }
@@ -39,6 +41,7 @@ export class UsersService {
         return user;
     }
 
+    @Transactional()
     async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<FindProfileResponseDto> {
         const user = await this.usersRepository.findById(userId, { id: true });
         if (!user) {
@@ -63,6 +66,7 @@ export class UsersService {
         });
     }
 
+    @Transactional()
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
         const user = await this.usersRepository.findById(userId);
 

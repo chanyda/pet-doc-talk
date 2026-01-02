@@ -4,6 +4,12 @@ import { UsersService } from "./users.service";
 import { LoginFrom } from "src/auth/auth.enums";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 
+jest.mock("@nestjs-cls/transactional", () => ({
+    Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
+        return descriptor;
+    },
+}));
+
 describe("UsersService", () => {
     let usersService: UsersService;
     let usersRepository: UsersRepository;
