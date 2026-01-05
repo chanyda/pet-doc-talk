@@ -54,6 +54,7 @@ export class UsersService {
     @Transactional()
     async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<FindProfileResponseDto> {
         const userExists = await this.existsByUserId(userId);
+
         if (!userExists) {
             throw new NotFoundException("User not exists.");
         }
@@ -79,6 +80,7 @@ export class UsersService {
     @Transactional()
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
         const userExists = await this.existsByUserId(userId);
+
         if (!userExists) {
             throw new NotFoundException("User not exists.");
         }

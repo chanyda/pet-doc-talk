@@ -203,7 +203,7 @@ describe("UsersService", () => {
                 const updateProfileDto = { nickname: "CHANGE_NICKNAME" };
                 const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
 
-                findByIdSpy.mockResolvedValue(mockUser);
+                findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 findByNicknameSpy.mockResolvedValue(null);
                 updateByIdSpy.mockResolvedValue(updateMockUserProfile);
 
@@ -224,7 +224,7 @@ describe("UsersService", () => {
                 const updateProfileDto = { profileImageUrl: "http://test.com" };
                 const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
 
-                findByIdSpy.mockResolvedValue(mockUser);
+                findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 updateByIdSpy.mockResolvedValue(updateMockUserProfile);
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
@@ -232,7 +232,7 @@ describe("UsersService", () => {
                 expect(result).toEqual(updateMockUserProfile);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
+                expect(findByNicknameSpy).not.toHaveBeenCalled();
                 expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
@@ -241,7 +241,7 @@ describe("UsersService", () => {
                 const updateProfileDto = { profileImageUrl: "http://test.com", nickname: "CHANGE_NICKNAME" };
                 const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
 
-                findByIdSpy.mockResolvedValue(mockUser);
+                findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 findByNicknameSpy.mockResolvedValue(null);
                 updateByIdSpy.mockResolvedValue(updateMockUserProfile);
 
@@ -261,7 +261,7 @@ describe("UsersService", () => {
             it("빈 객체가 넘어온 경우 업데이트할 요소가 없으므로 기존 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = {};
 
-                findByIdSpy.mockResolvedValue(mockUser);
+                findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 updateByIdSpy.mockResolvedValue(mockUserProfile);
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
@@ -269,7 +269,7 @@ describe("UsersService", () => {
                 expect(result).toEqual(mockUserProfile);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
+                expect(findByNicknameSpy).not.toHaveBeenCalled();
                 expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
@@ -286,12 +286,12 @@ describe("UsersService", () => {
                 );
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByNicknameSpy).toHaveBeenCalledTimes(0);
-                expect(updateByIdSpy).toHaveBeenCalledTimes(0);
+                expect(findByNicknameSpy).not.toHaveBeenCalled();
+                expect(updateByIdSpy).not.toHaveBeenCalled();
             });
 
             it("변경하려는 닉네임을 가진 사용자가 이미 존재하여 오류를 반환한다.", async () => {
-                findByIdSpy.mockResolvedValue(mockUser);
+                findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 findByNicknameSpy.mockResolvedValue({ id: 2 });
 
                 await expect(usersService.updateProfile(TEST_USER_ID, updateProfileDto)).rejects.toThrow(
@@ -301,7 +301,7 @@ describe("UsersService", () => {
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).toHaveBeenCalledWith(updateProfileDto.nickname, TEST_USER_ID, { id: true });
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
-                expect(updateByIdSpy).toHaveBeenCalledTimes(0);
+                expect(updateByIdSpy).not.toHaveBeenCalled();
             });
         });
     });
@@ -328,7 +328,7 @@ describe("UsersService", () => {
         it("사용자 정보 업데이트에 성공하여 업데이트된 User 정보를 반환한다.", async () => {
             const updateMockUser = { ...mockUser, ...updateUserDto };
 
-            findByIdSpy.mockResolvedValue(mockUser);
+            findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
             updateByIdSpy.mockResolvedValue(updateMockUser);
 
             const result = await usersService.updateById(TEST_USER_ID, updateUserDto);
@@ -348,7 +348,7 @@ describe("UsersService", () => {
             );
             expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
-            expect(updateByIdSpy).toHaveBeenCalledTimes(0);
+            expect(updateByIdSpy).not.toHaveBeenCalled();
         });
     });
 });

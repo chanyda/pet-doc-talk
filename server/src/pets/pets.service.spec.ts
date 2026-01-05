@@ -286,7 +286,7 @@ describe("PetsService", () => {
                 );
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledTimes(0);
+                expect(createSpy).not.toHaveBeenCalled();
             });
         });
     });
@@ -378,7 +378,7 @@ describe("PetsService", () => {
                 );
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(updateSpy).toHaveBeenCalledTimes(0);
+                expect(updateSpy).not.toHaveBeenCalled();
             });
         });
     });
@@ -405,7 +405,7 @@ describe("PetsService", () => {
             );
             expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
-            expect(deleteSpy).toHaveBeenCalledTimes(0);
+            expect(deleteSpy).not.toHaveBeenCalled();
         });
     });
 });
