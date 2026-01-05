@@ -52,8 +52,9 @@ export class PetsService {
 
     @Transactional()
     async create(userId: number, createPetDto: CreatePetDto): Promise<PetDetailResponseDto> {
-        const existsUser = await this.usersService.existsByUserId(userId);
-        if (!existsUser) {
+        const userExists = await this.usersService.existsByUserId(userId);
+
+        if (!userExists) {
             throw new NotFoundException("User not exists.");
         }
 

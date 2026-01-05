@@ -69,8 +69,8 @@ export class AuthService {
             try {
                 temporaryNickname = `user_${nanoid(10)}`;
 
-                const existsNickname = await this.usersService.existsByNickname(temporaryNickname);
-                exists = existsNickname;
+                const nicknameExists = await this.usersService.existsByNickname(temporaryNickname);
+                exists = nicknameExists;
             } catch (err) {
                 console.error(err);
             }
