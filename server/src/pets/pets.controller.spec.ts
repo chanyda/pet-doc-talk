@@ -15,6 +15,7 @@ describe("PetsController", () => {
     let findManySpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let updateSpy: jest.SpyInstance;
 
     const now = Math.floor(Date.now() / 1000);
     const mockReq: AuthRequest = {
@@ -38,6 +39,7 @@ describe("PetsController", () => {
                         findMany: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
+                        update: jest.fn(),
                     },
                 },
             ],
@@ -52,6 +54,7 @@ describe("PetsController", () => {
         findManySpy = jest.spyOn(petsService, "findMany");
         findByIdSpy = jest.spyOn(petsService, "findById");
         createSpy = jest.spyOn(petsService, "create");
+        updateSpy = jest.spyOn(petsService, "update");
     });
 
     afterEach(() => {
@@ -257,6 +260,88 @@ describe("PetsController", () => {
                 );
                 expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, requiredCreatePetDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("update", () => {
+        const mockPet = {
+            id: TEST_PET_ID,
+            name: "호두",
+            type: PetType.DOG,
+            gender: PetGender.MALE,
+            breed: "믹스",
+            weight: new Decimal(5.85),
+            birthDate: "2025-01-01T00:00:00Z",
+            isNeutered: true,
+            imageUrl: "http://test.com",
+        };
+
+        describe("펫 정보 업데이트 성공", () => {
+            it("단일 필드만 업데이트하여 수정된 펫 정보를 반환한다. (name)", async () => {
+                const updatePetDto = { name: "호동이" };
+                const mockUpdatePet = { ...mockPet, ...updatePetDto };
+
+                updateSpy.mockResolvedValue(mockUpdatePet);
+
+                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+
+                expect(result).toEqual(mockUpdatePet);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("일부 필드를 업데이트하여 수정된 펫 정보를 반환한다. (name, weight, imageUrl, birthDate)", async () => {
+                const updatePetDto = {
+                    name: "호동이",
+                    weight: new Decimal(10.8),
+                    birthDate: "2023-10-21T00:00:00Z",
+                    imageUrl: "http://test.com",
+                };
+                const mockUpdatePet = { ...mockPet, ...updatePetDto };
+
+                updateSpy.mockResolvedValue(mockUpdatePet);
+
+                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+
+                expect(result).toEqual(mockUpdatePet);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("모든 필드를 업데이트하여 수정된 펫 정보를 반환한다.", async () => {
+                const updatePetDto = {
+                    name: "호동이",
+                    gender: PetGender.FEMALE,
+                    breed: "포메라니안",
+                    weight: new Decimal(10.8),
+                    birthDate: "2023-10-21T00:00:00Z",
+                    isNeutered: false,
+                    imageUrl: "http://test.com",
+                };
+                const mockUpdatePet = { ...mockPet, ...updatePetDto };
+
+                updateSpy.mockResolvedValue(mockUpdatePet);
+
+                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+
+                expect(result).toEqual(mockUpdatePet);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("펫 정보 업데이트 실패", () => {
+            it("로그인한 유저에 대한 펫 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                const updatePetDto = { name: "호동이" };
+
+                updateSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
+
+                await expect(petsController.update(mockReq, TEST_PET_ID, updatePetDto)).rejects.toThrow(
+                    new NotFoundException("Pet not exists."),
+                );
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
