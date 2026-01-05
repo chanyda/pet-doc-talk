@@ -8,4 +8,5 @@ export interface IPetsRepository {
     findById(petId: number, userId: number, select?: PetSelect): Promise<IPet | null>;
     create(userId: number, createPetDto: CreatePetDto, select?: PetSelect): Promise<IPet>;
     update(petId: number, updatePetDto: UpdatePetDto, select?: PetSelect): Promise<IPet>;
+    delete(petId: number): Promise<void>;
 }
