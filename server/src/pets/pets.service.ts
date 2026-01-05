@@ -15,7 +15,7 @@ export class PetsService {
         gender: true,
         breed: true,
         imageUrl: true,
-    };
+    } as const;
     private readonly PET_DETAIL_SELECT = {
         ...this.PET_SUMMARY_SELECT,
         weight: true,
