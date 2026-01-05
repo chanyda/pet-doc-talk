@@ -24,8 +24,9 @@ export class PetSummaryDto {
     @IsNotEmpty()
     gender: PetGender;
 
-    @ApiProperty({ type: String, description: "The breed of pet.", maxLength: 100 })
+    @ApiProperty({ type: String, description: "The breed of pet.", minLength: 2, maxLength: 100 })
     @IsString()
+    @MinLength(2) // TODO: breed 정해지면 minLength 수정필요
     @MaxLength(100)
     @IsNotEmpty()
     breed: string;
