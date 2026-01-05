@@ -25,6 +25,8 @@ async function bootstrap() {
             },
             // 데이터에서 유효하지 않은 속성 자동 제거
             whitelist: true,
+            // 개발 환경에서만 어느 필드에 대한 validation error가 발생했는지 보여주고
+            // 실서버에서는 자세한 오류 메세지는 표시하지 않도록 한다. (보안상)
             disableErrorMessages:
                 configService.getOrThrow("app.nodeEnv", { infer: true }) === "development" ? false : true,
         }),
