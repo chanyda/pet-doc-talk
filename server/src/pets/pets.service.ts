@@ -78,4 +78,15 @@ export class PetsService {
 
         return this.petsRepository.update(petId, updatePetDto, this.PET_DETAIL_SELECT);
     }
+
+    @Transactional()
+    async remove(petId: number, userId: number): Promise<void> {
+        const petExists = await this.existsPetForUser(petId, userId);
+
+        if (!petExists) {
+            throw new NotFoundException("Pet not exists.");
+        }
+
+        await this.petsRepository.delete(petId);
+    }
 }

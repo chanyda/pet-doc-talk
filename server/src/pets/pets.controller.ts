@@ -1,4 +1,17 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    Query,
+    Req,
+    UseGuards,
+} from "@nestjs/common";
 import { PetsService } from "./pets.service";
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/auth/guards/auth.guard";
@@ -49,5 +62,13 @@ export class PetsController {
         @Body() updatePetDto: UpdatePetDto,
     ): Promise<PetDetailResponseDto> {
         return this.petsService.update(petId, req.user.userId, updatePetDto);
+    }
+
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOkResponse({ description: "Delete pet successful." })
+    @ApiNotFoundResponse({ description: "Pet not exists." })
+    remove(@Req() req: AuthRequest, @Param("id") petId: number): Promise<void> {
+        return this.petsService.remove(petId, req.user.userId);
     }
 }
