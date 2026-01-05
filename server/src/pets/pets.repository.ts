@@ -4,6 +4,7 @@ import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IPetsRepository } from "./interfaces/pets.repository.interface";
 import { CreatePetDto } from "./dtos/create-pet.dto";
+import { UpdatePetDto } from "./dtos/update-pet.dto";
 import { IPet } from "./interfaces/pets.interface";
 import { PetSelect } from "generated/prisma/models";
 
@@ -34,6 +35,14 @@ export class PetsRepository implements IPetsRepository {
     async create(userId: number, createPetDto: CreatePetDto, select?: PetSelect): Promise<IPet> {
         return this.txHost.tx.pet.create({
             data: { userId, ...createPetDto },
+            select,
+        });
+    }
+
+    async update(petId: number, updatePetDto: UpdatePetDto, select?: PetSelect): Promise<IPet> {
+        return this.txHost.tx.pet.update({
+            where: { id: petId },
+            data: updatePetDto,
             select,
         });
     }
