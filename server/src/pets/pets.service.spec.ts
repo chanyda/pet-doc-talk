@@ -23,6 +23,7 @@ describe("PetsService", () => {
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
+    let deleteSpy: jest.SpyInstance;
 
     const TEST_USER_ID = 1;
     const TEST_PET_ID = 1;
@@ -55,6 +56,7 @@ describe("PetsService", () => {
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
+                        delete: jest.fn(),
                     },
                 },
                 {
@@ -77,6 +79,7 @@ describe("PetsService", () => {
         findByIdSpy = jest.spyOn(petsRepository, "findById");
         createSpy = jest.spyOn(petsRepository, "create");
         updateSpy = jest.spyOn(petsRepository, "update");
+        deleteSpy = jest.spyOn(petsRepository, "delete");
     });
 
     afterEach(() => {
@@ -306,7 +309,7 @@ describe("PetsService", () => {
                 const updatePetDto = { name: "호동이" };
                 const mockUpdatePet = { ...mockPet, ...updatePetDto };
 
-                findByIdSpy.mockResolvedValue(mockPet);
+                findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
@@ -327,7 +330,7 @@ describe("PetsService", () => {
                 };
                 const mockUpdatePet = { ...mockPet, ...updatePetDto };
 
-                findByIdSpy.mockResolvedValue(mockPet);
+                findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
@@ -351,7 +354,7 @@ describe("PetsService", () => {
                 };
                 const mockUpdatePet = { ...mockPet, ...updatePetDto };
 
-                findByIdSpy.mockResolvedValue(mockPet);
+                findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
@@ -377,6 +380,32 @@ describe("PetsService", () => {
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(updateSpy).toHaveBeenCalledTimes(0);
             });
+        });
+    });
+
+    describe("remove", () => {
+        it("펫을 성공적으로 삭제한다.", async () => {
+            findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
+            deleteSpy.mockResolvedValue(undefined);
+
+            const result = await petsService.remove(TEST_PET_ID, TEST_USER_ID);
+
+            expect(result).toBeUndefined();
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+            expect(deleteSpy).toHaveBeenCalledWith(TEST_PET_ID);
+            expect(deleteSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("로그인한 유저에 대한 펫 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+            findByIdSpy.mockResolvedValue(null);
+
+            await expect(petsService.remove(TEST_PET_ID, TEST_USER_ID)).rejects.toThrow(
+                new NotFoundException("Pet not exists."),
+            );
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+            expect(deleteSpy).toHaveBeenCalledTimes(0);
         });
     });
 });

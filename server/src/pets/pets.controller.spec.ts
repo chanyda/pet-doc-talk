@@ -16,6 +16,7 @@ describe("PetsController", () => {
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
+    let removeSpy: jest.SpyInstance;
 
     const now = Math.floor(Date.now() / 1000);
     const mockReq: AuthRequest = {
@@ -40,6 +41,7 @@ describe("PetsController", () => {
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
+                        remove: jest.fn(),
                     },
                 },
             ],
@@ -55,6 +57,7 @@ describe("PetsController", () => {
         findByIdSpy = jest.spyOn(petsService, "findById");
         createSpy = jest.spyOn(petsService, "create");
         updateSpy = jest.spyOn(petsService, "update");
+        removeSpy = jest.spyOn(petsService, "remove");
     });
 
     afterEach(() => {
@@ -343,6 +346,28 @@ describe("PetsController", () => {
                 expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
             });
+        });
+    });
+
+    describe("remove", () => {
+        it("펫을 성공적으로 삭제한다.", async () => {
+            removeSpy.mockResolvedValue(undefined);
+
+            const result = await petsController.remove(mockReq, TEST_PET_ID);
+
+            expect(result).toBeUndefined();
+            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(removeSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("로그인한 유저에 대한 펫 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+            removeSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
+
+            await expect(petsController.remove(mockReq, TEST_PET_ID)).rejects.toThrow(
+                new NotFoundException("Pet not exists."),
+            );
+            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(removeSpy).toHaveBeenCalledTimes(1);
         });
     });
 });
