@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { PetsService } from "./pets.service";
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { AuthRequest } from "src/types/request.type";
 import { CreatePetDto } from "./dtos/create-pet.dto";
+import { UpdatePetDto } from "./dtos/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
 import { PetListResponseDto } from "./dtos/pet-list-response.dto";
 import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
@@ -36,5 +37,17 @@ export class PetsController {
     @ApiNotFoundResponse({ description: "User not exists." })
     create(@Req() req: AuthRequest, @Body() createPetDto: CreatePetDto): Promise<PetDetailResponseDto> {
         return this.petsService.create(req.user.userId, createPetDto);
+    }
+
+    @Patch(":id")
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Update pet successful.", type: PetDetailResponseDto })
+    @ApiNotFoundResponse({ description: "Pet not exists." })
+    update(
+        @Req() req: AuthRequest,
+        @Param("id") petId: number,
+        @Body() updatePetDto: UpdatePetDto,
+    ): Promise<PetDetailResponseDto> {
+        return this.petsService.update(petId, req.user.userId, updatePetDto);
     }
 }
