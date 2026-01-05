@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Decimal } from "@prisma/client/runtime/index-browser";
+import { Transform } from "class-transformer";
 import {
     IsBoolean,
     IsDateString,
@@ -47,17 +48,19 @@ export class CreatePetDto {
 
     @ApiPropertyOptional({ description: "The birth date of pet.", example: "2025-01-01T00:00:00Z" })
     @IsOptional()
+    @Transform(({ value }: { value: string }) => (value === "" ? null : value))
     @IsDateString()
-    birthDate?: string;
+    birthDate?: string | null;
 
     @ApiPropertyOptional({ description: "Whether the pet is neutered." })
     @IsOptional()
     @IsBoolean()
-    isNeutered?: boolean;
+    isNeutered?: boolean | null;
 
     @ApiPropertyOptional({ description: "The image URL of pet.", maxLength: 500 })
     @IsOptional()
+    @Transform(({ value }: { value: string }) => (value === "" ? null : value))
     @IsUrl({}, { message: "imageUrl must be a valid URL" })
     @MaxLength(500)
-    imageUrl?: string;
+    imageUrl?: string | null;
 }
