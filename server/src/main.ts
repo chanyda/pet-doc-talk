@@ -20,6 +20,13 @@ async function bootstrap() {
     app.useGlobalPipes(
         new ValidationPipe({
             transform: true,
+            transformOptions: {
+                enableImplicitConversion: true,
+            },
+            // 데이터에서 유효하지 않은 속성 자동 제거
+            whitelist: true,
+            disableErrorMessages:
+                configService.getOrThrow("app.nodeEnv", { infer: true }) === "development" ? false : true,
         }),
     );
     app.useGlobalInterceptors(new LoggingInterceptor());
