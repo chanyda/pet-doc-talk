@@ -6,13 +6,15 @@ import { NotFoundException } from "@nestjs/common";
 import { AuthRequest } from "src/types/request.type";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { Decimal } from "@prisma/client/runtime/index-browser";
+import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
 
 describe("PetsController", () => {
     let petsController: PetsController;
     let petsService: PetsService;
 
-    let createSpy: jest.SpyInstance;
+    let findManySpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
+    let createSpy: jest.SpyInstance;
 
     const now = Math.floor(Date.now() / 1000);
     const mockReq: AuthRequest = {
@@ -33,8 +35,9 @@ describe("PetsController", () => {
                 {
                     provide: PetsService,
                     useValue: {
-                        create: jest.fn(),
+                        findMany: jest.fn(),
                         findById: jest.fn(),
+                        create: jest.fn(),
                     },
                 },
             ],
@@ -46,12 +49,99 @@ describe("PetsController", () => {
         petsController = moduleRef.get(PetsController);
         petsService = moduleRef.get(PetsService);
 
-        createSpy = jest.spyOn(petsService, "create");
+        findManySpy = jest.spyOn(petsService, "findMany");
         findByIdSpy = jest.spyOn(petsService, "findById");
+        createSpy = jest.spyOn(petsService, "create");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findMany", () => {
+        // 우선 넘어온 cursor는 없다고 가정
+        const paginationQuery: PaginationQueryDto = { pageSize: 10 };
+
+        it("펫 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
+            const mockPets = Array.from({ length: paginationQuery.pageSize }, (_, i) => ({
+                id: i + 1,
+                name: `펫${i + 1}`,
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                imageUrl: null,
+            }));
+            const mockPetListResponse = { pets: mockPets, nextCursor: mockPets[mockPets.length - 1].id };
+
+            findManySpy.mockResolvedValue(mockPetListResponse);
+
+            const result = await petsController.findMany(mockReq, paginationQuery);
+
+            expect(result).toEqual(mockPetListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("펫 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
+            // 다음 페이지가 없으려면 조회된 펫 객체의 수가 pageSize보다 작아야하므로 -1 처리
+            const mockPets = Array.from({ length: paginationQuery.pageSize - 1 }, (_, i) => ({
+                id: i + 1,
+                name: `펫${i + 1}`,
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                imageUrl: null,
+            }));
+            const mockPetListResponse = { pets: mockPets, nextCursor: null };
+
+            findManySpy.mockResolvedValue(mockPetListResponse);
+
+            const result = await petsController.findMany(mockReq, paginationQuery);
+
+            expect(result).toEqual(mockPetListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("펫 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            const mockPetListResponse = { pets: [], nextCursor: null };
+
+            findManySpy.mockResolvedValue(mockPetListResponse);
+
+            const result = await petsController.findMany(mockReq, paginationQuery);
+
+            expect(result).toEqual(mockPetListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("cursor를 사용하여 다음 페이지의 펫 목록을 반환한다.", async () => {
+            const mockPetListResponse = {
+                pets: [
+                    {
+                        id: 11,
+                        name: "호두11",
+                        type: PetType.DOG,
+                        gender: PetGender.MALE,
+                        breed: "믹스",
+                        imageUrl: null,
+                    },
+                ],
+                nextCursor: null,
+            };
+            const cursor = 10;
+
+            findManySpy.mockResolvedValue(mockPetListResponse);
+
+            const result = await petsController.findMany(mockReq, {
+                ...paginationQuery,
+                cursor,
+            });
+
+            expect(result).toEqual(mockPetListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, cursor, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("findById", () => {

@@ -18,23 +18,29 @@ describe("PetsService", () => {
     let usersService: UsersService;
 
     let existsByUserIdSpy: jest.SpyInstance;
-    let createSpy: jest.SpyInstance;
+
+    let findManySpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
+    let createSpy: jest.SpyInstance;
 
     const TEST_USER_ID = 1;
     const TEST_PET_ID = 1;
 
-    // NOTE: 서비스의 private readonly PET_DETAIL_SELECT와 동일한 값이어야 함
-    const PET_DETAIL_SELECT = {
+    // NOTE: 서비스의 private readonly PET_SUMMARY_SELECT, PET_DETAIL_SELECT와 동일한 값이어야 함
+    const PET_SUMMARY_SELECT = {
         id: true,
         name: true,
         type: true,
         gender: true,
         breed: true,
+        imageUrl: true,
+    };
+
+    const PET_DETAIL_SELECT = {
+        ...PET_SUMMARY_SELECT,
         weight: true,
         birthDate: true,
         isNeutered: true,
-        imageUrl: true,
     };
 
     beforeEach(async () => {
@@ -44,8 +50,9 @@ describe("PetsService", () => {
                 {
                     provide: PetsRepository,
                     useValue: {
-                        create: jest.fn(),
+                        findMany: jest.fn(),
                         findById: jest.fn(),
+                        create: jest.fn(),
                     },
                 },
                 {
@@ -63,12 +70,89 @@ describe("PetsService", () => {
         usersService = moduleRef.get(UsersService);
 
         existsByUserIdSpy = jest.spyOn(usersService, "existsByUserId");
-        createSpy = jest.spyOn(petsRepository, "create");
+
+        findManySpy = jest.spyOn(petsRepository, "findMany");
         findByIdSpy = jest.spyOn(petsRepository, "findById");
+        createSpy = jest.spyOn(petsRepository, "create");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findMany", () => {
+        const PAGE_SIZE = 10;
+
+        it("펫 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
+            const mockPets = Array.from({ length: PAGE_SIZE }, (_, i) => ({
+                id: i + 1,
+                name: `호두${i + 1}`,
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                imageUrl: null,
+            }));
+
+            findManySpy.mockResolvedValue(mockPets);
+
+            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
+
+            expect(result).toEqual({ pets: mockPets, nextCursor: mockPets[mockPets.length - 1].id });
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("펫 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
+            // PAGE_SIZE보다 덜 조회되었다고 가정
+            const mockPets = Array.from({ length: PAGE_SIZE - 1 }, (_, i) => ({
+                id: i + 1,
+                name: `호두${i + 1}`,
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                imageUrl: null,
+            }));
+
+            findManySpy.mockResolvedValue(mockPets);
+
+            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
+
+            expect(result).toEqual({ pets: mockPets, nextCursor: null });
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("펫 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            findManySpy.mockResolvedValue([]);
+
+            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
+
+            expect(result).toEqual({ pets: [], nextCursor: null });
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("cursor를 사용하여 다음 페이지의 펫 목록을 조회한다.", async () => {
+            const mockPets = [
+                {
+                    id: 11,
+                    name: "호두11",
+                    type: PetType.DOG,
+                    gender: PetGender.MALE,
+                    breed: "믹스",
+                    imageUrl: null,
+                },
+            ];
+            const cursor = 10;
+
+            findManySpy.mockResolvedValue(mockPets);
+
+            const result = await petsService.findMany(TEST_USER_ID, cursor, PAGE_SIZE);
+
+            expect(result).toEqual({ pets: mockPets, nextCursor: null });
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, cursor, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("findById", () => {
