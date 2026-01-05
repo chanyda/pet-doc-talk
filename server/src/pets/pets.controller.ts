@@ -1,10 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { PetsService } from "./pets.service";
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { AuthRequest } from "src/types/request.type";
 import { CreatePetDto } from "./dtos/create-pet.dto";
 import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
+import { PetListResponseDto } from "./dtos/pet-list-response.dto";
+import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
 
 @ApiBearerAuth()
 @ApiTags("pets")
@@ -12,6 +14,13 @@ import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
 @Controller("pets")
 export class PetsController {
     constructor(private readonly petsService: PetsService) {}
+
+    @Get()
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Find pets successful.", type: PetListResponseDto })
+    findMany(@Req() req: AuthRequest, @Query() paginationQuery: PaginationQueryDto): Promise<PetListResponseDto> {
+        return this.petsService.findMany(req.user.userId, paginationQuery.cursor, paginationQuery.pageSize);
+    }
 
     @Get(":id")
     @HttpCode(HttpStatus.OK)
