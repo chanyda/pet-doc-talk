@@ -51,6 +51,7 @@ describe("AuthController", () => {
 
                 expect(result).toEqual({ accessToken, refreshToken, isNewUser: false });
                 expect(loginSpy).toHaveBeenCalledWith(loginDto);
+                expect(loginSpy).toHaveBeenCalledTimes(1);
             });
 
             it("신규 회원 - LoginResponse를 반환한다.", async () => {
@@ -60,6 +61,7 @@ describe("AuthController", () => {
 
                 expect(result).toEqual({ accessToken, refreshToken, isNewUser: true });
                 expect(loginSpy).toHaveBeenCalledWith(loginDto);
+                expect(loginSpy).toHaveBeenCalledTimes(1);
             });
         });
 
@@ -71,6 +73,7 @@ describe("AuthController", () => {
                     new BadRequestException("Already signed up using APPLE."),
                 );
                 expect(loginSpy).toHaveBeenCalledWith(loginDto);
+                expect(loginSpy).toHaveBeenCalledTimes(1);
             });
         });
     });

@@ -120,16 +120,16 @@ describe("UsersController", () => {
                 expect(updateProfileSpy).toHaveBeenCalledWith(mockReq.user.userId, updateProfileDto);
                 expect(updateProfileSpy).toHaveBeenCalledTimes(1);
             });
-        });
 
-        it("빈 객체가 넘어온 경우 업데이트할 요소가 없으므로 기존 프로필 정보를 반환한다.", async () => {
-            updateProfileSpy.mockResolvedValue(mockUserProfile);
+            it("빈 객체가 넘어온 경우 업데이트할 요소가 없으므로 기존 프로필 정보를 반환한다.", async () => {
+                updateProfileSpy.mockResolvedValue(mockUserProfile);
 
-            const result = await usersController.updateProfile(mockReq, {});
+                const result = await usersController.updateProfile(mockReq, {});
 
-            expect(result).toEqual(mockUserProfile);
-            expect(updateProfileSpy).toHaveBeenCalledWith(mockReq.user.userId, {});
-            expect(updateProfileSpy).toHaveBeenCalledTimes(1);
+                expect(result).toEqual(mockUserProfile);
+                expect(updateProfileSpy).toHaveBeenCalledWith(mockReq.user.userId, {});
+                expect(updateProfileSpy).toHaveBeenCalledTimes(1);
+            });
         });
 
         describe("프로필 업데이트 실패", () => {
