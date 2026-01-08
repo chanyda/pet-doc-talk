@@ -12,6 +12,7 @@
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "migrate:dev": "npx prisma generate && npx prisma migrate dev --name init",
+        "seed:dev": "npx prisma db seed",
         "test": "jest"
     },
     "dependencies": {
