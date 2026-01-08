@@ -29,12 +29,12 @@ export class PetsService {
         private readonly usersService: UsersService,
     ) {}
 
-    async findMany(userId: number, cursor: number | undefined, pageSize: number): Promise<PetListResponseDto> {
-        const pets = await this.petsRepository.findMany(userId, cursor, pageSize, this.PET_SUMMARY_SELECT);
+    async findMany(userId: number, cursor: number | undefined, limit: number): Promise<PetListResponseDto> {
+        const pets = await this.petsRepository.findMany(userId, cursor, limit, this.PET_SUMMARY_SELECT);
 
-        // 조회된 pet의 수가 pageSize와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
+        // 조회된 pet의 수가 limit와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
         // 동일하지 않은 경우 다음 페이지는 없다고 판단하여 null를 리턴한다.
-        const nextCursor = pets.length === pageSize ? pets[pets.length - 1].id : null;
+        const nextCursor = pets.length === limit ? pets[pets.length - 1].id : null;
         return {
             pets,
             nextCursor,

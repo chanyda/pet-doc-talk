@@ -33,7 +33,7 @@ export class PetsController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Find pets successful.", type: PetListResponseDto })
     findMany(@Req() req: AuthRequest, @Query() paginationQuery: PaginationQueryDto): Promise<PetListResponseDto> {
-        return this.petsService.findMany(req.user.userId, paginationQuery.cursor, paginationQuery.pageSize);
+        return this.petsService.findMany(req.user.userId, paginationQuery.cursor, paginationQuery.limit);
     }
 
     @Get(":id")

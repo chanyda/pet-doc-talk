@@ -66,10 +66,10 @@ describe("PetsController", () => {
 
     describe("findMany", () => {
         // 우선 넘어온 cursor는 없다고 가정
-        const paginationQuery: PaginationQueryDto = { pageSize: 10 };
+        const paginationQuery: PaginationQueryDto = { limit: 10 };
 
         it("펫 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
-            const mockPets = Array.from({ length: paginationQuery.pageSize }, (_, i) => ({
+            const mockPets = Array.from({ length: paginationQuery.limit }, (_, i) => ({
                 id: i + 1,
                 name: `펫${i + 1}`,
                 type: PetType.DOG,
@@ -84,13 +84,13 @@ describe("PetsController", () => {
             const result = await petsController.findMany(mockReq, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
         it("펫 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
-            // 다음 페이지가 없으려면 조회된 펫 객체의 수가 pageSize보다 작아야하므로 -1 처리
-            const mockPets = Array.from({ length: paginationQuery.pageSize - 1 }, (_, i) => ({
+            // 다음 페이지가 없으려면 조회된 펫 객체의 수가 limit보다 작아야하므로 -1 처리
+            const mockPets = Array.from({ length: paginationQuery.limit - 1 }, (_, i) => ({
                 id: i + 1,
                 name: `펫${i + 1}`,
                 type: PetType.DOG,
@@ -105,7 +105,7 @@ describe("PetsController", () => {
             const result = await petsController.findMany(mockReq, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -117,7 +117,7 @@ describe("PetsController", () => {
             const result = await petsController.findMany(mockReq, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -145,7 +145,7 @@ describe("PetsController", () => {
             });
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, cursor, paginationQuery.pageSize);
+            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, cursor, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
     });

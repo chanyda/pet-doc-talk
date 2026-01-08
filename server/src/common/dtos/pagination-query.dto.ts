@@ -11,7 +11,7 @@ export class PaginationQueryDto {
     @IsOptional()
     @IsInt()
     @Min(1)
-    // 과도한 요청을 방지하기 위해 pageSize의 최대값을 30으로 설정
+    // 과도한 요청을 방지하기 위해 limit의 최대값을 30으로 설정
     @Max(30)
-    pageSize: number = 10;
+    limit: number = 10;
 }
