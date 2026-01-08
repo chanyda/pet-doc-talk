@@ -1,4 +1,3 @@
-import { AuthRequest } from "src/types/request.type";
 import { PostsController } from "./posts.controller";
 import { PostsService } from "./posts.service";
 import { Test, TestingModule } from "@nestjs/testing";
@@ -10,16 +9,6 @@ describe("PostsController", () => {
     let postsService: PostsService;
 
     let createSpy: jest.SpyInstance;
-
-    const now = Math.floor(Date.now() / 1000);
-    const mockReq: AuthRequest = {
-        user: {
-            userId: 1,
-            email: "test@example.com",
-            iat: now,
-            exp: now + 10 * 24 * 60 * 60, // 10일 뒤
-        },
-    } as AuthRequest;
 
     const TEST_USER_ID = 1;
     const TEST_CATEGORY_ID = 1;
@@ -70,10 +59,10 @@ describe("PostsController", () => {
 
                 createSpy.mockResolvedValue(mockPost);
 
-                const result = await postsController.create(mockReq, createPostDto);
+                const result = await postsController.create(TEST_USER_ID, createPostDto);
 
                 expect(result).toEqual(mockPost);
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, createPostDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPostDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -82,20 +71,20 @@ describe("PostsController", () => {
             it("로그인한 유저에 대한 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
                 createSpy.mockRejectedValue(new NotFoundException("User not exists."));
 
-                await expect(postsController.create(mockReq, createPostDto)).rejects.toThrow(
+                await expect(postsController.create(TEST_USER_ID, createPostDto)).rejects.toThrow(
                     new NotFoundException("User not exists."),
                 );
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, createPostDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPostDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
             it("생성하려는 카테고리 id에 대한 카테고리 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
                 createSpy.mockRejectedValue(new NotFoundException("Category not exists."));
 
-                await expect(postsController.create(mockReq, createPostDto)).rejects.toThrow(
+                await expect(postsController.create(TEST_USER_ID, createPostDto)).rejects.toThrow(
                     new NotFoundException("Category not exists."),
                 );
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, createPostDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPostDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });

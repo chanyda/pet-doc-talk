@@ -3,7 +3,6 @@ import { PetsController } from "./pets.controller";
 import { PetsService } from "./pets.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { NotFoundException } from "@nestjs/common";
-import { AuthRequest } from "src/types/request.type";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { Decimal } from "@prisma/client/runtime/index-browser";
 import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
@@ -18,16 +17,7 @@ describe("PetsController", () => {
     let updateSpy: jest.SpyInstance;
     let removeSpy: jest.SpyInstance;
 
-    const now = Math.floor(Date.now() / 1000);
-    const mockReq: AuthRequest = {
-        user: {
-            userId: 1,
-            email: "test@example.com",
-            iat: now,
-            exp: now + 10 * 24 * 60 * 60, // 10일 뒤
-        },
-    } as AuthRequest;
-
+    const TEST_USER_ID = 1;
     const TEST_PET_ID = 1;
 
     beforeEach(async () => {
@@ -81,10 +71,10 @@ describe("PetsController", () => {
 
             findManySpy.mockResolvedValue(mockPetListResponse);
 
-            const result = await petsController.findMany(mockReq, paginationQuery);
+            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -102,10 +92,10 @@ describe("PetsController", () => {
 
             findManySpy.mockResolvedValue(mockPetListResponse);
 
-            const result = await petsController.findMany(mockReq, paginationQuery);
+            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -114,10 +104,10 @@ describe("PetsController", () => {
 
             findManySpy.mockResolvedValue(mockPetListResponse);
 
-            const result = await petsController.findMany(mockReq, paginationQuery);
+            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, undefined, paginationQuery.limit);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -139,13 +129,13 @@ describe("PetsController", () => {
 
             findManySpy.mockResolvedValue(mockPetListResponse);
 
-            const result = await petsController.findMany(mockReq, {
+            const result = await petsController.findMany(TEST_USER_ID, {
                 ...paginationQuery,
                 cursor,
             });
 
             expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(mockReq.user.userId, cursor, paginationQuery.limit);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, cursor, paginationQuery.limit);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
     });
@@ -166,20 +156,20 @@ describe("PetsController", () => {
 
             findByIdSpy.mockResolvedValue(mockPet);
 
-            const result = await petsController.findById(mockReq, TEST_PET_ID);
+            const result = await petsController.findById(TEST_USER_ID, TEST_PET_ID);
 
             expect(result).toEqual(mockPet);
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
 
         it("조회하려는 Pet이 존재하지 않아서 오류를 반환한다.", async () => {
             findByIdSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
 
-            await expect(petsController.findById(mockReq, TEST_PET_ID)).rejects.toThrow(
+            await expect(petsController.findById(TEST_USER_ID, TEST_PET_ID)).rejects.toThrow(
                 new NotFoundException("Pet not exists."),
             );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
     });
@@ -205,10 +195,10 @@ describe("PetsController", () => {
 
                 createSpy.mockResolvedValue(mockPet);
 
-                const result = await petsController.create(mockReq, requiredCreatePetDto);
+                const result = await petsController.create(TEST_USER_ID, requiredCreatePetDto);
 
                 expect(result).toEqual(mockPet);
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, requiredCreatePetDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredCreatePetDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -227,10 +217,10 @@ describe("PetsController", () => {
 
                 createSpy.mockResolvedValue(mockPet);
 
-                const result = await petsController.create(mockReq, createPetDto);
+                const result = await petsController.create(TEST_USER_ID, createPetDto);
 
                 expect(result).toEqual(mockPet);
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, createPetDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -246,10 +236,10 @@ describe("PetsController", () => {
 
                 createSpy.mockResolvedValue(mockPet);
 
-                const result = await petsController.create(mockReq, createPetDto);
+                const result = await petsController.create(TEST_USER_ID, createPetDto);
 
                 expect(result).toEqual(mockPet);
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, createPetDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -258,10 +248,10 @@ describe("PetsController", () => {
             it("로그인한 유저에 대한 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
                 createSpy.mockRejectedValue(new NotFoundException("User not exists."));
 
-                await expect(petsController.create(mockReq, requiredCreatePetDto)).rejects.toThrow(
+                await expect(petsController.create(TEST_USER_ID, requiredCreatePetDto)).rejects.toThrow(
                     new NotFoundException("User not exists."),
                 );
-                expect(createSpy).toHaveBeenCalledWith(mockReq.user.userId, requiredCreatePetDto);
+                expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredCreatePetDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -287,10 +277,10 @@ describe("PetsController", () => {
 
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
-                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+                const result = await petsController.update(TEST_USER_ID, TEST_PET_ID, updatePetDto);
 
                 expect(result).toEqual(mockUpdatePet);
-                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, updatePetDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -305,10 +295,10 @@ describe("PetsController", () => {
 
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
-                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+                const result = await petsController.update(TEST_USER_ID, TEST_PET_ID, updatePetDto);
 
                 expect(result).toEqual(mockUpdatePet);
-                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, updatePetDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -326,10 +316,10 @@ describe("PetsController", () => {
 
                 updateSpy.mockResolvedValue(mockUpdatePet);
 
-                const result = await petsController.update(mockReq, TEST_PET_ID, updatePetDto);
+                const result = await petsController.update(TEST_USER_ID, TEST_PET_ID, updatePetDto);
 
                 expect(result).toEqual(mockUpdatePet);
-                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, updatePetDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -340,10 +330,10 @@ describe("PetsController", () => {
 
                 updateSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
 
-                await expect(petsController.update(mockReq, TEST_PET_ID, updatePetDto)).rejects.toThrow(
+                await expect(petsController.update(TEST_USER_ID, TEST_PET_ID, updatePetDto)).rejects.toThrow(
                     new NotFoundException("Pet not exists."),
                 );
-                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId, updatePetDto);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, updatePetDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -353,20 +343,20 @@ describe("PetsController", () => {
         it("펫을 성공적으로 삭제한다.", async () => {
             removeSpy.mockResolvedValue(undefined);
 
-            const result = await petsController.remove(mockReq, TEST_PET_ID);
+            const result = await petsController.remove(TEST_USER_ID, TEST_PET_ID);
 
             expect(result).toBeUndefined();
-            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID);
             expect(removeSpy).toHaveBeenCalledTimes(1);
         });
 
         it("로그인한 유저에 대한 펫 정보를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
             removeSpy.mockRejectedValue(new NotFoundException("Pet not exists."));
 
-            await expect(petsController.remove(mockReq, TEST_PET_ID)).rejects.toThrow(
+            await expect(petsController.remove(TEST_USER_ID, TEST_PET_ID)).rejects.toThrow(
                 new NotFoundException("Pet not exists."),
             );
-            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, mockReq.user.userId);
+            expect(removeSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID);
             expect(removeSpy).toHaveBeenCalledTimes(1);
         });
     });

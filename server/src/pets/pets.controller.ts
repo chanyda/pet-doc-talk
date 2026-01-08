@@ -9,18 +9,17 @@ import {
     Patch,
     Post,
     Query,
-    Req,
     UseGuards,
 } from "@nestjs/common";
 import { PetsService } from "./pets.service";
 import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/auth/guards/auth.guard";
-import { AuthRequest } from "src/types/request.type";
 import { CreatePetDto } from "./dtos/create-pet.dto";
 import { UpdatePetDto } from "./dtos/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
 import { PetListResponseDto } from "./dtos/pet-list-response.dto";
 import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
+import { User } from "src/common/decorators/user.decorator";
 
 @ApiBearerAuth()
 @ApiTags("pets")
@@ -32,24 +31,27 @@ export class PetsController {
     @Get()
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Find pets successful.", type: PetListResponseDto })
-    findMany(@Req() req: AuthRequest, @Query() paginationQuery: PaginationQueryDto): Promise<PetListResponseDto> {
-        return this.petsService.findMany(req.user.userId, paginationQuery.cursor, paginationQuery.limit);
+    findMany(
+        @User("userId") userId: number,
+        @Query() paginationQuery: PaginationQueryDto,
+    ): Promise<PetListResponseDto> {
+        return this.petsService.findMany(userId, paginationQuery.cursor, paginationQuery.limit);
     }
 
     @Get(":id")
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Find pet successful.", type: PetDetailResponseDto })
     @ApiNotFoundResponse({ description: "Pet not exists." })
-    findById(@Req() req: AuthRequest, @Param("id") petId: number): Promise<PetDetailResponseDto> {
-        return this.petsService.findById(petId, req.user.userId);
+    findById(@User("userId") userId: number, @Param("id") petId: number): Promise<PetDetailResponseDto> {
+        return this.petsService.findById(petId, userId);
     }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
     @ApiCreatedResponse({ description: "Create pet successful.", type: PetDetailResponseDto })
     @ApiNotFoundResponse({ description: "User not exists." })
-    create(@Req() req: AuthRequest, @Body() createPetDto: CreatePetDto): Promise<PetDetailResponseDto> {
-        return this.petsService.create(req.user.userId, createPetDto);
+    create(@User("userId") userId: number, @Body() createPetDto: CreatePetDto): Promise<PetDetailResponseDto> {
+        return this.petsService.create(userId, createPetDto);
     }
 
     @Patch(":id")
@@ -57,18 +59,18 @@ export class PetsController {
     @ApiOkResponse({ description: "Update pet successful.", type: PetDetailResponseDto })
     @ApiNotFoundResponse({ description: "Pet not exists." })
     update(
-        @Req() req: AuthRequest,
+        @User("userId") userId: number,
         @Param("id") petId: number,
         @Body() updatePetDto: UpdatePetDto,
     ): Promise<PetDetailResponseDto> {
-        return this.petsService.update(petId, req.user.userId, updatePetDto);
+        return this.petsService.update(petId, userId, updatePetDto);
     }
 
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOkResponse({ description: "Delete pet successful." })
     @ApiNotFoundResponse({ description: "Pet not exists." })
-    remove(@Req() req: AuthRequest, @Param("id") petId: number): Promise<void> {
-        return this.petsService.remove(petId, req.user.userId);
+    remove(@User("userId") userId: number, @Param("id") petId: number): Promise<void> {
+        return this.petsService.remove(petId, userId);
     }
 }
