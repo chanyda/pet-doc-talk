@@ -1,14 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { PostsService } from "./posts.service";
-import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from "@nestjs/swagger";
-import { AuthGuard } from "src/auth/guards/auth.guard";
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePostDto } from "./dtos/create-post.dto";
 import { PostResponseDto } from "./dtos/post-response.dto";
 import { User } from "src/common/decorators/user.decorator";
+import { Auth } from "src/common/decorators/auth.decorator";
 
-@ApiBearerAuth()
 @ApiTags("posts")
-@UseGuards(AuthGuard)
+@Auth()
 @Controller("posts")
 export class PostsController {
     constructor(private readonly postsService: PostsService) {}

@@ -1,14 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { ApiBadRequestResponse, ApiBearerAuth, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { AuthGuard } from "src/auth/guards/auth.guard";
+import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
 import { UpdateProfileDto } from "./dtos/update-profile-dto";
 import { User } from "src/common/decorators/user.decorator";
+import { Auth } from "src/common/decorators/auth.decorator";
 
-@ApiBearerAuth()
 @ApiTags("users")
-@UseGuards(AuthGuard)
+@Auth()
 @Controller("users")
 export class UsersController {
     constructor(private usersService: UsersService) {}

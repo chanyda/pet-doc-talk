@@ -1,29 +1,16 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Param,
-    Patch,
-    Post,
-    Query,
-    UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { PetsService } from "./pets.service";
-import { ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { AuthGuard } from "src/auth/guards/auth.guard";
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePetDto } from "./dtos/create-pet.dto";
 import { UpdatePetDto } from "./dtos/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
 import { PetListResponseDto } from "./dtos/pet-list-response.dto";
 import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
 import { User } from "src/common/decorators/user.decorator";
+import { Auth } from "src/common/decorators/auth.decorator";
 
-@ApiBearerAuth()
 @ApiTags("pets")
-@UseGuards(AuthGuard)
+@Auth()
 @Controller("pets")
 export class PetsController {
     constructor(private readonly petsService: PetsService) {}
