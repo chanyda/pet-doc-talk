@@ -14,6 +14,7 @@ import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-pr
 import { PrismaService } from "./prisma/prisma.service";
 import { PetsModule } from "./pets/pets.module";
 import { CategoriesModule } from "./categories/categories.module";
+import { PostsModule } from "./posts/posts.module";
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { CategoriesModule } from "./categories/categories.module";
         AuthModule,
         PetsModule,
         CategoriesModule,
+        PostsModule,
     ],
     providers: [AuthService],
 })
