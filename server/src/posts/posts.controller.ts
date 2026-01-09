@@ -1,16 +1,27 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
 import { PostsService } from "./posts.service";
-import { ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from "@nestjs/swagger";
+import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePostDto } from "./dtos/create-post.dto";
 import { PostResponseDto } from "./dtos/post-response.dto";
 import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
+import { Public } from "src/common/decorators/public.decorator";
+import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
+import { PostListResponseDto } from "./dtos/post-list-response.dto";
 
 @ApiTags("posts")
 @Auth()
 @Controller("posts")
 export class PostsController {
     constructor(private readonly postsService: PostsService) {}
+
+    @Get()
+    @Public()
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Find posts successful.", type: PostListResponseDto })
+    findMany(@Query() findPostListQuery: FindPostListQueryDto): Promise<PostListResponseDto> {
+        return this.postsService.findMany(findPostListQuery);
+    }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
