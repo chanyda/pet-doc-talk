@@ -4,6 +4,8 @@ import { PostsService } from "./posts.service";
 import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
 import { NotFoundException } from "@nestjs/common";
+import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
+import { PostOrderBy } from "./posts.enums";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -19,6 +21,8 @@ describe("PostsService", () => {
 
     let existsByUserIdSpy: jest.SpyInstance;
     let existsByCategoryIdSpy: jest.SpyInstance;
+
+    let findManySpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
 
     const TEST_USER_ID = 1;
@@ -30,6 +34,7 @@ describe("PostsService", () => {
                 {
                     provide: PostsRepository,
                     useValue: {
+                        findMany: jest.fn(),
                         create: jest.fn(),
                     },
                 },
@@ -55,11 +60,379 @@ describe("PostsService", () => {
 
         existsByUserIdSpy = jest.spyOn(usersService, "existsByUserId");
         existsByCategoryIdSpy = jest.spyOn(categoriesService, "existsByCategoryId");
+
+        findManySpy = jest.spyOn(postsRepository, "findMany");
         createSpy = jest.spyOn(postsRepository, "create");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findMany", () => {
+        const selectInput = {
+            id: true,
+            title: true,
+            viewCount: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+                select: { id: true, nickname: true },
+            },
+            category: {
+                select: { id: true, name: true },
+            },
+        };
+        const requiredQuery: FindPostListQueryDto = { limit: 10, orderBy: PostOrderBy.CREATED_AT };
+
+        describe("Pagination", () => {
+            it("조회 결과가 없을 때 빈 배열과 nextCursor: null를 반환한다.", async () => {
+                findManySpy.mockResolvedValue([]);
+
+                const result = await postsService.findMany(requiredQuery);
+
+                expect(result).toEqual({ posts: [], nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: requiredQuery.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {},
+                    orderBy: { createdAt: "desc" },
+                });
+            });
+
+            it("limit만 전달하여 게시글 목록을 조회한다.", async () => {
+                const mockPost = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                    id: i + 1,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: i + 1,
+                        name: `카테고리${i + 1}`,
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(requiredQuery);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: mockPost[mockPost.length - 1].id });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: requiredQuery.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {},
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("cursor와 limit만 전달하여 게시글 목록을 조회한다.", async () => {
+                // 이전 페이지의 마지막 postId가 10이라고 가정
+                const query = { ...requiredQuery, cursor: 10 };
+                const mockPost = Array.from({ length: query.limit }, (_, i) => ({
+                    id: i + 10,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: i + 1,
+                        name: `카테고리${i + 1}`,
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: mockPost[mockPost.length - 1].id });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    // cursor가 있으므로 skip와 cursor를 정의
+                    skip: 1,
+                    cursor: { id: query.cursor },
+                    select: selectInput,
+                    where: {},
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("cursor와 limit만 전달하여 게시글 목록을 조회하고 마지막 페이지일 때 nextCursor가 null로 반환된다.", async () => {
+                // 이전 페이지의 마지막 postId가 10이라고 가정
+                const query = { ...requiredQuery, cursor: 10 };
+                const mockPost = [
+                    {
+                        id: 11,
+                        title: "게시글 제목",
+                        viewCount: 0,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        user: {
+                            id: 1,
+                            nickname: "닉네임1",
+                        },
+                        category: {
+                            id: 1,
+                            name: "카테고리1",
+                        },
+                    },
+                ];
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    // cursor가 있으므로 skip와 cursor를 정의
+                    skip: 1,
+                    cursor: { id: query.cursor },
+                    select: selectInput,
+                    where: {},
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("Filtering", () => {
+            it("categoryId를 전달하여 특정 카테고리의 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, categoryId: 2 };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: 2,
+                        name: "카테고리2",
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {
+                        categoryId: query.categoryId,
+                    },
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("categoryId와 cursor를 전달하여 특정 카테고리의 다음 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, categoryId: 2, cursor: 10 };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 10,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: 2,
+                        name: "카테고리2",
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: 1,
+                    cursor: { id: query.cursor },
+                    select: selectInput,
+                    where: {
+                        categoryId: query.categoryId,
+                    },
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("Searching", () => {
+            it("keyword를 전달하여 제목 또는 내용에 검색어가 포함된 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, keyword: "제목" };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: i + 1,
+                        name: `카테고리${i + 1}`,
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {
+                        OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
+                    },
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("keyword와 categoryId를 전달하여 특정 카테고리 내 제목 또는 내용에 검색어가 포함된 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, keyword: "제목", categoryId: 1 };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: 1,
+                        name: "카테고리1",
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {
+                        categoryId: query.categoryId,
+                        OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
+                    },
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("keyword와 categoryId와 cursor를 전달하여 특정 카테고리 내 제목 또는 내용에 검색어가 포함된 다음 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, keyword: "제목", categoryId: 1, cursor: 10 };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 10,
+                    title: "게시글 제목",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: 1,
+                        name: "카테고리1",
+                    },
+                }));
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: 1,
+                    cursor: { id: query.cursor },
+                    select: selectInput,
+                    where: {
+                        categoryId: query.categoryId,
+                        OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
+                    },
+                    orderBy: { createdAt: "desc" },
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("Sorting", () => {
+            it("orderBy를 viewCount로 전달하여 조회순으로 정렬된 게시글 목록을 조회한다.", async () => {
+                const query = { ...requiredQuery, orderBy: PostOrderBy.VIEW_COUNT };
+                const mockPost = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    title: "게시글 제목",
+                    viewCount: i + 10,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: i + 1,
+                        nickname: `닉네임${i + 1}`,
+                    },
+                    category: {
+                        id: i + 1,
+                        name: `카테고리${i + 1}`,
+                    },
+                })).reverse();
+
+                findManySpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.findMany(query);
+
+                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(findManySpy).toHaveBeenCalledWith({
+                    take: query.limit,
+                    skip: undefined,
+                    cursor: undefined,
+                    select: selectInput,
+                    where: {},
+                    orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
+                });
+                expect(findManySpy).toHaveBeenCalledTimes(1);
+            });
+
+            // TODO: 게시글 좋아요 기능 추가 시 좋아요순 정렬에 대한 테스트 코드 작성 필요
+        });
     });
 
     describe("create", () => {

@@ -3,11 +3,14 @@ import { PostsService } from "./posts.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { NotFoundException } from "@nestjs/common";
+import { PostOrderBy } from "./posts.enums";
+import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
 
 describe("PostsController", () => {
     let postsController: PostsController;
     let postsService: PostsService;
 
+    let findManySpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
 
     const TEST_USER_ID = 1;
@@ -20,6 +23,7 @@ describe("PostsController", () => {
                 {
                     provide: PostsService,
                     useValue: {
+                        findMany: jest.fn(),
                         create: jest.fn(),
                     },
                 },
@@ -32,11 +36,82 @@ describe("PostsController", () => {
         postsController = moduleRef.get(PostsController);
         postsService = moduleRef.get(PostsService);
 
+        findManySpy = jest.spyOn(postsService, "findMany");
         createSpy = jest.spyOn(postsService, "create");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findMany", () => {
+        const requiredQuery: FindPostListQueryDto = { limit: 10, orderBy: PostOrderBy.CREATED_AT, keyword: "제목" };
+
+        it("게시글 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
+            const mockPosts = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                id: i + 1,
+                title: "게시글 제목",
+                viewCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                user: {
+                    id: i + 1,
+                    nickname: `닉네임${i + 1}`,
+                },
+                category: {
+                    id: i + 1,
+                    name: `카테고리${i + 1}`,
+                },
+            }));
+            const mockPostListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
+
+            findManySpy.mockResolvedValue(mockPostListResponse);
+
+            const result = await postsController.findMany(requiredQuery);
+
+            expect(result).toEqual(mockPostListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("게시글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
+            const mockPosts = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                id: i + 1,
+                title: "게시글 제목",
+                viewCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                user: {
+                    id: i + 1,
+                    nickname: `닉네임${i + 1}`,
+                },
+                category: {
+                    id: i + 1,
+                    name: `카테고리${i + 1}`,
+                },
+            }));
+            const mockPostListResponse = { posts: mockPosts, nextCursor: null };
+
+            findManySpy.mockResolvedValue(mockPostListResponse);
+
+            const result = await postsController.findMany(requiredQuery);
+
+            expect(result).toEqual(mockPostListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("게시글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            const mockPostListResponse = { posts: [], nextCursor: null };
+
+            findManySpy.mockResolvedValue(mockPostListResponse);
+
+            const result = await postsController.findMany(requiredQuery);
+
+            expect(result).toEqual(mockPostListResponse);
+            expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
+            expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("create", () => {
