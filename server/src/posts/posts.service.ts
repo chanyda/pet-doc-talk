@@ -2,8 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { PostsRepository } from "./posts.repository";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
 import { PostResponseDto } from "./dtos/responses/post-response.dto";
-import { CreatePostDto } from "./dtos/create-post.dto";
-import { PostResponseDto } from "./dtos/post-response.dto";
+import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
 import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
@@ -54,6 +53,36 @@ export class PostsService {
             posts,
             nextCursor,
         };
+    }
+
+    async findById(postId: number): Promise<PostDetailResponseDto> {
+        // TODO: 좋아요와 댓글 기능 추가 시 실제 likeCount, commentCount, isLiked 계산
+        const selectInput: PostSelect = {
+            id: true,
+            title: true,
+            content: true,
+            viewCount: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+                select: { id: true, nickname: true, profileImageUrl: true },
+            },
+            category: {
+                select: { id: true, name: true },
+            },
+        };
+
+        const post = await this.postsRepository.findById(postId, selectInput);
+
+        if (!post) {
+            throw new NotFoundException("Post not exists.");
+        }
+
+        // NOTE: 본인의 게시글을 클릭했을 때에도 viewCount를 올릴지 생각해보자. 우선은 클릭하면 viewCount+1 되도록 함
+        const { viewCount: updatedViewCount } = await this.postsRepository.updateViewCount(postId);
+        post.viewCount = updatedViewCount;
+
+        return post;
     }
 
     @Transactional()
