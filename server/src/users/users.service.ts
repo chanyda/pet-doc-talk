@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "./users.repository";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { UpdateUserDto } from "./dtos/update-user.dto";
+import { CreateUserDto } from "./dtos/requests/create-user.dto";
+import { UpdateUserDto } from "./dtos/requests/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
-import { FindProfileResponseDto } from "./dtos/find-profile-response.dto";
-import { UpdateProfileDto } from "./dtos/update-profile-dto";
+import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
+import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
 import { Transactional } from "@nestjs-cls/transactional";
 
 @Injectable()

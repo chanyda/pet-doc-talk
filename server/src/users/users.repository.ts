@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IUsersRepository } from "./interfaces/users.repository.interface";
-import { CreateUserDto } from "./dtos/create-user.dto";
-import { UpdateUserDto } from "./dtos/update-user.dto";
+import { CreateUserDto } from "./dtos/requests/create-user.dto";
+import { UpdateUserDto } from "./dtos/requests/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";

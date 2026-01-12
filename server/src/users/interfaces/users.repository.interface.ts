@@ -1,6 +1,6 @@
 import { UserSelect } from "generated/prisma/models";
-import { CreateUserDto } from "../dtos/create-user.dto";
-import { UpdateUserDto } from "../dtos/update-user.dto";
+import { CreateUserDto } from "../dtos/requests/create-user.dto";
+import { UpdateUserDto } from "../dtos/requests/update-user.dto";
 import { IUser } from "./users.interface";
 
 export interface IUsersRepository {
