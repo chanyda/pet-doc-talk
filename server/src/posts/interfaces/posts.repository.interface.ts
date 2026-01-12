@@ -1,5 +1,5 @@
 import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
-import { CreatePostDto } from "../dtos/create-post.dto";
+import { CreatePostDto } from "../dtos/requests/create-post.dto";
 import { IPost } from "./posts.interface";
 import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
 

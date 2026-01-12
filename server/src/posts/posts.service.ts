@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PostsRepository } from "./posts.repository";
+import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { CreatePostDto } from "./dtos/create-post.dto";
 import { PostResponseDto } from "./dtos/post-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
 import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
-import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
-import { PostListResponseDto } from "./dtos/post-list-response.dto";
+import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
+import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
 import { PostOrderByWithRelationInput, PostSelect, PostWhereInput } from "generated/prisma/models";
 import { PostOrderBy } from "./posts.enums";
 

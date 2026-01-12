@@ -1,13 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { CreatePostDto } from "./dtos/create-post.dto";
 import { PostResponseDto } from "./dtos/post-response.dto";
 import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
 import { Public } from "src/common/decorators/public.decorator";
-import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
-import { PostListResponseDto } from "./dtos/post-list-response.dto";
+import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
+import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
 
 @ApiTags("posts")
 @Auth()

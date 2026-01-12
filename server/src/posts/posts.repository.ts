@@ -3,7 +3,7 @@ import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-pr
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IPostsRepository } from "./interfaces/posts.repository.interface";
-import { CreatePostDto } from "./dtos/create-post.dto";
+import { CreatePostDto } from "./dtos/requests/create-post.dto";
 import { IPost } from "./interfaces/posts.interface";
 import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
 import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
