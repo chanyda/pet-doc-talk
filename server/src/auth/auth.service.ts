@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { LoginDto } from "./dto/login.dto";
+import { LoginDto } from "./dtos/requests/login.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { GenerateTokenResponseDto, LoginResponseDto } from "./dto/login-response.dto";
+import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/login-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
 import { ConfigType } from "src/types/config.type";
 import { nanoid } from "nanoid";
