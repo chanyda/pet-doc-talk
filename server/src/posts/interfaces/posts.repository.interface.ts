@@ -5,5 +5,6 @@ import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
 
 export interface IPostsRepository {
     findMany<T extends PostFindManyArgs>(params: SelectSubset<T, PostFindManyArgs>): Promise<PostGetPayload<T>[]>;
+    findById<T extends PostSelect>(postId: number, select: T): Promise<PostGetPayload<{ select: T }> | null>;
     create(userId: number, createPostDto: CreatePostDto, select?: PostSelect): Promise<IPost>;
 }

@@ -20,6 +20,17 @@ export class PostsRepository implements IPostsRepository {
         return this.txHost.tx.post.findMany(params);
     }
 
+    // 다른 함수와 달리 select를 필수로 받는 이유:
+    // select가 옵셔널이면 Prisma가 Post의 모든 필드를 반환하는 기본 타입으로 추론됨 (user, category 제외)
+    // select를 필수로 받으면 Prisma가 select에 지정된 필드만 포함한 타입으로 정확히 추론함 (user, category 포함)
+    // findById는 user, category 등 관계 데이터를 포함한 타입을 반환해야 하므로 select를 필수로 받음
+    async findById<T extends PostSelect>(postId: number, select: T): Promise<PostGetPayload<{ select: T }> | null> {
+        return this.txHost.tx.post.findUnique({
+            where: { id: postId },
+            select,
+        });
+    }
+
     async create(userId: number, createPostDto: CreatePostDto, select?: PostSelect): Promise<IPost> {
         return this.txHost.tx.post.create({
             data: { userId, ...createPostDto },
