@@ -5,7 +5,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { NotFoundException } from "@nestjs/common";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { Decimal } from "@prisma/client/runtime/index-browser";
-import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 
 describe("PetsController", () => {
     let petsController: PetsController;

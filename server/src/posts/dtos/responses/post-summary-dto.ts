@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { PostCategoryDto } from "./categories/post-category.dto";
-import { UserPublicDto } from "src/common/dtos/users/user-public.dto";
+import { UserPublicDto } from "src/common/dtos/responses/users/user-public.dto";
 
 export class PostSummaryDto {
     @ApiProperty({ description: "The ID of post." })

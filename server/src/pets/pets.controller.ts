@@ -5,7 +5,7 @@ import { CreatePetDto } from "./dtos/create-pet.dto";
 import { UpdatePetDto } from "./dtos/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
 import { PetListResponseDto } from "./dtos/pet-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
 

@@ -1,4 +1,4 @@
-import { PaginationQueryDto } from "src/common/dtos/pagination-query.dto";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from "class-validator";
 import { PostOrderBy } from "src/posts/posts.enums";
