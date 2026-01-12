@@ -19,6 +19,7 @@ export class PostsController {
     @Public()
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Find posts successful.", type: PostListResponseDto })
+    // TODO: 좋아요 기능 추가 시 userId를 받아서 로그인한 사용자가 좋아요를 누른 게시글인지 보여줘야함
     findMany(@Query() findPostListQuery: FindPostListQueryDto): Promise<PostListResponseDto> {
         return this.postsService.findMany(findPostListQuery);
     }
