@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PetsRepository } from "./pets.repository";
-import { CreatePetDto } from "./dtos/create-pet.dto";
-import { UpdatePetDto } from "./dtos/update-pet.dto";
+import { CreatePetDto } from "./dtos/requests/create-pet.dto";
+import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
 import { Transactional } from "@nestjs-cls/transactional";
-import { PetDetailResponseDto } from "./dtos/pet-detail-response.dto";
+import { PetDetailResponseDto } from "./dtos/responses/pet-detail-response.dto";
 import { UsersService } from "src/users/users.service";
-import { PetListResponseDto } from "./dtos/pet-list-response.dto";
+import { PetListResponseDto } from "./dtos/responses/pet-list-response.dto";
 
 @Injectable()
 export class PetsService {

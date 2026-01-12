@@ -3,8 +3,8 @@ import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-pr
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IPetsRepository } from "./interfaces/pets.repository.interface";
-import { CreatePetDto } from "./dtos/create-pet.dto";
-import { UpdatePetDto } from "./dtos/update-pet.dto";
+import { CreatePetDto } from "./dtos/requests/create-pet.dto";
+import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
 import { IPet } from "./interfaces/pets.interface";
 import { PetSelect } from "generated/prisma/models";
 
