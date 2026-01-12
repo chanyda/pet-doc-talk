@@ -4,15 +4,17 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { NotFoundException } from "@nestjs/common";
 import { PostOrderBy } from "./posts.enums";
-import { FindPostListQueryDto } from "./dtos/find-post-list-query.dto";
+import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 
 describe("PostsController", () => {
     let postsController: PostsController;
     let postsService: PostsService;
 
     let findManySpy: jest.SpyInstance;
+    let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
 
+    const TEST_POST_ID = 1;
     const TEST_USER_ID = 1;
     const TEST_CATEGORY_ID = 1;
 
@@ -24,6 +26,7 @@ describe("PostsController", () => {
                     provide: PostsService,
                     useValue: {
                         findMany: jest.fn(),
+                        findById: jest.fn(),
                         create: jest.fn(),
                     },
                 },
@@ -37,6 +40,7 @@ describe("PostsController", () => {
         postsService = moduleRef.get(PostsService);
 
         findManySpy = jest.spyOn(postsService, "findMany");
+        findByIdSpy = jest.spyOn(postsService, "findById");
         createSpy = jest.spyOn(postsService, "create");
     });
 
@@ -111,6 +115,46 @@ describe("PostsController", () => {
             expect(result).toEqual(mockPostListResponse);
             expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
             expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("findById", () => {
+        it("게시글 상세 조회에 성공하여 게시글을 반환한다.", async () => {
+            const post = {
+                id: 1,
+                title: "게시글 제목",
+                content: "게시글 내용",
+                viewCount: 1,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                user: {
+                    id: TEST_USER_ID,
+                    nickname: "Tester",
+                    profileImageUrl: "http://test.com",
+                },
+                category: {
+                    id: 1,
+                    name: "건강·상담·병원",
+                },
+            };
+
+            findByIdSpy.mockResolvedValue(post);
+
+            const result = await postsController.findById(TEST_POST_ID);
+
+            expect(result).toEqual(post);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("조회하려는 id에 대한 게시글을 찾지 못하여 오류를 반환한다.", async () => {
+            findByIdSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+
+            await expect(postsController.findById(TEST_POST_ID)).rejects.toThrow(
+                new NotFoundException("Post not exists."),
+            );
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
+            expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
     });
 
