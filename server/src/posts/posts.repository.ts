@@ -37,4 +37,11 @@ export class PostsRepository implements IPostsRepository {
             select,
         });
     }
+
+    async updateViewCount(postId: number): Promise<IPost> {
+        return this.txHost.tx.post.update({
+            where: { id: postId },
+            data: { viewCount: { increment: 1 } },
+        });
+    }
 }
