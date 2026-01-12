@@ -1,29 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsInt, IsString, MaxLength, MinLength, ValidateNested } from "class-validator";
-
-class PostUserDto {
-    @ApiProperty({ description: "The ID of user." })
-    @IsInt()
-    id: number;
-
-    @ApiProperty({ description: "The nickname of user." })
-    @IsString()
-    @MinLength(1)
-    @MaxLength(20)
-    nickname: string;
-}
-
-class PostCategoryDto {
-    @ApiProperty({ description: "The category ID of post.", minimum: 1 })
-    @IsInt()
-    id: number;
-
-    @ApiProperty({ description: "The category name of post.", minimum: 1, maximum: 100 })
-    @IsString()
-    @MinLength(1)
-    @MaxLength(100)
-    name: string;
-}
+import { PostCategoryDto } from "./categories/post-category.dto";
+import { UserPublicDto } from "src/common/dtos/users/user-public.dto";
 
 export class PostSummaryDto {
     @ApiProperty({ description: "The ID of post." })
@@ -40,6 +18,18 @@ export class PostSummaryDto {
     @IsInt()
     viewCount: number;
 
+    // @ApiProperty({ description: "The like count of post." })
+    // @IsInt()
+    // likeCount: number;
+
+    // @ApiProperty({ description: "The comment count of post." })
+    // @IsInt()
+    // commentCount: number;
+
+    // @ApiProperty({ description: "Whether the current user liked this post." })
+    // @IsBoolean()
+    // isLiked: boolean;
+
     @ApiProperty({ type: Date, description: "The creation date of post." })
     @IsDate()
     createdAt: Date;
@@ -50,7 +40,7 @@ export class PostSummaryDto {
 
     @ApiProperty({ description: "The user of post." })
     @ValidateNested()
-    user: PostUserDto;
+    user: UserPublicDto;
 
     @ApiProperty({ description: "The category of post." })
     @ValidateNested()
