@@ -79,7 +79,7 @@ export class PostsService {
         }
 
         // NOTE: 본인의 게시글을 클릭했을 때에도 viewCount를 올릴지 생각해보자. 우선은 클릭하면 viewCount+1 되도록 함
-        const { viewCount: updatedViewCount } = await this.postsRepository.updateViewCount(postId);
+        const { viewCount: updatedViewCount } = await this.postsRepository.updateViewCount(postId, { viewCount: true });
         post.viewCount = updatedViewCount;
 
         return post;
