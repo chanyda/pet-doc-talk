@@ -54,4 +54,10 @@ export class PostsRepository implements IPostsRepository {
             select,
         });
     }
+
+    async delete(postId: number): Promise<IPost> {
+        return this.txHost.tx.post.delete({
+            where: { id: postId },
+        });
+    }
 }

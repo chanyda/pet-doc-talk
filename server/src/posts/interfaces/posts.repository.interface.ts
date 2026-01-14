@@ -10,4 +10,5 @@ export interface IPostsRepository {
     create(userId: number, createPostDto: CreatePostDto, select?: PostSelect): Promise<IPost>;
     update(postId: number, updatePostDto: UpdatePostDto, select?: PostSelect): Promise<IPost>;
     updateViewCount(postId: number, select?: PostSelect): Promise<IPost>;
+    delete(postId: number): Promise<IPost>;
 }
