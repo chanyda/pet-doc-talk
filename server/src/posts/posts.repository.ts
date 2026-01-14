@@ -4,6 +4,7 @@ import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { IPostsRepository } from "./interfaces/posts.repository.interface";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { IPost } from "./interfaces/posts.interface";
 import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
 import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
@@ -34,6 +35,14 @@ export class PostsRepository implements IPostsRepository {
     async create(userId: number, createPostDto: CreatePostDto, select?: PostSelect): Promise<IPost> {
         return this.txHost.tx.post.create({
             data: { userId, ...createPostDto },
+            select,
+        });
+    }
+
+    async update(postId: number, updatePostDto: UpdatePostDto, select?: PostSelect): Promise<IPost> {
+        return this.txHost.tx.post.update({
+            where: { id: postId },
+            data: updatePostDto,
             select,
         });
     }
