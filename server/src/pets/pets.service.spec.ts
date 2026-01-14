@@ -386,7 +386,20 @@ describe("PetsService", () => {
     describe("remove", () => {
         it("펫을 성공적으로 삭제한다.", async () => {
             findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
-            deleteSpy.mockResolvedValue(undefined);
+            deleteSpy.mockResolvedValue({
+                id: TEST_PET_ID,
+                userID: TEST_USER_ID,
+                name: "호두",
+                type: PetType.DOG,
+                gender: PetGender.MALE,
+                breed: "믹스",
+                weight: new Decimal(5.85),
+                birthDate: "2025-01-01T00:00:00Z",
+                isNeutered: true,
+                imageUrl: "http://test.com",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
 
             const result = await petsService.remove(TEST_PET_ID, TEST_USER_ID);
 

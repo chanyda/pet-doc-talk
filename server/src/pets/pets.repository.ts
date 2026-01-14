@@ -47,8 +47,8 @@ export class PetsRepository implements IPetsRepository {
         });
     }
 
-    async delete(petId: number): Promise<void> {
-        await this.txHost.tx.pet.delete({
+    async delete(petId: number): Promise<IPet> {
+        return this.txHost.tx.pet.delete({
             where: { id: petId },
         });
     }
