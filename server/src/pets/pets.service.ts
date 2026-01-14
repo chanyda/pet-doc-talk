@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { PetsRepository } from "./pets.repository";
 import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
-import { Transactional } from "@nestjs-cls/transactional";
 import { PetDetailResponseDto } from "./dtos/responses/pet-detail-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PetListResponseDto } from "./dtos/responses/pet-list-response.dto";
@@ -57,7 +56,6 @@ export class PetsService {
         return !!pet;
     }
 
-    @Transactional()
     async create(userId: number, createPetDto: CreatePetDto): Promise<PetDetailResponseDto> {
         const userExists = await this.usersService.existsByUserId(userId);
 
@@ -68,7 +66,6 @@ export class PetsService {
         return this.petsRepository.create(userId, createPetDto, this.PET_DETAIL_SELECT);
     }
 
-    @Transactional()
     async update(petId: number, userId: number, updatePetDto: UpdatePetDto): Promise<PetDetailResponseDto> {
         const petExists = await this.existsPetForUser(petId, userId);
 
@@ -79,7 +76,6 @@ export class PetsService {
         return this.petsRepository.update(petId, updatePetDto, this.PET_DETAIL_SELECT);
     }
 
-    @Transactional()
     async remove(petId: number, userId: number): Promise<void> {
         const petExists = await this.existsPetForUser(petId, userId);
 

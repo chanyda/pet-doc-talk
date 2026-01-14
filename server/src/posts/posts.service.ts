@@ -4,7 +4,6 @@ import { CreatePostDto } from "./dtos/requests/create-post.dto";
 import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
-import { Transactional } from "@nestjs-cls/transactional";
 import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
@@ -86,7 +85,6 @@ export class PostsService {
         return post;
     }
 
-    @Transactional()
     async create(userId: number, createPostDto: CreatePostDto): Promise<PostResponseDto> {
         const userExists = await this.usersService.existsByUserId(userId);
 

@@ -4,7 +4,6 @@ import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/login-response.dto";
-import { Transactional } from "@nestjs-cls/transactional";
 import { ConfigType } from "src/types/config.type";
 import { nanoid } from "nanoid";
 
@@ -16,7 +15,6 @@ export class AuthService {
         private configService: ConfigService<ConfigType, true>,
     ) {}
 
-    @Transactional()
     async login(loginDto: LoginDto): Promise<LoginResponseDto> {
         let user = await this.usersService.findByEmail(loginDto.email);
         let isNewUser = false;
