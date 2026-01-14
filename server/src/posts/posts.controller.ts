@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { PostsService } from "./posts.service";
-import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
 import { User } from "src/common/decorators/user.decorator";
@@ -41,5 +42,18 @@ export class PostsController {
     @ApiNotFoundResponse({ description: "User or Category not exists." })
     create(@User("userId") userId: number, @Body() createPostDto: CreatePostDto): Promise<PostResponseDto> {
         return this.postsService.create(userId, createPostDto);
+    }
+
+    @Patch(":id")
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Update post successful.", type: PostResponseDto })
+    @ApiNotFoundResponse({ description: "Post or Category not exists." })
+    @ApiForbiddenResponse({ description: "You do not have permission to update this post." })
+    update(
+        @Param("id") postId: number,
+        @User("userId") userId: number,
+        @Body() updatePostDto: UpdatePostDto,
+    ): Promise<PostResponseDto> {
+        return this.postsService.update(postId, userId, updatePostDto);
     }
 }

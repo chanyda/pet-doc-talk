@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PostsRepository } from "./posts.repository";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
 import { Transactional } from "@nestjs-cls/transactional";
@@ -100,6 +101,29 @@ export class PostsService {
         }
 
         return this.postsRepository.create(userId, createPostDto);
+    }
+
+    async update(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<PostResponseDto> {
+        const post = await this.postsRepository.findById(postId, { id: true, userId: true });
+
+        if (!post) {
+            throw new NotFoundException("Post not exists.");
+        }
+
+        if (post.userId !== userId) {
+            throw new ForbiddenException("You do not have permission to update this post.");
+        }
+
+        // 카테고리 변경 시, 유효한 카테고리인지 체크한다.
+        if (updatePostDto.categoryId) {
+            const categoryExists = await this.categoriesService.existsByCategoryId(updatePostDto.categoryId);
+
+            if (!categoryExists) {
+                throw new NotFoundException("Category not exists.");
+            }
+        }
+
+        return this.postsRepository.update(postId, updatePostDto);
     }
 
     private buildFindManyOrderByInput(
