@@ -3,7 +3,7 @@ import { PostsRepository } from "./posts.repository";
 import { PostsService } from "./posts.service";
 import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
-import { NotFoundException } from "@nestjs/common";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostOrderBy } from "./posts.enums";
 
@@ -25,6 +25,7 @@ describe("PostsService", () => {
     let findManySpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let updateSpy: jest.SpyInstance;
     let updateViewCountSpy: jest.SpyInstance;
 
     const TEST_POST_ID = 1;
@@ -40,6 +41,7 @@ describe("PostsService", () => {
                         findMany: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
+                        update: jest.fn(),
                         updateViewCount: jest.fn(),
                     },
                 },
@@ -69,6 +71,7 @@ describe("PostsService", () => {
         findManySpy = jest.spyOn(postsRepository, "findMany");
         findByIdSpy = jest.spyOn(postsRepository, "findById");
         createSpy = jest.spyOn(postsRepository, "create");
+        updateSpy = jest.spyOn(postsRepository, "update");
         updateViewCountSpy = jest.spyOn(postsRepository, "updateViewCount");
     });
 
@@ -561,6 +564,116 @@ describe("PostsService", () => {
                 expect(existsByCategoryIdSpy).toHaveBeenCalledWith(createPostDto.categoryId);
                 expect(existsByCategoryIdSpy).toHaveBeenCalledTimes(1);
                 expect(createSpy).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe("update", () => {
+        describe("게시글 수정 성공", () => {
+            const mockPost = {
+                id: TEST_POST_ID,
+                userId: TEST_USER_ID,
+                categoryId: 1,
+                title: "Test",
+                content: "Test",
+                viewCount: 10,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+
+            it("빈 객체가 들어와서 아무것도 수정되지 않은 게시글 정보를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: TEST_USER_ID });
+                updateSpy.mockResolvedValue(mockPost);
+
+                const result = await postsService.update(TEST_POST_ID, TEST_USER_ID, {});
+
+                expect(result).toEqual(mockPost);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).not.toHaveBeenCalled();
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, {});
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("단일 필드(title)를 수정하여 수정된 게시글 정보를 반환한다.", async () => {
+                const updatePostDto = { title: "update title" };
+                const mockUpdatePost = { ...mockPost, title: updatePostDto.title };
+
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: TEST_USER_ID });
+                updateSpy.mockResolvedValue(mockUpdatePost);
+
+                const result = await postsService.update(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+
+                expect(result).toEqual(mockUpdatePost);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).not.toHaveBeenCalled();
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("모든 필드(title, content, categoryId)를 수정하여 수정된 게시글 정보를 반환한다.", async () => {
+                const updatePostDto = { title: "update title", content: "update content", categoryId: 2 };
+                const mockUpdatePost = { ...mockPost, ...updatePostDto };
+
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: TEST_USER_ID });
+                existsByCategoryIdSpy.mockResolvedValue(true);
+                updateSpy.mockResolvedValue(mockUpdatePost);
+
+                const result = await postsService.update(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+
+                expect(result).toEqual(mockUpdatePost);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).toHaveBeenCalledWith(updatePostDto.categoryId);
+                expect(existsByCategoryIdSpy).toHaveBeenCalledTimes(1);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("게시글 수정 실패", () => {
+            const updatePostDto = { title: "Test" };
+
+            it("수정하려는 게시글 id에 대한 게시글을 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue(null);
+
+                await expect(postsService.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).not.toHaveBeenCalled();
+                expect(updateSpy).not.toHaveBeenCalled();
+            });
+
+            it("로그인한 사용자와 게시글 작성자가 상이하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: 2 });
+
+                await expect(postsService.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to update this post."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).not.toHaveBeenCalled();
+                expect(updateSpy).not.toHaveBeenCalled();
+            });
+
+            it("수정하려는 카테고리 id에 대한 카테고리를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                // 존재하지 않는 categoryId로 지정
+                const updatePostDto = { categoryId: 20 };
+
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: TEST_USER_ID });
+                existsByCategoryIdSpy.mockResolvedValue(false);
+
+                await expect(postsService.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new NotFoundException("Category not exists."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(existsByCategoryIdSpy).toHaveBeenCalledWith(updatePostDto.categoryId);
+                expect(existsByCategoryIdSpy).toHaveBeenCalledTimes(1);
+                expect(updateSpy).not.toHaveBeenCalled();
             });
         });
     });

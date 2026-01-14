@@ -2,7 +2,7 @@ import { PostsController } from "./posts.controller";
 import { PostsService } from "./posts.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthGuard } from "src/auth/guards/auth.guard";
-import { NotFoundException } from "@nestjs/common";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { PostOrderBy } from "./posts.enums";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 
@@ -13,6 +13,7 @@ describe("PostsController", () => {
     let findManySpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let updateSpy: jest.SpyInstance;
 
     const TEST_POST_ID = 1;
     const TEST_USER_ID = 1;
@@ -28,6 +29,7 @@ describe("PostsController", () => {
                         findMany: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
+                        update: jest.fn(),
                     },
                 },
             ],
@@ -42,6 +44,7 @@ describe("PostsController", () => {
         findManySpy = jest.spyOn(postsService, "findMany");
         findByIdSpy = jest.spyOn(postsService, "findById");
         createSpy = jest.spyOn(postsService, "create");
+        updateSpy = jest.spyOn(postsService, "update");
     });
 
     afterEach(() => {
@@ -205,6 +208,66 @@ describe("PostsController", () => {
                 );
                 expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPostDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("update", () => {
+        const updatePostDto = { title: "update title" };
+
+        describe("게시글 수정 성공", () => {
+            it("게시글 수정에 성공하여 수정된 게시글 정보를 반환한다.", async () => {
+                const mockUpdatePost = {
+                    id: TEST_POST_ID,
+                    userId: TEST_USER_ID,
+                    categoryId: 1,
+                    title: updatePostDto.title,
+                    content: "Test",
+                    viewCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                };
+                updateSpy.mockResolvedValue(mockUpdatePost);
+
+                const result = await postsController.update(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+
+                expect(result).toEqual(mockUpdatePost);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("게시글 수정 실패", () => {
+            it("수정하려는 게시글 id에 대한 게시글을 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                updateSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+
+                await expect(postsController.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("로그인한 사용자와 게시글 작성자가 상이하여 오류를 반환한다.", async () => {
+                updateSpy.mockRejectedValue(new ForbiddenException("You do not have permission to update this post."));
+
+                await expect(postsController.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to update this post."),
+                );
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("수정하려는 카테고리 id에 대한 카테고리를 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                const updatePostDto = { categoryId: 20 };
+
+                updateSpy.mockRejectedValue(new NotFoundException("Category not exists."));
+
+                await expect(postsController.update(TEST_POST_ID, TEST_USER_ID, updatePostDto)).rejects.toThrow(
+                    new NotFoundException("Category not exists."),
+                );
+                expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, updatePostDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
