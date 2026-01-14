@@ -124,6 +124,20 @@ export class PostsService {
         return this.postsRepository.update(postId, updatePostDto);
     }
 
+    async remove(postId: number, userId: number): Promise<void> {
+        const post = await this.postsRepository.findById(postId, { id: true, userId: true });
+
+        if (!post) {
+            throw new NotFoundException("Post not exists.");
+        }
+
+        if (post.userId !== userId) {
+            throw new ForbiddenException("You do not have permission to delete this post.");
+        }
+
+        await this.postsRepository.delete(postId);
+    }
+
     private buildFindManyOrderByInput(
         orderBy: PostOrderBy,
     ): PostOrderByWithRelationInput | PostOrderByWithRelationInput[] {

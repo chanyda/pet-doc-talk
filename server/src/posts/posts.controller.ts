@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
@@ -55,5 +55,14 @@ export class PostsController {
         @Body() updatePostDto: UpdatePostDto,
     ): Promise<PostResponseDto> {
         return this.postsService.update(postId, userId, updatePostDto);
+    }
+
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOkResponse({ description: "Delete post successful." })
+    @ApiNotFoundResponse({ description: "Post not exists." })
+    @ApiForbiddenResponse({ description: "You do not have permission to delete this post." })
+    remove(@Param("id") postId: number, @User("userId") userId: number): Promise<void> {
+        return this.postsService.remove(postId, userId);
     }
 }
