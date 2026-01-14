@@ -27,6 +27,7 @@ describe("PostsService", () => {
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
     let updateViewCountSpy: jest.SpyInstance;
+    let deleteSpy: jest.SpyInstance;
 
     const TEST_POST_ID = 1;
     const TEST_USER_ID = 1;
@@ -43,6 +44,7 @@ describe("PostsService", () => {
                         create: jest.fn(),
                         update: jest.fn(),
                         updateViewCount: jest.fn(),
+                        delete: jest.fn(),
                     },
                 },
                 {
@@ -73,6 +75,7 @@ describe("PostsService", () => {
         createSpy = jest.spyOn(postsRepository, "create");
         updateSpy = jest.spyOn(postsRepository, "update");
         updateViewCountSpy = jest.spyOn(postsRepository, "updateViewCount");
+        deleteSpy = jest.spyOn(postsRepository, "delete");
     });
 
     afterEach(() => {
@@ -674,6 +677,55 @@ describe("PostsService", () => {
                 expect(existsByCategoryIdSpy).toHaveBeenCalledWith(updatePostDto.categoryId);
                 expect(existsByCategoryIdSpy).toHaveBeenCalledTimes(1);
                 expect(updateSpy).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe("delete", () => {
+        describe("게시글 삭제 성공", () => {
+            it("게시글을 삭제한다.", async () => {
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: TEST_USER_ID });
+                deleteSpy.mockResolvedValue({
+                    id: TEST_POST_ID,
+                    userId: TEST_USER_ID,
+                    categoryId: 1,
+                    title: "Test",
+                    content: "Test",
+                    viewCount: 10,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                await postsService.remove(TEST_POST_ID, TEST_USER_ID);
+
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(deleteSpy).toHaveBeenCalledWith(TEST_POST_ID);
+                expect(deleteSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("게시글 삭제 실패", () => {
+            it("삭제하려는 게시글 id에 대한 게시글을 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue(null);
+
+                await expect(postsService.remove(TEST_POST_ID, TEST_USER_ID)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(deleteSpy).not.toHaveBeenCalled();
+            });
+
+            it("로그인한 사용자와 게시글 작성자가 상이하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockResolvedValue({ id: TEST_POST_ID, userId: 2 });
+
+                await expect(postsService.remove(TEST_POST_ID, TEST_USER_ID)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to delete this post."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, { id: true, userId: true });
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(deleteSpy).not.toHaveBeenCalled();
             });
         });
     });

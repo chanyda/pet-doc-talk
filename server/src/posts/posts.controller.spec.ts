@@ -14,6 +14,7 @@ describe("PostsController", () => {
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
+    let removeSpy: jest.SpyInstance;
 
     const TEST_POST_ID = 1;
     const TEST_USER_ID = 1;
@@ -30,6 +31,7 @@ describe("PostsController", () => {
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
+                        remove: jest.fn(),
                     },
                 },
             ],
@@ -45,6 +47,7 @@ describe("PostsController", () => {
         findByIdSpy = jest.spyOn(postsService, "findById");
         createSpy = jest.spyOn(postsService, "create");
         updateSpy = jest.spyOn(postsService, "update");
+        removeSpy = jest.spyOn(postsService, "remove");
     });
 
     afterEach(() => {
@@ -268,6 +271,41 @@ describe("PostsController", () => {
                 );
                 expect(updateSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, updatePostDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("remove", () => {
+        describe("게시글 삭제 성공", () => {
+            it("게시글 삭제에 성공한다.", async () => {
+                removeSpy.mockResolvedValue(undefined);
+
+                await postsController.remove(TEST_POST_ID, TEST_USER_ID);
+
+                expect(removeSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("게시글 삭제 실패", () => {
+            it("삭제하려는 게시글 id에 대한 게시글을 DB에서 찾지 못하여 오류를 반환한다.", async () => {
+                removeSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+
+                await expect(postsController.remove(TEST_POST_ID, TEST_USER_ID)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(removeSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("로그인한 사용자와 게시글 작성자가 상이하여 오류를 반환한다.", async () => {
+                removeSpy.mockRejectedValue(new ForbiddenException("You do not have permission to delete this post."));
+
+                await expect(postsController.remove(TEST_POST_ID, TEST_USER_ID)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to delete this post."),
+                );
+                expect(removeSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
