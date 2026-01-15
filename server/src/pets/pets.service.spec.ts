@@ -5,6 +5,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { NotFoundException } from "@nestjs/common";
 import { Decimal } from "@prisma/client/runtime/index-browser";
+import { PET_DETAIL_SELECT, PET_SUMMARY_SELECT } from "./constants";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -27,23 +28,6 @@ describe("PetsService", () => {
 
     const TEST_USER_ID = 1;
     const TEST_PET_ID = 1;
-
-    // NOTE: 서비스의 private readonly PET_SUMMARY_SELECT, PET_DETAIL_SELECT와 동일한 값이어야 함
-    const PET_SUMMARY_SELECT = {
-        id: true,
-        name: true,
-        type: true,
-        gender: true,
-        breed: true,
-        imageUrl: true,
-    };
-
-    const PET_DETAIL_SELECT = {
-        ...PET_SUMMARY_SELECT,
-        weight: true,
-        birthDate: true,
-        isNeutered: true,
-    };
 
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
