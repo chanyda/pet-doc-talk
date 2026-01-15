@@ -5,6 +5,8 @@ import { UpdateUserDto } from "./dtos/requests/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
 import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
 import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
+import { UserGetPayload } from "generated/prisma/models";
+import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
 
 @Injectable()
 export class UsersService {
@@ -34,19 +36,13 @@ export class UsersService {
     }
 
     async findProfile(userId: number): Promise<FindProfileResponseDto> {
-        const user = await this.usersRepository.findById(userId, {
-            id: true,
-            email: true,
-            name: true,
-            nickname: true,
-            profileImageUrl: true,
-        });
+        const user = await this.usersRepository.findById(userId, USER_PROFILE_SELECT);
 
         if (!user) {
             throw new NotFoundException("User not exists.");
         }
 
-        return user;
+        return this.toProfileResponse(user);
     }
 
     async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<FindProfileResponseDto> {
@@ -65,13 +61,9 @@ export class UsersService {
             }
         }
 
-        return this.usersRepository.updateById(userId, updateProfileDto, {
-            id: true,
-            email: true,
-            name: true,
-            nickname: true,
-            profileImageUrl: true,
-        });
+        const user = await this.usersRepository.updateById(userId, updateProfileDto, USER_PROFILE_SELECT);
+
+        return this.toProfileResponse(user);
     }
 
     async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser> {
@@ -82,5 +74,16 @@ export class UsersService {
         }
 
         return this.usersRepository.updateById(userId, updateUserDto);
+    }
+
+    private toProfileResponse(user: UserGetPayload<{ select: UserProfileSelect }>): FindProfileResponseDto {
+        return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            nickname: user.nickname,
+            profileImageUrl: user.profileImageUrl,
+            postCount: user._count.posts,
+        };
     }
 }

@@ -15,4 +15,7 @@ export class FindProfileResponseDto {
 
     @ApiPropertyOptional({ type: String, nullable: true })
     profileImageUrl?: string | null;
+
+    @ApiProperty()
+    postCount: number;
 }
