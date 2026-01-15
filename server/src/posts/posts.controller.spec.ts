@@ -11,6 +11,7 @@ describe("PostsController", () => {
     let postsService: PostsService;
 
     let findManySpy: jest.SpyInstance;
+    let findMyPostsSpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
@@ -28,6 +29,7 @@ describe("PostsController", () => {
                     provide: PostsService,
                     useValue: {
                         findMany: jest.fn(),
+                        findMyPosts: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
@@ -44,6 +46,7 @@ describe("PostsController", () => {
         postsService = moduleRef.get(PostsService);
 
         findManySpy = jest.spyOn(postsService, "findMany");
+        findMyPostsSpy = jest.spyOn(postsService, "findMyPosts");
         findByIdSpy = jest.spyOn(postsService, "findById");
         createSpy = jest.spyOn(postsService, "create");
         updateSpy = jest.spyOn(postsService, "update");
@@ -73,13 +76,13 @@ describe("PostsController", () => {
                     name: `카테고리${i + 1}`,
                 },
             }));
-            const mockPostListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
+            const postListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
 
-            findManySpy.mockResolvedValue(mockPostListResponse);
+            findManySpy.mockResolvedValue(postListResponse);
 
             const result = await postsController.findMany(requiredQuery);
 
-            expect(result).toEqual(mockPostListResponse);
+            expect(result).toEqual(postListResponse);
             expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
@@ -100,27 +103,70 @@ describe("PostsController", () => {
                     name: `카테고리${i + 1}`,
                 },
             }));
-            const mockPostListResponse = { posts: mockPosts, nextCursor: null };
+            const postListResponse = { posts: mockPosts, nextCursor: null };
 
-            findManySpy.mockResolvedValue(mockPostListResponse);
+            findManySpy.mockResolvedValue(postListResponse);
 
             const result = await postsController.findMany(requiredQuery);
 
-            expect(result).toEqual(mockPostListResponse);
+            expect(result).toEqual(postListResponse);
             expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
         it("게시글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-            const mockPostListResponse = { posts: [], nextCursor: null };
+            const postListResponse = { posts: [], nextCursor: null };
 
-            findManySpy.mockResolvedValue(mockPostListResponse);
+            findManySpy.mockResolvedValue(postListResponse);
 
             const result = await postsController.findMany(requiredQuery);
 
-            expect(result).toEqual(mockPostListResponse);
+            expect(result).toEqual(postListResponse);
             expect(findManySpy).toHaveBeenCalledWith(requiredQuery);
             expect(findManySpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("findMyPosts", () => {
+        const requiredQuery = { limit: 10 };
+
+        it("내가 작성한 게시글을 반환한다.", async () => {
+            const mockPosts = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                id: i + 1,
+                title: "게시글 제목",
+                viewCount: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                user: {
+                    id: i + 1,
+                    nickname: `닉네임${i + 1}`,
+                },
+                category: {
+                    id: i + 1,
+                    name: `카테고리${i + 1}`,
+                },
+            }));
+            const postListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
+
+            findMyPostsSpy.mockResolvedValue(postListResponse);
+
+            const result = await postsController.findMyPosts(TEST_USER_ID, requiredQuery);
+
+            expect(result).toEqual(postListResponse);
+            expect(findMyPostsSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredQuery);
+            expect(findMyPostsSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("내가 작성한 게시글이 없어서 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            const postListResponse = { posts: [], nextCursor: null };
+
+            findMyPostsSpy.mockResolvedValue(postListResponse);
+
+            const result = await postsController.findMyPosts(TEST_USER_ID, requiredQuery);
+
+            expect(result).toEqual(postListResponse);
+            expect(findMyPostsSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredQuery);
+            expect(findMyPostsSpy).toHaveBeenCalledTimes(1);
         });
     });
 
