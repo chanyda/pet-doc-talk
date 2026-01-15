@@ -3,6 +3,9 @@ import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { LoginFrom } from "generated/prisma/enums";
+import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
+import { UserGetPayload } from "generated/prisma/models";
+import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -24,14 +27,6 @@ describe("UsersService", () => {
     const TEST_NAME = "Tester";
     const TEST_NICKNAME = "Tester";
     const TEST_USER_ID = 1;
-
-    const USER_SELECT = {
-        id: true,
-        email: true,
-        name: true,
-        nickname: true,
-        profileImageUrl: true,
-    };
 
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -155,14 +150,18 @@ describe("UsersService", () => {
                 name: TEST_NAME,
                 nickname: TEST_NICKNAME,
                 profileImageUrl: null,
+                _count: {
+                    posts: 10,
+                },
             };
+            const profileResponse = toProfileResponse(mockUserProfile);
 
             findByIdSpy.mockResolvedValue(mockUserProfile);
 
             const result = await usersService.findProfile(TEST_USER_ID);
 
-            expect(result).toEqual(mockUserProfile);
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_SELECT);
+            expect(result).toEqual(profileResponse);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_PROFILE_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
 
@@ -172,36 +171,26 @@ describe("UsersService", () => {
             await expect(usersService.findProfile(TEST_USER_ID)).rejects.toThrow(
                 new NotFoundException("User not exists."),
             );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_SELECT);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, USER_PROFILE_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
     });
 
     describe("updateProfile", () => {
-        const mockUser = {
-            id: TEST_USER_ID,
-            email: TEST_EMAIL,
-            name: TEST_NAME,
-            nickname: TEST_NICKNAME,
-            loginFrom: LoginFrom.KAKAO,
-            profileImageUrl: null,
-            refreshToken: "",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
-
-        const mockUserProfile = {
-            id: mockUser.id,
-            email: mockUser.email,
-            name: mockUser.name,
-            nickname: mockUser.nickname,
-            profileImageUrl: null,
-        };
-
         describe("프로필 업데이트 성공", () => {
             it("nickname 변경에 성공하여 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = { nickname: "CHANGE_NICKNAME" };
-                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+                const updateMockUserProfile = {
+                    id: TEST_USER_ID,
+                    email: TEST_EMAIL,
+                    name: TEST_NAME,
+                    nickname: updateProfileDto.nickname,
+                    profileImageUrl: null,
+                    _count: {
+                        posts: 10,
+                    },
+                };
+                const profileResponse = toProfileResponse(updateMockUserProfile);
 
                 findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 findByNicknameSpy.mockResolvedValue(null);
@@ -209,37 +198,57 @@ describe("UsersService", () => {
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
 
-                expect(result).toEqual(updateMockUserProfile);
+                expect(result).toEqual(profileResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).toHaveBeenCalledWith(updateMockUserProfile.nickname, TEST_USER_ID, {
                     id: true,
                 });
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_PROFILE_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
             it("profileImageUrl 변경에 성공하여 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = { profileImageUrl: "http://test.com" };
-                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+                const updateMockUserProfile = {
+                    id: TEST_USER_ID,
+                    email: TEST_EMAIL,
+                    name: TEST_NAME,
+                    nickname: TEST_NICKNAME,
+                    profileImageUrl: updateProfileDto.profileImageUrl,
+                    _count: {
+                        posts: 10,
+                    },
+                };
+                const profileResponse = toProfileResponse(updateMockUserProfile);
 
                 findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 updateByIdSpy.mockResolvedValue(updateMockUserProfile);
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
 
-                expect(result).toEqual(updateMockUserProfile);
+                expect(result).toEqual(profileResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).not.toHaveBeenCalled();
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_PROFILE_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
             it("profileImageUrl, nickname 변경에 성공하여 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = { profileImageUrl: "http://test.com", nickname: "CHANGE_NICKNAME" };
-                const updateMockUserProfile = { ...mockUserProfile, ...updateProfileDto };
+                const updateMockUserProfile = {
+                    id: TEST_USER_ID,
+                    email: TEST_EMAIL,
+                    name: TEST_NAME,
+                    nickname: updateProfileDto.nickname,
+                    profileImageUrl: updateProfileDto.profileImageUrl,
+                    _count: {
+                        posts: 10,
+                    },
+                };
+                const profileResponse = toProfileResponse(updateMockUserProfile);
 
                 findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
                 findByNicknameSpy.mockResolvedValue(null);
@@ -247,30 +256,41 @@ describe("UsersService", () => {
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
 
-                expect(result).toEqual(updateMockUserProfile);
+                expect(result).toEqual(profileResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).toHaveBeenCalledWith(updateMockUserProfile.nickname, TEST_USER_ID, {
                     id: true,
                 });
                 expect(findByNicknameSpy).toHaveBeenCalledTimes(1);
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_PROFILE_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
 
             it("빈 객체가 넘어온 경우 업데이트할 요소가 없으므로 기존 프로필 정보를 반환한다.", async () => {
                 const updateProfileDto = {};
+                const updateMockUserProfile = {
+                    id: TEST_USER_ID,
+                    email: TEST_EMAIL,
+                    name: TEST_NAME,
+                    nickname: TEST_NICKNAME,
+                    profileImageUrl: null,
+                    _count: {
+                        posts: 10,
+                    },
+                };
+                const profileResponse = toProfileResponse(updateMockUserProfile);
 
                 findByIdSpy.mockResolvedValue({ id: TEST_USER_ID });
-                updateByIdSpy.mockResolvedValue(mockUserProfile);
+                updateByIdSpy.mockResolvedValue(updateMockUserProfile);
 
                 const result = await usersService.updateProfile(TEST_USER_ID, updateProfileDto);
 
-                expect(result).toEqual(mockUserProfile);
+                expect(result).toEqual(profileResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByNicknameSpy).not.toHaveBeenCalled();
-                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_SELECT);
+                expect(updateByIdSpy).toHaveBeenCalledWith(TEST_USER_ID, updateProfileDto, USER_PROFILE_SELECT);
                 expect(updateByIdSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -352,3 +372,14 @@ describe("UsersService", () => {
         });
     });
 });
+
+function toProfileResponse(user: UserGetPayload<{ select: UserProfileSelect }>): FindProfileResponseDto {
+    return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        nickname: user.nickname,
+        profileImageUrl: user.profileImageUrl,
+        postCount: user._count.posts,
+    };
+}
