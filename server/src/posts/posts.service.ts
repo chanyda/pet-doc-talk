@@ -8,10 +8,10 @@ import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
-import { PostOrderByWithRelationInput, PostSelect, PostWhereInput } from "generated/prisma/models";
+import { PostOrderByWithRelationInput, PostWhereInput } from "generated/prisma/models";
 import { PostOrderBy } from "./posts.enums";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { POST_SUMMARY_SELECT } from "./constants";
+import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT } from "./constants";
 
 @Injectable()
 export class PostsService {
@@ -24,26 +24,13 @@ export class PostsService {
     async findMany(query: FindPostListQueryDto): Promise<PostListResponseDto> {
         const orderByInput = this.buildFindManyOrderByInput(query.orderBy);
         const whereInput = this.buildFindManyWhereInput(query.categoryId, query.keyword);
-        const selectInput: PostSelect = {
-            id: true,
-            title: true,
-            viewCount: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: { id: true, nickname: true },
-            },
-            category: {
-                select: { id: true, name: true },
-            },
-        };
 
         // TODO: 좋아요와 댓글 기능 추가 시 likeCount, commentCount, isLiked도 보여줘야함
         const posts = await this.postsRepository.findMany({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
-            select: selectInput,
+            select: POST_SUMMARY_SELECT,
             where: whereInput,
             orderBy: orderByInput,
         });
@@ -75,23 +62,7 @@ export class PostsService {
     }
 
     async findById(postId: number): Promise<PostDetailResponseDto> {
-        // TODO: 좋아요와 댓글 기능 추가 시 실제 likeCount, commentCount, isLiked 계산
-        const selectInput: PostSelect = {
-            id: true,
-            title: true,
-            content: true,
-            viewCount: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: { id: true, nickname: true, profileImageUrl: true },
-            },
-            category: {
-                select: { id: true, name: true },
-            },
-        };
-
-        const post = await this.postsRepository.findById(postId, selectInput);
+        const post = await this.postsRepository.findById(postId, POST_DETAIL_SELECT);
 
         if (!post) {
             throw new NotFoundException("Post not exists.");

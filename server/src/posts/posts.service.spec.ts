@@ -6,6 +6,7 @@ import { CategoriesService } from "src/categories/categories.service";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostOrderBy } from "./posts.enums";
+import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT } from "./constants/selects.constant";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -83,19 +84,6 @@ describe("PostsService", () => {
     });
 
     describe("findMany", () => {
-        const selectInput = {
-            id: true,
-            title: true,
-            viewCount: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: { id: true, nickname: true },
-            },
-            category: {
-                select: { id: true, name: true },
-            },
-        };
         const requiredQuery: FindPostListQueryDto = { limit: 10, orderBy: PostOrderBy.CREATED_AT };
 
         describe("Pagination", () => {
@@ -109,7 +97,7 @@ describe("PostsService", () => {
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {},
                     orderBy: { createdAt: "desc" },
                 });
@@ -141,7 +129,7 @@ describe("PostsService", () => {
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {},
                     orderBy: { createdAt: "desc" },
                 });
@@ -177,7 +165,7 @@ describe("PostsService", () => {
                     // cursor가 있으므로 skip와 cursor를 정의
                     skip: 1,
                     cursor: { id: query.cursor },
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {},
                     orderBy: { createdAt: "desc" },
                 });
@@ -215,7 +203,7 @@ describe("PostsService", () => {
                     // cursor가 있으므로 skip와 cursor를 정의
                     skip: 1,
                     cursor: { id: query.cursor },
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {},
                     orderBy: { createdAt: "desc" },
                 });
@@ -251,7 +239,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {
                         categoryId: query.categoryId,
                     },
@@ -287,7 +275,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: 1,
                     cursor: { id: query.cursor },
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {
                         categoryId: query.categoryId,
                     },
@@ -325,7 +313,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {
                         OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
                     },
@@ -361,7 +349,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {
                         categoryId: query.categoryId,
                         OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
@@ -398,7 +386,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: 1,
                     cursor: { id: query.cursor },
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {
                         categoryId: query.categoryId,
                         OR: [{ title: { contains: query.keyword } }, { content: { contains: query.keyword } }],
@@ -437,7 +425,7 @@ describe("PostsService", () => {
                     take: query.limit,
                     skip: undefined,
                     cursor: undefined,
-                    select: selectInput,
+                    select: POST_SUMMARY_SELECT,
                     where: {},
                     orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
                 });
@@ -449,21 +437,6 @@ describe("PostsService", () => {
     });
 
     describe("findById", () => {
-        const selectInput = {
-            id: true,
-            title: true,
-            content: true,
-            viewCount: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-                select: { id: true, nickname: true, profileImageUrl: true },
-            },
-            category: {
-                select: { id: true, name: true },
-            },
-        };
-
         it("게시글 상세 조회에 성공하여 게시글을 반환한다.", async () => {
             const post = {
                 id: TEST_POST_ID,
@@ -490,7 +463,7 @@ describe("PostsService", () => {
             const result = await postsService.findById(TEST_POST_ID);
 
             expect(result).toEqual({ ...post, viewCount: updatedViewCount });
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, selectInput);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, POST_DETAIL_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
             expect(updateViewCountSpy).toHaveBeenCalledWith(TEST_POST_ID, { viewCount: true });
             expect(updateViewCountSpy).toHaveBeenCalledTimes(1);
@@ -502,7 +475,7 @@ describe("PostsService", () => {
             await expect(postsService.findById(TEST_POST_ID)).rejects.toThrow(
                 new NotFoundException("Post not exists."),
             );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, selectInput);
+            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, POST_DETAIL_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
             expect(updateViewCountSpy).not.toHaveBeenCalled();
         });
