@@ -10,6 +10,8 @@ import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
 import { PostOrderByWithRelationInput, PostSelect, PostWhereInput } from "generated/prisma/models";
 import { PostOrderBy } from "./posts.enums";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { POST_SUMMARY_SELECT } from "./constants";
 
 @Injectable()
 export class PostsService {
@@ -48,6 +50,23 @@ export class PostsService {
 
         // 조회된 post의 수가 limit와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
         // 동일하지 않은 경우 다음 페이지는 없다고 판단하여 null를 리턴한다.
+        const nextCursor = posts.length === query.limit ? posts[posts.length - 1].id : null;
+        return {
+            posts,
+            nextCursor,
+        };
+    }
+
+    async findMyPosts(userId: number, query: PaginationQueryDto): Promise<PostListResponseDto> {
+        const posts = await this.postsRepository.findMany({
+            take: query.limit,
+            skip: query.cursor ? 1 : undefined,
+            cursor: query.cursor ? { id: query.cursor } : undefined,
+            select: POST_SUMMARY_SELECT,
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+        });
+
         const nextCursor = posts.length === query.limit ? posts[posts.length - 1].id : null;
         return {
             posts,

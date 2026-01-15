@@ -10,6 +10,7 @@ import { Auth } from "src/common/decorators/auth.decorator";
 import { Public } from "src/common/decorators/public.decorator";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 
 @ApiTags("posts")
 @Auth()
@@ -24,6 +25,16 @@ export class PostsController {
     // TODO: 좋아요 기능 추가 시 userId를 받아서 로그인한 사용자가 좋아요를 누른 게시글인지 보여줘야함
     findMany(@Query() findPostListQuery: FindPostListQueryDto): Promise<PostListResponseDto> {
         return this.postsService.findMany(findPostListQuery);
+    }
+
+    @Get("me")
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Find my posts successful.", type: PostListResponseDto })
+    findMyPosts(
+        @User("userId") userId: number,
+        @Query() paginationQuery: PaginationQueryDto,
+    ): Promise<PostListResponseDto> {
+        return this.postsService.findMyPosts(userId, paginationQuery);
     }
 
     @Get(":id")
