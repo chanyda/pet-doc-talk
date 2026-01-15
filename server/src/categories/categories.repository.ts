@@ -10,6 +10,10 @@ import { ICategory } from "./interfaces/categories.interface";
 export class CategoriesRepository implements ICategoriesRepository {
     constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>) {}
 
+    async findMany(select?: CategorySelect): Promise<ICategory[]> {
+        return this.txHost.tx.category.findMany({ select });
+    }
+
     async findById(categoryId: number, select?: CategorySelect): Promise<ICategory | null> {
         return this.txHost.tx.category.findUnique({
             where: { id: categoryId },
