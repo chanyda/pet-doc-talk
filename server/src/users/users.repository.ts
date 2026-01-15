@@ -6,7 +6,7 @@ import { IUser } from "./interfaces/users.interface";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
-import { UserSelect } from "generated/prisma/models";
+import { UserGetPayload, UserSelect } from "generated/prisma/models";
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -18,7 +18,14 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async findById(userId: number, select?: UserSelect): Promise<IUser | null> {
+    // select가 없는 경우 기본적으로 모든 User 필드 및 타입을 반환하도록 하고,
+    // select가 있는 경우 select에 대한 User 필드 및 타입을 반환하도록 하기 위해 메소드 오버로딩
+    async findById(userId: number): Promise<IUser | null>;
+    async findById<T extends UserSelect>(userId: number, select: T): Promise<UserGetPayload<{ select: T }> | null>;
+    async findById<T extends UserSelect>(
+        userId: number,
+        select?: T,
+    ): Promise<IUser | UserGetPayload<{ select: T }> | null> {
         return this.txHost.tx.user.findUnique({
             where: { id: userId },
             select,
@@ -39,7 +46,17 @@ export class UsersRepository implements IUsersRepository {
         });
     }
 
-    async updateById(userId: number, updateUserDto: UpdateUserDto, select?: UserSelect): Promise<IUser> {
+    async updateById(userId: number, updateUserDto: UpdateUserDto): Promise<IUser>;
+    async updateById<T extends UserSelect>(
+        userId: number,
+        updateUserDto: UpdateUserDto,
+        select: T,
+    ): Promise<UserGetPayload<{ select: T }>>;
+    async updateById<T extends UserSelect>(
+        userId: number,
+        updateUserDto: UpdateUserDto,
+        select?: T,
+    ): Promise<IUser | UserGetPayload<{ select: T }>> {
         return this.txHost.tx.user.update({
             where: { id: userId },
             data: updateUserDto,
