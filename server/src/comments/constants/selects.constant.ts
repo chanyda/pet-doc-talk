@@ -11,4 +11,15 @@ export const COMMENT_SELECT = {
     deletedAt: true,
 };
 
+export const COMMENT_REPLY_SELECT = {
+    id: true,
+    content: true,
+    parentId: true,
+    user: { select: { id: true, nickname: true, profileImageUrl: true } },
+    mentionUser: { select: { id: true, nickname: true } },
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true,
+};
+
 export type CommentSelect = typeof COMMENT_SELECT;

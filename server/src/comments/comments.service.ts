@@ -5,9 +5,10 @@ import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PostsService } from "src/posts/posts.service";
 import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_SELECT, CommentSelect } from "./constants";
+import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect } from "./constants";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
+import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
 import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
 
 @Injectable()
@@ -42,6 +43,41 @@ export class CommentsService {
         };
     }
 
+    // TODO: 댓글 좋아요 기능 추가 시 userId를 받아서 좋아요한 댓글에 대한 정보를 보여줘야함
+    async findReplies(
+        postId: number,
+        parentCommentId: number,
+        query: PaginationQueryDto,
+    ): Promise<CommentReplyListResponseDto> {
+        const postExists = await this.postsService.existsByPostId(postId);
+        if (!postExists) {
+            throw new NotFoundException("Post not exists.");
+        }
+
+        const parentComment = await this.commentsRepository.findById(parentCommentId, { id: true, postId: true });
+        if (!parentComment) {
+            throw new NotFoundException("Parent comment not exists.");
+        }
+
+        if (parentComment.postId !== postId) {
+            throw new BadRequestException("Parent comment does not belong to this post.");
+        }
+
+        const replies = await this.commentsRepository.findMany({
+            take: query.limit,
+            skip: query.cursor ? 1 : undefined,
+            cursor: query.cursor ? { id: query.cursor } : undefined,
+            where: { postId: postId, parentId: parentCommentId },
+            select: COMMENT_REPLY_SELECT,
+            orderBy: { id: "asc" },
+        });
+        const nextCursor = replies.length === query.limit ? replies[replies.length - 1].id : null;
+
+        return {
+            replies,
+            nextCursor,
+        };
+    }
 
     /**
      * 댓글 구조는 예시는 아래와 같음

@@ -14,6 +14,7 @@ import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
 import { Public } from "src/common/decorators/public.decorator";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
 
 @ApiTags("comments")
 @Auth()
@@ -27,6 +28,19 @@ export class CommentsController {
     @ApiNotFoundResponse({ description: "Post not exists." })
     findComments(@Param("postId") postId: number, @Query() query: PaginationQueryDto): Promise<CommentListResponseDto> {
         return this.commentsService.findComments(postId, query);
+    }
+
+    @Get("posts/:postId/comments/:commentId/replies")
+    @Public()
+    @ApiOkResponse({ description: "Get comment reply list successful.", type: CommentReplyListResponseDto })
+    @ApiBadRequestResponse({ description: "Parent comment does not belong to this post." })
+    @ApiNotFoundResponse({ description: "Post or parent comment not exists." })
+    findReplies(
+        @Param("postId") postId: number,
+        @Param("commentId") commentId: number,
+        @Query() query: PaginationQueryDto,
+    ): Promise<CommentReplyListResponseDto> {
+        return this.commentsService.findReplies(postId, commentId, query);
     }
 
     @Post("posts/:postId/comments")
