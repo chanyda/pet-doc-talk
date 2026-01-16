@@ -5,11 +5,25 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { ICommentsRepository } from "./interfaces/comments.repository.interface";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { IComment } from "./interfaces/comments.interface";
-import { CommentSelect } from "generated/prisma/models";
+import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
+import { CommentGetPayload, SelectSubset } from "generated/prisma/internal/prismaNamespace";
 
 @Injectable()
 export class CommentsRepository implements ICommentsRepository {
     constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>) {}
+
+    async findMany<T extends CommentFindManyArgs>(
+        params: SelectSubset<T, CommentFindManyArgs>,
+    ): Promise<CommentGetPayload<T>[]> {
+        return this.txHost.tx.comment.findMany(params);
+    }
+
+    async findById(commentId: number, select?: CommentSelect): Promise<IComment | null> {
+        return this.txHost.tx.comment.findUnique({
+            where: { id: commentId },
+            select,
+        });
+    }
 
     async create(
         postId: number,
@@ -25,13 +39,6 @@ export class CommentsRepository implements ICommentsRepository {
                 parentId: createCommentDto.parentId ?? null,
                 mentionUserId: createCommentDto.mentionUserId ?? null,
             },
-            select,
-        });
-    }
-
-    async findById(commentId: number, select?: CommentSelect): Promise<IComment | null> {
-        return this.txHost.tx.comment.findUnique({
-            where: { id: commentId },
             select,
         });
     }
