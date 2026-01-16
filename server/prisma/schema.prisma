@@ -14,17 +14,19 @@ datasource db {
 }
 
 model User {
-  id              Int    @id @default(autoincrement()) @db.Integer
-  email           String    @unique @db.VarChar(255)
-  name            String    @db.VarChar(100)
-  nickname        String   @unique @db.VarChar(20) 
-  loginFrom       LoginFrom
-  profileImageUrl String?   @db.VarChar(500)
-  refreshToken    String    @db.VarChar(500)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  pets            Pet[]
-  posts           Post[]
+  id                Int       @id @default(autoincrement()) @db.Integer
+  email             String    @unique @db.VarChar(255)
+  name              String    @db.VarChar(100)
+  nickname          String    @unique @db.VarChar(20)
+  loginFrom         LoginFrom
+  profileImageUrl   String?   @db.VarChar(500)
+  refreshToken      String    @db.VarChar(500)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  pets              Pet[]
+  posts             Post[]
+  comments          Comment[] @relation("CommentAuthor")
+  mentionedComments Comment[] @relation("CommentMention")
 }
 
 model Pet {
@@ -82,8 +84,30 @@ model Post {
   updatedAt  DateTime @updatedAt
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments   Comment[]
 
   @@index([userId])
   @@index([categoryId])
   @@index([createdAt])
+}
+
+model Comment {
+  id            Int       @id @default(autoincrement()) @db.Integer
+  postId        Int       @db.Integer
+  userId        Int       @db.Integer
+  parentId      Int?      @db.Integer
+  mentionUserId Int?      @db.Integer
+  content       String    @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? @db.Timestamp
+  post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user          User      @relation("CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  mentionUser   User?     @relation("CommentMention", fields: [mentionUserId], references: [id], onDelete: SetNull)
+  parent        Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       Comment[] @relation("CommentReplies")
+
+  @@index([postId, createdAt])
+  @@index([userId, createdAt])
+  @@index([parentId, createdAt])
 }
