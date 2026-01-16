@@ -128,7 +128,7 @@ export class CommentsService {
         }
 
         if (parentComment.postId !== postId) {
-            throw new NotFoundException("Parent comment does not belong to this post.");
+            throw new BadRequestException("Parent comment does not belong to this post.");
         }
 
         if (parentComment.deletedAt) {

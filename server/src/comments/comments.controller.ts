@@ -46,7 +46,9 @@ export class CommentsController {
     @Post("posts/:postId/comments")
     @HttpCode(HttpStatus.CREATED)
     @ApiCreatedResponse({ description: "Create comment successful.", type: CommentResponseDto })
-    @ApiBadRequestResponse({ description: "Cannot reply to a deleted parent comment." })
+    @ApiBadRequestResponse({
+        description: "Cannot reply to a deleted parent comment or Parent comment does not belong to this post.",
+    })
     @ApiNotFoundResponse({ description: "Post, User, Parent comment, or Mention user not exists." })
     create(
         @Param("postId") postId: number,
