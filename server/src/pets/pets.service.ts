@@ -6,6 +6,7 @@ import { PetDetailResponseDto } from "./dtos/responses/pet-detail-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PetListResponseDto } from "./dtos/responses/pet-list-response.dto";
 import { PET_DETAIL_SELECT, PET_SUMMARY_SELECT } from "./constants";
+import { getNextCursor } from "src/common/utils/pagination.util";
 
 @Injectable()
 export class PetsService {
@@ -19,7 +20,7 @@ export class PetsService {
 
         // 조회된 pet의 수가 limit와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
         // 동일하지 않은 경우 다음 페이지는 없다고 판단하여 null를 리턴한다.
-        const nextCursor = pets.length === limit ? pets[pets.length - 1].id : null;
+        const nextCursor = getNextCursor(pets, limit);
         return {
             pets,
             nextCursor,

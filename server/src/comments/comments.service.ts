@@ -10,6 +10,7 @@ import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dt
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
 import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
+import { getNextCursor } from "src/common/utils/pagination.util";
 
 @Injectable()
 export class CommentsService {
@@ -35,7 +36,7 @@ export class CommentsService {
             select: COMMENT_SELECT,
             orderBy: { id: "asc" },
         });
-        const nextCursor = parentComments.length === query.limit ? parentComments[parentComments.length - 1].id : null;
+        const nextCursor = getNextCursor(parentComments, query.limit);
 
         return {
             comments: parentComments.map((comment) => this.toCommentResponse(comment)),
@@ -71,7 +72,7 @@ export class CommentsService {
             select: COMMENT_REPLY_SELECT,
             orderBy: { id: "asc" },
         });
-        const nextCursor = replies.length === query.limit ? replies[replies.length - 1].id : null;
+        const nextCursor = getNextCursor(replies, query.limit);
 
         return {
             replies,
