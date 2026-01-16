@@ -75,6 +75,11 @@ export class PostsService {
         return post;
     }
 
+    async existsByPostId(postId: number): Promise<boolean> {
+        const post = await this.postsRepository.findById(postId, { id: true });
+        return !!post;
+    }
+
     async create(userId: number, createPostDto: CreatePostDto): Promise<PostResponseDto> {
         const userExists = await this.usersService.existsByUserId(userId);
 

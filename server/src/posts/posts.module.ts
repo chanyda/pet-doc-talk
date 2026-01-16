@@ -10,5 +10,6 @@ import { CategoriesModule } from "src/categories/categories.module";
     imports: [PrismaModule, UsersModule, CategoriesModule],
     controllers: [PostsController],
     providers: [PostsService, PostsRepository],
+    exports: [PostsService],
 })
 export class PostsModule {}
