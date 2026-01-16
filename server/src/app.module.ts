@@ -15,6 +15,7 @@ import { PrismaService } from "./prisma/prisma.service";
 import { PetsModule } from "./pets/pets.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { PostsModule } from "./posts/posts.module";
+import { CommentsModule } from "./comments/comments.module";
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { PostsModule } from "./posts/posts.module";
         PetsModule,
         CategoriesModule,
         PostsModule,
+        CommentsModule,
     ],
     providers: [AuthService],
 })
