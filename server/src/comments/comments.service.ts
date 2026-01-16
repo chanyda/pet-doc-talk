@@ -4,6 +4,11 @@ import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PostsService } from "src/posts/posts.service";
+import { CommentGetPayload } from "generated/prisma/models";
+import { COMMENT_SELECT, CommentSelect } from "./constants";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
+import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
 
 @Injectable()
 export class CommentsService {
@@ -12,6 +17,31 @@ export class CommentsService {
         private readonly usersService: UsersService,
         private readonly postsService: PostsService,
     ) {}
+
+    // TODO: 댓글 좋아요 기능 추가 시 userId를 받아서 좋아요한 댓글에 대한 정보를 보여줘야함
+    async findComments(postId: number, query: PaginationQueryDto): Promise<CommentListResponseDto> {
+        const postExists = await this.postsService.existsByPostId(postId);
+        if (!postExists) {
+            throw new NotFoundException("Post not exists.");
+        }
+
+        const parentComments = await this.commentsRepository.findMany({
+            take: query.limit,
+            skip: query.cursor ? 1 : undefined,
+            cursor: query.cursor ? { id: query.cursor } : undefined,
+            // 댓글만 가져오기 때문에 parentId는 null이다. (답글 혹은 대댓글인 경우 parentId를 가지고 있음)
+            where: { postId: postId, parentId: null },
+            select: COMMENT_SELECT,
+            orderBy: { id: "asc" },
+        });
+        const nextCursor = parentComments.length === query.limit ? parentComments[parentComments.length - 1].id : null;
+
+        return {
+            comments: parentComments.map((comment) => this.toCommentResponse(comment)),
+            nextCursor,
+        };
+    }
+
 
     /**
      * 댓글 구조는 예시는 아래와 같음
@@ -76,5 +106,18 @@ export class CommentsService {
         if (!mentionUserExists) {
             throw new NotFoundException("Mention user not exists.");
         }
+    }
+
+    private toCommentResponse(comment: CommentGetPayload<{ select: CommentSelect }>): CommentListItemDto {
+        return {
+            id: comment.id,
+            content: comment.content,
+            parentId: comment.parentId,
+            user: comment.user,
+            replyCount: comment._count.replies,
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
+            deletedAt: comment.deletedAt,
+        };
     }
 }

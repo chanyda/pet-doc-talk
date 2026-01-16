@@ -1,16 +1,33 @@
-import { Body, Controller, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiTags } from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiCreatedResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiTags,
+} from "@nestjs/swagger";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
+import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
+import { Public } from "src/common/decorators/public.decorator";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 
 @ApiTags("comments")
 @Auth()
 @Controller()
 export class CommentsController {
     constructor(private readonly commentsService: CommentsService) {}
+
+    @Get("posts/:postId/comments")
+    @Public()
+    @ApiOkResponse({ description: "Get comment list successful.", type: CommentListResponseDto })
+    @ApiNotFoundResponse({ description: "Post not exists." })
+    findComments(@Param("postId") postId: number, @Query() query: PaginationQueryDto): Promise<CommentListResponseDto> {
+        return this.commentsService.findComments(postId, query);
+    }
 
     @Post("posts/:postId/comments")
     @HttpCode(HttpStatus.CREATED)
