@@ -30,17 +30,15 @@ export class CommentsController {
         return this.commentsService.findComments(postId, query);
     }
 
-    @Get("posts/:postId/comments/:commentId/replies")
+    @Get("comments/:commentId/replies")
     @Public()
     @ApiOkResponse({ description: "Get comment reply list successful.", type: CommentReplyListResponseDto })
-    @ApiBadRequestResponse({ description: "Parent comment does not belong to this post." })
-    @ApiNotFoundResponse({ description: "Post or parent comment not exists." })
+    @ApiNotFoundResponse({ description: "Parent comment not exists." })
     findReplies(
-        @Param("postId") postId: number,
         @Param("commentId") commentId: number,
         @Query() query: PaginationQueryDto,
     ): Promise<CommentReplyListResponseDto> {
-        return this.commentsService.findReplies(postId, commentId, query);
+        return this.commentsService.findReplies(commentId, query);
     }
 
     @Post("posts/:postId/comments")

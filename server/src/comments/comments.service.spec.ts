@@ -199,22 +199,19 @@ describe("CommentsService", () => {
                 }));
                 const repliesResponse = { replies: mockReplies, nextCursor: mockReplies[mockReplies.length - 1].id };
 
-                existsByPostIdSpy.mockResolvedValue(true);
-                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID, postId: TEST_POST_ID });
+                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
                 findManySpy.mockResolvedValue(mockReplies);
 
-                const result = await commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                const result = await commentsService.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual(repliesResponse);
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true, postId: true });
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
-                    where: { postId: TEST_POST_ID, parentId: TEST_COMMENT_ID },
+                    where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
                     orderBy: { id: "asc" },
                 });
@@ -236,22 +233,19 @@ describe("CommentsService", () => {
                 }));
                 const repliesResponse = { replies: mockReplies, nextCursor: null };
 
-                existsByPostIdSpy.mockResolvedValue(true);
-                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID, postId: TEST_POST_ID });
+                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
                 findManySpy.mockResolvedValue(mockReplies);
 
-                const result = await commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, query);
+                const result = await commentsService.findReplies(TEST_COMMENT_ID, query);
 
                 expect(result).toEqual(repliesResponse);
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true, postId: true });
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: 1,
                     cursor: { id: query.cursor },
-                    where: { postId: TEST_POST_ID, parentId: TEST_COMMENT_ID },
+                    where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
                     orderBy: { id: "asc" },
                 });
@@ -259,22 +253,19 @@ describe("CommentsService", () => {
             });
 
             it("답글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-                existsByPostIdSpy.mockResolvedValue(true);
-                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID, postId: TEST_POST_ID });
+                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
                 findManySpy.mockResolvedValue([]);
 
-                const result = await commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                const result = await commentsService.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual({ replies: [], nextCursor: null });
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true, postId: true });
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
-                    where: { postId: TEST_POST_ID, parentId: TEST_COMMENT_ID },
+                    where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
                     orderBy: { id: "asc" },
                 });
@@ -283,42 +274,13 @@ describe("CommentsService", () => {
         });
 
         describe("답글 목록 조회 실패", () => {
-            it("답글을 조회하려는 게시글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
-                existsByPostIdSpy.mockResolvedValue(false);
-
-                await expect(commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery)).rejects.toThrow(
-                    new NotFoundException("Post not exists."),
-                );
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).not.toHaveBeenCalled();
-                expect(findManySpy).not.toHaveBeenCalled();
-            });
-
-            it("답글을 조회하려는 게시글의 댓글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
-                existsByPostIdSpy.mockResolvedValue(true);
+            it("답글을 조회하려는 댓글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
                 findByIdSpy.mockResolvedValue(null);
 
-                await expect(commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery)).rejects.toThrow(
+                await expect(commentsService.findReplies(TEST_COMMENT_ID, requiredQuery)).rejects.toThrow(
                     new NotFoundException("Parent comment not exists."),
                 );
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true, postId: true });
-                expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).not.toHaveBeenCalled();
-            });
-
-            it("답글 목록을 조회하려는 댓글의 게시글id가 현재 조회하려는 게시글id와 일치하지 않아 오류를 반환한다.", async () => {
-                existsByPostIdSpy.mockResolvedValue(true);
-                findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID, postId: 2 });
-
-                await expect(commentsService.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery)).rejects.toThrow(
-                    new BadRequestException("Parent comment does not belong to this post."),
-                );
-                expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-                expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true, postId: true });
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManySpy).not.toHaveBeenCalled();
             });

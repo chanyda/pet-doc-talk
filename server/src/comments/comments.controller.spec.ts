@@ -142,10 +142,10 @@ describe("CommentsController", () => {
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
-                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                const result = await commentsController.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual(repliesResponse);
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, requiredQuery);
                 expect(findRepliesSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -164,10 +164,10 @@ describe("CommentsController", () => {
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
-                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                const result = await commentsController.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual(repliesResponse);
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, requiredQuery);
                 expect(findRepliesSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -176,44 +176,22 @@ describe("CommentsController", () => {
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
-                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                const result = await commentsController.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual(repliesResponse);
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, requiredQuery);
                 expect(findRepliesSpy).toHaveBeenCalledTimes(1);
             });
         });
 
         describe("답글 목록 조회 실패", () => {
-            it("답글을 조회하려는 게시글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
-                findRepliesSpy.mockRejectedValue(new NotFoundException("Post not exists."));
-
-                await expect(
-                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
-                ).rejects.toThrow(new NotFoundException("Post not exists."));
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
-                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
-            });
-
-            it("답글을 조회하려는 게시글의 댓글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
+            it("답글을 조회하려는 댓글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
                 findRepliesSpy.mockRejectedValue(new NotFoundException("Parent comment not exists."));
 
-                await expect(
-                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
-                ).rejects.toThrow(new NotFoundException("Parent comment not exists."));
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
-                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
-            });
-
-            it("답글 목록을 조회하려는 댓글의 게시글id가 현재 조회하려는 게시글id와 일치하지 않아 오류를 반환한다.", async () => {
-                findRepliesSpy.mockRejectedValue(
-                    new BadRequestException("Parent comment does not belong to this post."),
+                await expect(commentsController.findReplies(TEST_COMMENT_ID, requiredQuery)).rejects.toThrow(
+                    new NotFoundException("Parent comment not exists."),
                 );
-
-                await expect(
-                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
-                ).rejects.toThrow(new BadRequestException("Parent comment does not belong to this post."));
-                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, requiredQuery);
                 expect(findRepliesSpy).toHaveBeenCalledTimes(1);
             });
         });
