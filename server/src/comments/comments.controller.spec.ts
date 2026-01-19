@@ -8,6 +8,8 @@ describe("CommentsController", () => {
     let commentsController: CommentsController;
     let commentsService: CommentsService;
 
+    let findCommentsSpy: jest.SpyInstance;
+    let findRepliesSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
 
     const TEST_COMMENT_ID = 1;
@@ -21,6 +23,8 @@ describe("CommentsController", () => {
                 {
                     provide: CommentsService,
                     useValue: {
+                        findComments: jest.fn(),
+                        findReplies: jest.fn(),
                         create: jest.fn(),
                     },
                 },
@@ -33,11 +37,186 @@ describe("CommentsController", () => {
         commentsController = moduleRef.get(CommentsController);
         commentsService = moduleRef.get(CommentsService);
 
+        findCommentsSpy = jest.spyOn(commentsService, "findComments");
+        findRepliesSpy = jest.spyOn(commentsService, "findReplies");
         createSpy = jest.spyOn(commentsService, "create");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe("findComments", () => {
+        const requiredQuery = { limit: 10 };
+
+        describe("댓글 목록 조회 성공", () => {
+            it("댓글 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
+                const mockComments = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                    id: i + 1,
+                    content: "Test",
+                    parentId: null,
+                    user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    replyCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    deletedAt: null,
+                }));
+                const commentsResponse = {
+                    comments: mockComments,
+                    nextCursor: mockComments[mockComments.length - 1].id,
+                };
+
+                findCommentsSpy.mockResolvedValue(commentsResponse);
+
+                const result = await commentsController.findComments(TEST_POST_ID, requiredQuery);
+
+                expect(result).toEqual(commentsResponse);
+                expect(findCommentsSpy).toHaveBeenCalledWith(TEST_POST_ID, requiredQuery);
+                expect(findCommentsSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("댓글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
+                const mockComments = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    content: "Test",
+                    parentId: null,
+                    user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    replyCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    deletedAt: null,
+                }));
+                const commentsResponse = { comments: mockComments, nextCursor: null };
+
+                findCommentsSpy.mockResolvedValue(commentsResponse);
+
+                const result = await commentsController.findComments(TEST_POST_ID, requiredQuery);
+
+                expect(result).toEqual(commentsResponse);
+                expect(findCommentsSpy).toHaveBeenCalledWith(TEST_POST_ID, requiredQuery);
+                expect(findCommentsSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("댓글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+                const commentsResponse = { comments: [], nextCursor: null };
+
+                findCommentsSpy.mockResolvedValue(commentsResponse);
+
+                const result = await commentsController.findComments(TEST_POST_ID, requiredQuery);
+
+                expect(result).toEqual(commentsResponse);
+                expect(findCommentsSpy).toHaveBeenCalledWith(TEST_POST_ID, requiredQuery);
+                expect(findCommentsSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("댓글 목록 조회 실패", () => {
+            it("댓글을 조회하려는 게시글 정보가 존재하지 않아 오류를 반환한다.", async () => {
+                findCommentsSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+
+                await expect(commentsController.findComments(TEST_POST_ID, requiredQuery)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(findCommentsSpy).toHaveBeenCalledWith(TEST_POST_ID, requiredQuery);
+                expect(findCommentsSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("findReplies", () => {
+        const requiredQuery = { limit: 10 };
+
+        describe("답글 목록 조회 성공", () => {
+            it("답글 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
+                const mockReplies = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                    id: i + 1,
+                    content: "Test",
+                    parentId: null,
+                    user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    mentionUser: { id: i + 10, nickname: `닉네임${i + 10}` },
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    deletedAt: null,
+                }));
+                const repliesResponse = { replies: mockReplies, nextCursor: mockReplies[mockReplies.length - 1].id };
+
+                findRepliesSpy.mockResolvedValue(repliesResponse);
+
+                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+
+                expect(result).toEqual(repliesResponse);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("답글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
+                const mockReplies = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                    id: i + 1,
+                    content: "Test",
+                    parentId: null,
+                    user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    mentionUser: { id: i + 10, nickname: `닉네임${i + 10}` },
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    deletedAt: null,
+                }));
+                const repliesResponse = { replies: mockReplies, nextCursor: null };
+
+                findRepliesSpy.mockResolvedValue(repliesResponse);
+
+                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+
+                expect(result).toEqual(repliesResponse);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("답글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+                const repliesResponse = { replies: [], nextCursor: null };
+
+                findRepliesSpy.mockResolvedValue(repliesResponse);
+
+                const result = await commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+
+                expect(result).toEqual(repliesResponse);
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("답글 목록 조회 실패", () => {
+            it("답글을 조회하려는 게시글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
+                findRepliesSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+
+                await expect(
+                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
+                ).rejects.toThrow(new NotFoundException("Post not exists."));
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("답글을 조회하려는 게시글의 댓글 정보가 존재하지 않아서 오류를 반환한다.", async () => {
+                findRepliesSpy.mockRejectedValue(new NotFoundException("Parent comment not exists."));
+
+                await expect(
+                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
+                ).rejects.toThrow(new NotFoundException("Parent comment not exists."));
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("답글 목록을 조회하려는 댓글의 게시글id가 현재 조회하려는 게시글id와 일치하지 않아 오류를 반환한다.", async () => {
+                findRepliesSpy.mockRejectedValue(
+                    new BadRequestException("Parent comment does not belong to this post."),
+                );
+
+                await expect(
+                    commentsController.findReplies(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery),
+                ).rejects.toThrow(new BadRequestException("Parent comment does not belong to this post."));
+                expect(findRepliesSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_COMMENT_ID, requiredQuery);
+                expect(findRepliesSpy).toHaveBeenCalledTimes(1);
+            });
+        });
     });
 
     describe("create", () => {
@@ -102,11 +281,11 @@ describe("CommentsController", () => {
             });
 
             it("답글을 다려고 하는 댓글의 게시글과 현재 답글을 다려는 게시글이 일치하지 않아서 오류를 반환한다.", async () => {
-                createSpy.mockRejectedValue(new NotFoundException("Parent comment does not belong to this post."));
+                createSpy.mockRejectedValue(new BadRequestException("Parent comment does not belong to this post."));
 
                 await expect(
                     commentsController.create(TEST_POST_ID, TEST_USER_ID, { ...createCommentDto, parentId: 2 }),
-                ).rejects.toThrow(new NotFoundException("Parent comment does not belong to this post."));
+                ).rejects.toThrow(new BadRequestException("Parent comment does not belong to this post."));
                 expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, {
                     ...createCommentDto,
                     parentId: 2,
