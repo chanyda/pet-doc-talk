@@ -51,4 +51,18 @@ export class CommentsRepository implements ICommentsRepository {
             select,
         });
     }
+
+    // NOTE: Soft delete를 구현하기 위해 Prisma Client Extensions의 $extends를 사용하려고 시도했으나,
+    // any 타입에 대한 타입 오류 처리 등에 대한 해결책을 찾지 못해 현재는 repository에서 update로 처리함.
+    // 향후 Prisma 버전 업데이트나 타입 개선 시 Client Extensions로 변경 필요
+    // https://www.prisma.io/docs/orm/prisma-client/client-extensions/model#example-1
+    // https://medium.com/@erciliomarquesmanhica/implementing-soft-delete-in-prisma-using-client-extensions-a-step-by-step-guide-for-nestjs-51a9d0716831
+
+    async delete(commentId: number): Promise<{ id: number }> {
+        return this.txHost.tx.comment.update({
+            where: { id: commentId },
+            data: { deletedAt: new Date() },
+            select: { id: true },
+        });
+    }
 }

@@ -16,4 +16,5 @@ export interface ICommentsRepository {
         select?: CommentSelect,
     ): Promise<IComment>;
     update(commentId: number, updateCommentDto: UpdateCommentDto, select?: CommentSelect): Promise<IComment>;
+    delete(commentId: number): Promise<{ id: number }>;
 }
