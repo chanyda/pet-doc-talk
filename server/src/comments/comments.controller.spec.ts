@@ -12,6 +12,7 @@ describe("CommentsController", () => {
     let findRepliesSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
+    let removeSpy: jest.SpyInstance;
 
     const TEST_COMMENT_ID = 1;
     const TEST_POST_ID = 1;
@@ -28,6 +29,7 @@ describe("CommentsController", () => {
                         findReplies: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
+                        remove: jest.fn(),
                     },
                 },
             ],
@@ -43,6 +45,7 @@ describe("CommentsController", () => {
         findRepliesSpy = jest.spyOn(commentsService, "findReplies");
         createSpy = jest.spyOn(commentsService, "create");
         updateSpy = jest.spyOn(commentsService, "update");
+        removeSpy = jest.spyOn(commentsService, "remove");
     });
 
     afterEach(() => {
@@ -360,6 +363,54 @@ describe("CommentsController", () => {
                 ).rejects.toThrow(new BadRequestException("Cannot update a deleted comment."));
                 expect(updateSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
                 expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("remove", () => {
+        describe("댓글 삭제 성공", () => {
+            it("댓글 삭제에 성공한다.", async () => {
+                removeSpy.mockResolvedValue(undefined);
+
+                const result = await commentsController.remove(TEST_COMMENT_ID, TEST_USER_ID);
+
+                expect(result).toBeUndefined();
+                expect(removeSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("댓글 삭제 실패", () => {
+            it("삭제하려는 댓글이 DB에 존재하지 않아서 오류를 반환한다.", async () => {
+                removeSpy.mockRejectedValue(new NotFoundException("Comment not exists."));
+
+                await expect(commentsController.remove(TEST_COMMENT_ID, TEST_USER_ID)).rejects.toThrow(
+                    new NotFoundException("Comment not exists."),
+                );
+                expect(removeSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("다른 사용자가 작성한 댓글을 삭제하려고 하여 오류를 반환한다.", async () => {
+                removeSpy.mockRejectedValue(
+                    new ForbiddenException("You do not have permission to delete this comment."),
+                );
+
+                await expect(commentsController.remove(TEST_COMMENT_ID, TEST_USER_ID)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to delete this comment."),
+                );
+                expect(removeSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("이미 삭제된 댓글을 삭제하려고 하여 오류를 반환한다.", async () => {
+                removeSpy.mockRejectedValue(new BadRequestException("Comment already deleted."));
+
+                await expect(commentsController.remove(TEST_COMMENT_ID, TEST_USER_ID)).rejects.toThrow(
+                    new BadRequestException("Comment already deleted."),
+                );
+                expect(removeSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID);
+                expect(removeSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
