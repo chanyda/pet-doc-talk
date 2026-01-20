@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
     ApiForbiddenResponse,
+    ApiNoContentResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
@@ -69,5 +70,15 @@ export class CommentsController {
         @Body() updateCommentDto: UpdateCommentDto,
     ): Promise<CommentResponseDto> {
         return this.commentsService.update(id, userId, updateCommentDto);
+    }
+
+    @Delete("comments/:id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({ description: "Delete comment successful." })
+    @ApiBadRequestResponse({ description: "Comment already deleted." })
+    @ApiForbiddenResponse({ description: "You do not have permission to delete this comment." })
+    @ApiNotFoundResponse({ description: "Comment not exists." })
+    remove(@Param("id") id: number, @User("userId") userId: number): Promise<void> {
+        return this.commentsService.remove(id, userId);
     }
 }

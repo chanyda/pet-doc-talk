@@ -123,6 +123,24 @@ export class CommentsService {
         return this.commentsRepository.update(commentId, updateCommentDto);
     }
 
+    async remove(commentId: number, userId: number): Promise<void> {
+        const comment = await this.commentsRepository.findById(commentId, { id: true, userId: true, deletedAt: true });
+
+        if (!comment) {
+            throw new NotFoundException("Comment not exists.");
+        }
+
+        if (comment.userId !== userId) {
+            throw new ForbiddenException("You do not have permission to delete this comment.");
+        }
+
+        if (comment.deletedAt) {
+            throw new BadRequestException("Comment already deleted.");
+        }
+
+        await this.commentsRepository.delete(commentId);
+    }
+
     private async validateParentComment(parentId: number, postId: number): Promise<void> {
         const parentComment = await this.commentsRepository.findById(parentId, {
             id: true,
