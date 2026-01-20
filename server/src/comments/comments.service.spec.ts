@@ -111,7 +111,7 @@ describe("CommentsService", () => {
                     cursor: undefined,
                     where: { postId: TEST_POST_ID, parentId: null },
                     select: COMMENT_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });
@@ -148,7 +148,7 @@ describe("CommentsService", () => {
                     cursor: { id: query.cursor },
                     where: { postId: TEST_POST_ID, parentId: null },
                     select: COMMENT_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });
@@ -168,7 +168,7 @@ describe("CommentsService", () => {
                     cursor: undefined,
                     where: { postId: TEST_POST_ID, parentId: null },
                     select: COMMENT_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });
@@ -219,7 +219,7 @@ describe("CommentsService", () => {
                     cursor: undefined,
                     where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });
@@ -253,7 +253,7 @@ describe("CommentsService", () => {
                     cursor: { id: query.cursor },
                     where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });
@@ -273,7 +273,7 @@ describe("CommentsService", () => {
                     cursor: undefined,
                     where: { parentId: TEST_COMMENT_ID },
                     select: COMMENT_REPLY_SELECT,
-                    orderBy: { id: "asc" },
+                    orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
             });

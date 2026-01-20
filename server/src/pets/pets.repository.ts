@@ -21,7 +21,7 @@ export class PetsRepository implements IPetsRepository {
             where: { userId },
             cursor: cursor ? { id: cursor } : undefined,
             select,
-            orderBy: { id: "desc" },
+            orderBy: { createdAt: "desc" },
         });
     }
 

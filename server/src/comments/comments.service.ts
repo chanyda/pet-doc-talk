@@ -35,7 +35,7 @@ export class CommentsService {
             // 댓글만 가져오기 때문에 parentId는 null이다. (답글 혹은 대댓글인 경우 parentId를 가지고 있음)
             where: { postId: postId, parentId: null },
             select: COMMENT_SELECT,
-            orderBy: { id: "asc" },
+            orderBy: { createdAt: "asc" },
         });
         const nextCursor = getNextCursor(parentComments, query.limit);
 
@@ -58,7 +58,7 @@ export class CommentsService {
             cursor: query.cursor ? { id: query.cursor } : undefined,
             where: { parentId: parentCommentId },
             select: COMMENT_REPLY_SELECT,
-            orderBy: { id: "asc" },
+            orderBy: { createdAt: "asc" },
         });
         const nextCursor = getNextCursor(replies, query.limit);
 
