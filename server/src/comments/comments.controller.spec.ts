@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CommentsController } from "./comments.controller";
 import { CommentsService } from "./comments.service";
 import { AuthGuard } from "src/auth/guards/auth.guard";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 
 describe("CommentsController", () => {
     let commentsController: CommentsController;
@@ -11,6 +11,7 @@ describe("CommentsController", () => {
     let findCommentsSpy: jest.SpyInstance;
     let findRepliesSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let updateSpy: jest.SpyInstance;
 
     const TEST_COMMENT_ID = 1;
     const TEST_POST_ID = 1;
@@ -26,6 +27,7 @@ describe("CommentsController", () => {
                         findComments: jest.fn(),
                         findReplies: jest.fn(),
                         create: jest.fn(),
+                        update: jest.fn(),
                     },
                 },
             ],
@@ -40,6 +42,7 @@ describe("CommentsController", () => {
         findCommentsSpy = jest.spyOn(commentsService, "findComments");
         findRepliesSpy = jest.spyOn(commentsService, "findReplies");
         createSpy = jest.spyOn(commentsService, "create");
+        updateSpy = jest.spyOn(commentsService, "update");
     });
 
     afterEach(() => {
@@ -295,6 +298,68 @@ describe("CommentsController", () => {
                     mentionUserId: 2,
                 });
                 expect(createSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe("update", () => {
+        const updateCommentDto = { content: "update" };
+
+        describe("댓글 수정 성공", () => {
+            it("댓글을 정상적으로 수정하여 수정된 댓글을 반환한다.", async () => {
+                const mockUpdateComment = {
+                    id: TEST_COMMENT_ID,
+                    postId: TEST_POST_ID,
+                    userId: TEST_USER_ID,
+                    parentId: null,
+                    mentionUserId: null,
+                    content: updateCommentDto.content,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    deletedAt: null,
+                };
+
+                updateSpy.mockResolvedValue(mockUpdateComment);
+
+                const result = await commentsController.update(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
+
+                expect(result).toEqual(mockUpdateComment);
+                expect(updateSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("댓글 수정 실패", () => {
+            it("수정하려는 댓글이 DB에 존재하지 않아서 오류를 반환한다.", async () => {
+                updateSpy.mockRejectedValue(new NotFoundException("Comment not exists."));
+
+                await expect(
+                    commentsController.update(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto),
+                ).rejects.toThrow(new NotFoundException("Comment not exists."));
+                expect(updateSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("다른 사용자가 작성한 댓글을 수정하려고 하여 오류를 반환한다.", async () => {
+                updateSpy.mockRejectedValue(
+                    new ForbiddenException("You do not have permission to update this comment."),
+                );
+
+                await expect(
+                    commentsController.update(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto),
+                ).rejects.toThrow(new ForbiddenException("You do not have permission to update this comment."));
+                expect(updateSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("이미 삭제된 댓글을 수정하려고 하여 오류를 반환한다.", async () => {
+                updateSpy.mockRejectedValue(new BadRequestException("Cannot update a deleted comment."));
+
+                await expect(
+                    commentsController.update(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto),
+                ).rejects.toThrow(new BadRequestException("Cannot update a deleted comment."));
+                expect(updateSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, TEST_USER_ID, updateCommentDto);
+                expect(updateSpy).toHaveBeenCalledTimes(1);
             });
         });
     });
