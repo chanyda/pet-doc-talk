@@ -1,13 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
 import { CommentsService } from "./comments.service";
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
+    ApiForbiddenResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiTags,
 } from "@nestjs/swagger";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
+import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { User } from "src/common/decorators/user.decorator";
@@ -54,5 +56,18 @@ export class CommentsController {
         @Body() createCommentDto: CreateCommentDto,
     ): Promise<CommentResponseDto> {
         return this.commentsService.create(postId, userId, createCommentDto);
+    }
+
+    @Patch("comments/:id")
+    @ApiOkResponse({ description: "Update comment successful.", type: CommentResponseDto })
+    @ApiBadRequestResponse({ description: "Cannot update a deleted comment." })
+    @ApiForbiddenResponse({ description: "You do not have permission to update this comment." })
+    @ApiNotFoundResponse({ description: "Comment not exists." })
+    update(
+        @Param("id") id: number,
+        @User("userId") userId: number,
+        @Body() updateCommentDto: UpdateCommentDto,
+    ): Promise<CommentResponseDto> {
+        return this.commentsService.update(id, userId, updateCommentDto);
     }
 }

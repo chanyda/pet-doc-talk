@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "./comments.repository";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
+import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PostsService } from "src/posts/posts.service";
@@ -102,6 +103,24 @@ export class CommentsService {
         }
 
         return this.commentsRepository.create(postId, userId, createCommentDto);
+    }
+
+    async update(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<CommentResponseDto> {
+        const comment = await this.commentsRepository.findById(commentId, { id: true, userId: true, deletedAt: true });
+
+        if (!comment) {
+            throw new NotFoundException("Comment not exists.");
+        }
+
+        if (comment.userId !== userId) {
+            throw new ForbiddenException("You do not have permission to update this comment.");
+        }
+
+        if (comment.deletedAt) {
+            throw new BadRequestException("Cannot update a deleted comment.");
+        }
+
+        return this.commentsRepository.update(commentId, updateCommentDto);
     }
 
     private async validateParentComment(parentId: number, postId: number): Promise<void> {
