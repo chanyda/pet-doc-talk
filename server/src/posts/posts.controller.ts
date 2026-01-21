@@ -18,6 +18,7 @@ import { Public } from "src/common/decorators/public.decorator";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { MyPostListResponseDto } from "./dtos/responses/my-post-list-response.dto";
 
 @ApiTags("posts")
 @Auth()
@@ -36,11 +37,11 @@ export class PostsController {
 
     @Get("me")
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: "Find my posts successful.", type: PostListResponseDto })
+    @ApiOkResponse({ description: "Find my posts successful.", type: MyPostListResponseDto })
     findMyPosts(
         @User("userId") userId: number,
         @Query() paginationQuery: PaginationQueryDto,
-    ): Promise<PostListResponseDto> {
+    ): Promise<MyPostListResponseDto> {
         return this.postsService.findMyPosts(userId, paginationQuery);
     }
 

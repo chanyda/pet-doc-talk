@@ -8,11 +8,20 @@ import { UsersService } from "src/users/users.service";
 import { CategoriesService } from "src/categories/categories.service";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
-import { PostOrderByWithRelationInput, PostWhereInput } from "generated/prisma/models";
+import { PostGetPayload, PostOrderByWithRelationInput, PostWhereInput } from "generated/prisma/models";
 import { PostOrderBy } from "./posts.enums";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT } from "./constants";
+import {
+    MY_POST_SUMMARY_SELECT,
+    MyPostSummarySelect,
+    POST_DETAIL_SELECT,
+    POST_SUMMARY_SELECT,
+    PostSummarySelect,
+} from "./constants";
 import { getNextCursor } from "src/common/utils/pagination.util";
+import { PostSummaryDto } from "./dtos/responses/post-summary-dto";
+import { MyPostSummaryDto } from "./dtos/responses/my-post-summary-dto";
+import { MyPostListResponseDto } from "./dtos/responses/my-post-list-response.dto";
 
 @Injectable()
 export class PostsService {
@@ -45,20 +54,21 @@ export class PostsService {
         };
     }
 
-    async findMyPosts(userId: number, query: PaginationQueryDto): Promise<PostListResponseDto> {
-        const posts = await this.postsRepository.findMany({
+    async findMyPosts(userId: number, query: PaginationQueryDto): Promise<MyPostListResponseDto> {
+        const { posts, totalCount } = await this.postsRepository.findManyAndCount({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
-            select: POST_SUMMARY_SELECT,
+            select: MY_POST_SUMMARY_SELECT,
             where: { userId },
             orderBy: { createdAt: "desc" },
         });
-
         const nextCursor = getNextCursor(posts, query.limit);
+
         return {
-            posts,
+            posts: posts.map((post) => this.toMyPostSummary(post)),
             nextCursor,
+            totalPostCount: totalCount,
         };
     }
 
@@ -173,6 +183,18 @@ export class PostsService {
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
             user: post.user,
+            category: post.category,
+        };
+    }
+
+    private toMyPostSummary(post: PostGetPayload<{ select: MyPostSummarySelect }>): MyPostSummaryDto {
+        return {
+            id: post.id,
+            title: post.title,
+            viewCount: post.viewCount,
+            commentCount: post._count.comments,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
             category: post.category,
         };
     }

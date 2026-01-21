@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
-import { IPostsRepository } from "./interfaces/posts.repository.interface";
+import { FindManyAndCountResult, IPostsRepository } from "./interfaces/posts.repository.interface";
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
 import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { IPost } from "./interfaces/posts.interface";
@@ -19,6 +19,17 @@ export class PostsRepository implements IPostsRepository {
         params: SelectSubset<T, PostFindManyArgs>,
     ): Promise<PostGetPayload<T>[]> {
         return this.txHost.tx.post.findMany(params);
+    }
+
+    async findManyAndCount<T extends PostFindManyArgs>(
+        params: SelectSubset<T, PostFindManyArgs>,
+    ): Promise<FindManyAndCountResult<T>> {
+        return this.txHost.withTransaction(async () => {
+            const posts = await this.findMany(params);
+            const totalCount = await this.txHost.tx.post.count({ where: params.where });
+
+            return { posts, totalCount };
+        });
     }
 
     // 다른 함수와 달리 select를 필수로 받는 이유:
