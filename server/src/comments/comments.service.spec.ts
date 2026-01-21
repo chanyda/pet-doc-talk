@@ -5,8 +5,10 @@ import { PostsService } from "src/posts/posts.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect } from "./constants";
+import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
 import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
+import { MyCommentListItemDto } from "./dtos/responses/my-comment-list-item.dto";
+import { getNextCursor } from "src/common/utils/pagination.util";
 
 describe("CommentsService", () => {
     let commentsService: CommentsService;
@@ -15,6 +17,7 @@ describe("CommentsService", () => {
     let postsService: PostsService;
 
     let findManySpy: jest.SpyInstance;
+    let findManyAndCountSpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
@@ -35,6 +38,7 @@ describe("CommentsService", () => {
                     provide: CommentsRepository,
                     useValue: {
                         findMany: jest.fn(),
+                        findManyAndCount: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
@@ -63,6 +67,7 @@ describe("CommentsService", () => {
         postsService = moduleRef.get(PostsService);
 
         findManySpy = jest.spyOn(commentsRepository, "findMany");
+        findManyAndCountSpy = jest.spyOn(commentsRepository, "findManyAndCount");
         findByIdSpy = jest.spyOn(commentsRepository, "findById");
         createSpy = jest.spyOn(commentsRepository, "create");
         updateSpy = jest.spyOn(commentsRepository, "update");
@@ -290,6 +295,95 @@ describe("CommentsService", () => {
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManySpy).not.toHaveBeenCalled();
             });
+        });
+    });
+
+    describe("findMyComments", () => {
+        const requiredQuery = { limit: 10 };
+
+        it("cursor를 전달하여 내가 작성한 댓글 목록을 반환한다.", async () => {
+            const query = { cursor: 10, ...requiredQuery };
+            const mockComments = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                id: i + 10,
+                content: "댓글입니다.",
+                post: {
+                    id: 1,
+                    title: "게시글 제목",
+                    _count: { comments: 5 },
+                },
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }));
+
+            findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 20 });
+
+            const result = await commentsService.findMyComments(TEST_USER_ID, query);
+
+            expect(result).toEqual({
+                comments: mockComments.map((comment) => toMyCommentListItem(comment)),
+                nextCursor: getNextCursor(mockComments, query.limit),
+                totalCommentCount: 20,
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
+                take: query.limit,
+                skip: 1,
+                cursor: { id: query.cursor },
+                where: { userId: TEST_USER_ID, deletedAt: null },
+                select: MY_COMMENT_SELECT,
+                orderBy: { createdAt: "desc" },
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("내가 작성한 댓글 목록을 반환하고, 더이상 다음 페이지가 없어서 nextCursor를 null로 반환한다.", async () => {
+            const query = { cursor: 10, ...requiredQuery };
+            const mockComments = Array.from({ length: requiredQuery.limit - 1 }, (_, i) => ({
+                id: i + 10,
+                content: "댓글입니다.",
+                post: {
+                    id: 1,
+                    title: "게시글 제목",
+                    _count: { comments: 5 },
+                },
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }));
+
+            findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 20 });
+
+            const result = await commentsService.findMyComments(TEST_USER_ID, query);
+
+            expect(result).toEqual({
+                comments: mockComments.map((comment) => toMyCommentListItem(comment)),
+                nextCursor: null,
+                totalCommentCount: 20,
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
+                take: query.limit,
+                skip: 1,
+                cursor: { id: query.cursor },
+                where: { userId: TEST_USER_ID, deletedAt: null },
+                select: MY_COMMENT_SELECT,
+                orderBy: { createdAt: "desc" },
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("내가 작성한 댓글 목록이 없어서 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            findManyAndCountSpy.mockResolvedValue({ comments: [], totalCount: 0 });
+
+            const result = await commentsService.findMyComments(TEST_USER_ID, requiredQuery);
+
+            expect(result).toEqual({ comments: [], nextCursor: null, totalCommentCount: 0 });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
+                take: requiredQuery.limit,
+                skip: undefined,
+                cursor: undefined,
+                where: { userId: TEST_USER_ID, deletedAt: null },
+                select: MY_COMMENT_SELECT,
+                orderBy: { createdAt: "desc" },
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -663,5 +757,19 @@ function toCommentResponse(comment: CommentGetPayload<{ select: CommentSelect }>
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt,
         deletedAt: comment.deletedAt,
+    };
+}
+
+function toMyCommentListItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentListItemDto {
+    return {
+        id: comment.id,
+        content: comment.content,
+        post: {
+            id: comment.post.id,
+            title: comment.post.title,
+            commentCount: comment.post._count.comments,
+        },
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
     };
 }

@@ -3,6 +3,7 @@ import { CommentsController } from "./comments.controller";
 import { CommentsService } from "./comments.service";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import { getNextCursor } from "src/common/utils/pagination.util";
 
 describe("CommentsController", () => {
     let commentsController: CommentsController;
@@ -10,6 +11,7 @@ describe("CommentsController", () => {
 
     let findCommentsSpy: jest.SpyInstance;
     let findRepliesSpy: jest.SpyInstance;
+    let findMyCommentsSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
     let removeSpy: jest.SpyInstance;
@@ -27,6 +29,7 @@ describe("CommentsController", () => {
                     useValue: {
                         findComments: jest.fn(),
                         findReplies: jest.fn(),
+                        findMyComments: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
                         remove: jest.fn(),
@@ -43,6 +46,7 @@ describe("CommentsController", () => {
 
         findCommentsSpy = jest.spyOn(commentsService, "findComments");
         findRepliesSpy = jest.spyOn(commentsService, "findReplies");
+        findMyCommentsSpy = jest.spyOn(commentsService, "findMyComments");
         createSpy = jest.spyOn(commentsService, "create");
         updateSpy = jest.spyOn(commentsService, "update");
         removeSpy = jest.spyOn(commentsService, "remove");
@@ -200,6 +204,49 @@ describe("CommentsController", () => {
                 expect(findRepliesSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, requiredQuery);
                 expect(findRepliesSpy).toHaveBeenCalledTimes(1);
             });
+        });
+    });
+
+    describe("findMyComments", () => {
+        const requiredQuery = { limit: 10 };
+
+        it("내가 작성한 댓글들을 반환한다.", async () => {
+            const mockComments = Array.from({ length: requiredQuery.limit }, (_, i) => ({
+                id: i + 1,
+                content: "댓글입니다.",
+                post: {
+                    id: 1,
+                    title: "게시글 제목",
+                    commentCount: 5,
+                },
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }));
+            const commentListResponse = {
+                comments: mockComments,
+                nextCursor: getNextCursor(mockComments, requiredQuery.limit),
+                totalCommentCount: 20,
+            };
+
+            findMyCommentsSpy.mockResolvedValue(commentListResponse);
+
+            const result = await commentsController.findMyComments(TEST_USER_ID, requiredQuery);
+
+            expect(result).toEqual(commentListResponse);
+            expect(findMyCommentsSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredQuery);
+            expect(findMyCommentsSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("내가 작성한 댓글이 없어서 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+            const commentListResponse = { comments: [], nextCursor: null, totalCommentCount: 0 };
+
+            findMyCommentsSpy.mockResolvedValue(commentListResponse);
+
+            const result = await commentsController.findMyComments(TEST_USER_ID, requiredQuery);
+
+            expect(result).toEqual(commentListResponse);
+            expect(findMyCommentsSpy).toHaveBeenCalledWith(TEST_USER_ID, requiredQuery);
+            expect(findMyCommentsSpy).toHaveBeenCalledTimes(1);
         });
     });
 
