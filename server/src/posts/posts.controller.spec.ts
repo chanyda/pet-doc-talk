@@ -65,6 +65,7 @@ describe("PostsController", () => {
                 id: i + 1,
                 title: "게시글 제목",
                 viewCount: 0,
+                commentCount: 5,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 user: {
@@ -92,6 +93,7 @@ describe("PostsController", () => {
                 id: i + 1,
                 title: "게시글 제목",
                 viewCount: 0,
+                commentCount: 5,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 user: {
@@ -135,18 +137,19 @@ describe("PostsController", () => {
                 id: i + 1,
                 title: "게시글 제목",
                 viewCount: 0,
+                commentCount: 5,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                user: {
-                    id: i + 1,
-                    nickname: `닉네임${i + 1}`,
-                },
                 category: {
                     id: i + 1,
                     name: `카테고리${i + 1}`,
                 },
             }));
-            const postListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
+            const postListResponse = {
+                posts: mockPosts,
+                nextCursor: mockPosts[mockPosts.length - 1].id,
+                totalPostCount: 20,
+            };
 
             findMyPostsSpy.mockResolvedValue(postListResponse);
 
@@ -158,7 +161,7 @@ describe("PostsController", () => {
         });
 
         it("내가 작성한 게시글이 없어서 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-            const postListResponse = { posts: [], nextCursor: null };
+            const postListResponse = { posts: [], nextCursor: null, totalPostCount: 0 };
 
             findMyPostsSpy.mockResolvedValue(postListResponse);
 

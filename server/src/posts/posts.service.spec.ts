@@ -6,7 +6,16 @@ import { CategoriesService } from "src/categories/categories.service";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostOrderBy } from "./posts.enums";
-import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT } from "./constants/selects.constant";
+import {
+    MY_POST_SUMMARY_SELECT,
+    MyPostSummarySelect,
+    POST_DETAIL_SELECT,
+    POST_SUMMARY_SELECT,
+    PostSummarySelect,
+} from "./constants/selects.constant";
+import { PostGetPayload } from "generated/prisma/models";
+import { PostSummaryDto } from "./dtos/responses/post-summary-dto";
+import { MyPostSummaryDto } from "./dtos/responses/my-post-summary-dto";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -24,6 +33,7 @@ describe("PostsService", () => {
     let existsByCategoryIdSpy: jest.SpyInstance;
 
     let findManySpy: jest.SpyInstance;
+    let findManyAndCountSpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
@@ -41,7 +51,7 @@ describe("PostsService", () => {
                     provide: PostsRepository,
                     useValue: {
                         findMany: jest.fn(),
-                        findMyPosts: jest.fn(),
+                        findManyAndCount: jest.fn(),
                         findById: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
@@ -73,6 +83,7 @@ describe("PostsService", () => {
         existsByCategoryIdSpy = jest.spyOn(categoriesService, "existsByCategoryId");
 
         findManySpy = jest.spyOn(postsRepository, "findMany");
+        findManyAndCountSpy = jest.spyOn(postsRepository, "findManyAndCount");
         findByIdSpy = jest.spyOn(postsRepository, "findById");
         createSpy = jest.spyOn(postsRepository, "create");
         updateSpy = jest.spyOn(postsRepository, "update");
@@ -119,13 +130,17 @@ describe("PostsService", () => {
                         id: i + 1,
                         name: `카테고리${i + 1}`,
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(requiredQuery);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: mockPost[mockPost.length - 1].id });
+                expect(result).toEqual({
+                    posts: mockPost.map((post) => toPostSummary(post)),
+                    nextCursor: mockPost[mockPost.length - 1].id,
+                });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
@@ -154,13 +169,17 @@ describe("PostsService", () => {
                         id: i + 1,
                         name: `카테고리${i + 1}`,
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: mockPost[mockPost.length - 1].id });
+                expect(result).toEqual({
+                    posts: mockPost.map((post) => toPostSummary(post)),
+                    nextCursor: mockPost[mockPost.length - 1].id,
+                });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     // cursor가 있으므로 skip와 cursor를 정의
@@ -191,14 +210,15 @@ describe("PostsService", () => {
                             id: 1,
                             name: "카테고리1",
                         },
+                        _count: { comments: 5 },
                     },
-                ];
+                ] as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     // cursor가 있으므로 skip와 cursor를 정의
@@ -229,13 +249,14 @@ describe("PostsService", () => {
                         id: 2,
                         name: "카테고리2",
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: undefined,
@@ -265,13 +286,14 @@ describe("PostsService", () => {
                         id: 2,
                         name: "카테고리2",
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: 1,
@@ -303,13 +325,17 @@ describe("PostsService", () => {
                         id: i + 1,
                         name: `카테고리${i + 1}`,
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({
+                    posts: mockPost.map((post) => toPostSummary(post)),
+                    nextCursor: null,
+                });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: undefined,
@@ -339,13 +365,14 @@ describe("PostsService", () => {
                         id: 1,
                         name: "카테고리1",
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: undefined,
@@ -376,13 +403,14 @@ describe("PostsService", () => {
                         id: 1,
                         name: "카테고리1",
                     },
-                }));
+                    _count: { comments: 5 },
+                })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: 1,
@@ -415,13 +443,14 @@ describe("PostsService", () => {
                         id: i + 1,
                         name: `카테고리${i + 1}`,
                     },
-                })).reverse();
+                    _count: { comments: 5 },
+                })).reverse() as PostGetPayload<{ select: PostSummarySelect }>[];
 
                 findManySpy.mockResolvedValue(mockPost);
 
                 const result = await postsService.findMany(query);
 
-                expect(result).toEqual({ posts: mockPost, nextCursor: null });
+                expect(result).toEqual({ posts: mockPost.map((post) => toPostSummary(post)), nextCursor: null });
                 expect(findManySpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: undefined,
@@ -448,30 +477,31 @@ describe("PostsService", () => {
                 viewCount: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                user: {
-                    id: i + 1,
-                    nickname: `닉네임${i + 1}`,
-                },
                 category: {
                     id: 1,
                     name: "카테고리1",
                 },
-            }));
+                _count: { comments: 5 },
+            })) as PostGetPayload<{ select: MyPostSummarySelect }>[];
 
-            findManySpy.mockResolvedValue(mockPosts);
+            findManyAndCountSpy.mockResolvedValue({ posts: mockPosts, totalCount: 20 });
 
             const result = await postsService.findMyPosts(TEST_USER_ID, query);
 
-            expect(result).toEqual({ posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id });
-            expect(findManySpy).toHaveBeenCalledWith({
+            expect(result).toEqual({
+                posts: mockPosts.map((post) => toMyPostSummary(post)),
+                nextCursor: mockPosts[mockPosts.length - 1].id,
+                totalPostCount: 20,
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
                 take: query.limit,
                 skip: 1,
                 cursor: { id: query.cursor },
-                select: POST_SUMMARY_SELECT,
+                select: MY_POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
-            expect(findManySpy).toHaveBeenCalledTimes(1);
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
         });
 
         it("내가 작성한 게시글을 반환하고, 더이상 다음 페이지가 없어서 nextCursor를 null로 반환한다.", async () => {
@@ -482,46 +512,48 @@ describe("PostsService", () => {
                 viewCount: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                user: {
-                    id: i + 1,
-                    nickname: `닉네임${i + 1}`,
-                },
                 category: {
                     id: 1,
                     name: "카테고리1",
                 },
-            }));
+                _count: { comments: 5 },
+            })) as PostGetPayload<{ select: MyPostSummarySelect }>[];
 
-            findManySpy.mockResolvedValue(mockPosts);
+            findManyAndCountSpy.mockResolvedValue({ posts: mockPosts, totalCount: 20 });
 
             const result = await postsService.findMyPosts(TEST_USER_ID, query);
 
-            expect(result).toEqual({ posts: mockPosts, nextCursor: null });
-            expect(findManySpy).toHaveBeenCalledWith({
+            expect(result).toEqual({
+                posts: mockPosts.map((post) => toMyPostSummary(post)),
+                nextCursor: null,
+                totalPostCount: 20,
+            });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
                 take: query.limit,
                 skip: 1,
                 cursor: { id: query.cursor },
-                select: POST_SUMMARY_SELECT,
+                select: MY_POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
-            expect(findManySpy).toHaveBeenCalledTimes(1);
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
         });
 
         it("내가 작성한 게시글이 없어서 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-            findManySpy.mockResolvedValue([]);
+            findManyAndCountSpy.mockResolvedValue({ posts: [], totalCount: 0 });
 
             const result = await postsService.findMyPosts(TEST_USER_ID, requiredQuery);
 
-            expect(result).toEqual({ posts: [], nextCursor: null });
-            expect(findManySpy).toHaveBeenCalledWith({
+            expect(result).toEqual({ posts: [], nextCursor: null, totalPostCount: 0 });
+            expect(findManyAndCountSpy).toHaveBeenCalledWith({
                 take: requiredQuery.limit,
                 skip: undefined,
                 cursor: undefined,
-                select: POST_SUMMARY_SELECT,
+                select: MY_POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
+            expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -792,3 +824,29 @@ describe("PostsService", () => {
         });
     });
 });
+
+// NOTE: toPostSummary, toMyPostSummary 함수 변경 시 테스트 코드도 변경 필요
+function toPostSummary(post: PostGetPayload<{ select: PostSummarySelect }>): PostSummaryDto {
+    return {
+        id: post.id,
+        title: post.title,
+        viewCount: post.viewCount,
+        commentCount: post._count.comments,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        user: post.user,
+        category: post.category,
+    };
+}
+
+function toMyPostSummary(post: PostGetPayload<{ select: MyPostSummarySelect }>): MyPostSummaryDto {
+    return {
+        id: post.id,
+        title: post.title,
+        viewCount: post.viewCount,
+        commentCount: post._count.comments,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        category: post.category,
+    };
+}
