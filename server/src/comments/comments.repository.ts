@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
-import { ICommentsRepository } from "./interfaces/comments.repository.interface";
+import { FindManyAndCountResult, ICommentsRepository } from "./interfaces/comments.repository.interface";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { IComment } from "./interfaces/comments.interface";
@@ -17,6 +17,17 @@ export class CommentsRepository implements ICommentsRepository {
         params: SelectSubset<T, CommentFindManyArgs>,
     ): Promise<CommentGetPayload<T>[]> {
         return this.txHost.tx.comment.findMany(params);
+    }
+
+    async findManyAndCount<T extends CommentFindManyArgs>(
+        params: SelectSubset<T, CommentFindManyArgs>,
+    ): Promise<FindManyAndCountResult<T>> {
+        return this.txHost.withTransaction(async () => {
+            const comments = await this.findMany(params);
+            const totalCount = await this.txHost.tx.comment.count({ where: params.where });
+
+            return { comments, totalCount };
+        });
     }
 
     async findById(commentId: number, select?: CommentSelect): Promise<IComment | null> {
