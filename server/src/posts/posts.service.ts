@@ -26,7 +26,7 @@ export class PostsService {
         const orderByInput = this.buildFindManyOrderByInput(query.orderBy);
         const whereInput = this.buildFindManyWhereInput(query.categoryId, query.keyword);
 
-        // TODO: 좋아요와 댓글 기능 추가 시 likeCount, commentCount, isLiked도 보여줘야함
+        // TODO: 좋아요 기능 추가 시 likeCount, isLiked도 보여줘야함
         const posts = await this.postsRepository.findMany({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
@@ -35,12 +35,12 @@ export class PostsService {
             where: whereInput,
             orderBy: orderByInput,
         });
-
         // 조회된 post의 수가 limit와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
         // 동일하지 않은 경우 다음 페이지는 없다고 판단하여 null를 리턴한다.
         const nextCursor = getNextCursor(posts, query.limit);
+
         return {
-            posts,
+            posts: posts.map((post) => this.toPostSummary(post)),
             nextCursor,
         };
     }
@@ -162,5 +162,18 @@ export class PostsService {
         }
 
         return where;
+    }
+
+    private toPostSummary(post: PostGetPayload<{ select: PostSummarySelect }>): PostSummaryDto {
+        return {
+            id: post.id,
+            title: post.title,
+            viewCount: post.viewCount,
+            commentCount: post._count.comments,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+            user: post.user,
+            category: post.category,
+        };
     }
 }

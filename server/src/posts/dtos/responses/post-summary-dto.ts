@@ -15,8 +15,8 @@ export class PostSummaryDto {
     // @ApiProperty({ description: "The like count of post." })
     // likeCount: number;
 
-    // @ApiProperty({ description: "The comment count of post." })
-    // commentCount: number;
+    @ApiProperty({ description: "The comment count of post." })
+    commentCount: number;
 
     // @ApiProperty({ description: "Whether the current user liked this post." })
     // isLiked: boolean;
