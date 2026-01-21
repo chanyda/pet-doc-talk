@@ -11,6 +11,24 @@ export const COMMENT_SELECT = {
     deletedAt: true,
 };
 
+export const MY_COMMENT_SELECT = {
+    id: true,
+    content: true,
+    post: {
+        select: {
+            id: true,
+            title: true,
+            _count: {
+                select: {
+                    comments: { where: { deletedAt: null } },
+                },
+            },
+        },
+    },
+    createdAt: true,
+    updatedAt: true,
+};
+
 export const COMMENT_REPLY_SELECT = {
     id: true,
     content: true,
@@ -23,3 +41,4 @@ export const COMMENT_REPLY_SELECT = {
 };
 
 export type CommentSelect = typeof COMMENT_SELECT;
+export type MyCommentSelect = typeof MY_COMMENT_SELECT;

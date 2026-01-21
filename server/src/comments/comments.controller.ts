@@ -18,6 +18,7 @@ import { Auth } from "src/common/decorators/auth.decorator";
 import { Public } from "src/common/decorators/public.decorator";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
+import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
 
 @ApiTags("comments")
 @Auth()
@@ -42,6 +43,16 @@ export class CommentsController {
         @Query() query: PaginationQueryDto,
     ): Promise<CommentReplyListResponseDto> {
         return this.commentsService.findReplies(commentId, query);
+    }
+
+    @Get("comments/me")
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Find my comments successful.", type: MyCommentListResponseDto })
+    findMyComments(
+        @User("userId") userId: number,
+        @Query() query: PaginationQueryDto,
+    ): Promise<MyCommentListResponseDto> {
+        return this.commentsService.findMyComments(userId, query);
     }
 
     @Post("posts/:postId/comments")

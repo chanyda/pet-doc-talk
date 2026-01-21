@@ -6,12 +6,14 @@ import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PostsService } from "src/posts/posts.service";
 import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect } from "./constants";
+import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
 import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
 import { getNextCursor } from "src/common/utils/pagination.util";
+import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
+import { MyCommentListItemDto } from "./dtos/responses/my-comment-list-item.dto";
 
 @Injectable()
 export class CommentsService {
@@ -67,6 +69,25 @@ export class CommentsService {
         return {
             replies,
             nextCursor,
+        };
+    }
+
+    async findMyComments(userId: number, query: PaginationQueryDto): Promise<MyCommentListResponseDto> {
+        const { comments, totalCount } = await this.commentsRepository.findManyAndCount({
+            take: query.limit,
+            skip: query.cursor ? 1 : undefined,
+            cursor: query.cursor ? { id: query.cursor } : undefined,
+            // 내가 작성한 댓글을 보여줘야하므로, 삭제된 댓글은 보여주지 않는다.
+            where: { userId, deletedAt: null },
+            select: MY_COMMENT_SELECT,
+            orderBy: { createdAt: "desc" },
+        });
+        const nextCursor = getNextCursor(comments, query.limit);
+
+        return {
+            comments: comments.map((comment) => this.toMyCommentListItem(comment)),
+            nextCursor,
+            totalCommentCount: totalCount,
         };
     }
 
@@ -181,6 +202,20 @@ export class CommentsService {
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt,
             deletedAt: comment.deletedAt,
+        };
+    }
+
+    private toMyCommentListItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentListItemDto {
+        return {
+            id: comment.id,
+            content: comment.content,
+            post: {
+                id: comment.post.id,
+                title: comment.post.title,
+                commentCount: comment.post._count.comments,
+            },
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
         };
     }
 }
