@@ -40,7 +40,7 @@ export class CommentsService {
         const nextCursor = getNextCursor(parentComments, query.limit);
 
         return {
-            comments: parentComments.map((comment) => this.toCommentResponse(comment)),
+            comments: parentComments.map((comment) => this.toCommentListItem(comment)),
             nextCursor,
         };
     }
@@ -169,7 +169,7 @@ export class CommentsService {
         }
     }
 
-    private toCommentResponse(comment: CommentGetPayload<{ select: CommentSelect }>): CommentListItemDto {
+    private toCommentListItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentListItemDto {
         return {
             id: comment.id,
             content: comment.content,
