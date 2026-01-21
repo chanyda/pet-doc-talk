@@ -28,6 +28,7 @@ export class CommentsController {
 
     @Get("posts/:postId/comments")
     @Public()
+    @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Get comment list successful.", type: CommentListResponseDto })
     @ApiNotFoundResponse({ description: "Post not exists." })
     findComments(@Param("postId") postId: number, @Query() query: PaginationQueryDto): Promise<CommentListResponseDto> {
@@ -36,6 +37,7 @@ export class CommentsController {
 
     @Get("comments/:commentId/replies")
     @Public()
+    @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Get comment reply list successful.", type: CommentReplyListResponseDto })
     @ApiNotFoundResponse({ description: "Parent comment not exists." })
     findReplies(
@@ -71,6 +73,7 @@ export class CommentsController {
     }
 
     @Patch("comments/:id")
+    @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Update comment successful.", type: CommentResponseDto })
     @ApiBadRequestResponse({ description: "Cannot update a deleted comment." })
     @ApiForbiddenResponse({ description: "You do not have permission to update this comment." })
