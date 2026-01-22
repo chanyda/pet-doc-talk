@@ -4,6 +4,7 @@ import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import { IS_PUBLIC_KEY } from "src/common/decorators/public.decorator";
+import { extractTokenFromHeader } from "src/common/utils/auth.util";
 import { JwtPayload } from "src/types/auth.type";
 import { ConfigType } from "src/types/config.type";
 import { AuthRequest } from "src/types/request.type";
@@ -18,7 +19,7 @@ export class AuthGuard implements CanActivate {
 
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest<AuthRequest>();
-        const token = this.extractTokenFromHeader(request);
+        const token = extractTokenFromHeader(request.headers?.authorization);
 
         const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
             context.getHandler(),
@@ -48,10 +49,5 @@ export class AuthGuard implements CanActivate {
         }
 
         return true;
-    }
-
-    private extractTokenFromHeader(request: Request): string | null {
-        const [type, token] = request.headers.authorization?.split(" ") ?? [];
-        return type === "Bearer" ? token : null;
     }
 }
