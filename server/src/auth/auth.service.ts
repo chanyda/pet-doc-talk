@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { LoginDto } from "./dtos/requests/login.dto";
+import { RefreshTokenDto } from "./dtos/requests/refresh-token.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -7,6 +8,8 @@ import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/log
 import { ConfigType } from "src/types/config.type";
 import { nanoid } from "nanoid";
 import { Transactional } from "@nestjs-cls/transactional";
+import { JwtPayload } from "src/types/auth.type";
+import { extractTokenFromHeader } from "src/common/utils/auth.util";
 
 @Injectable()
 export class AuthService {
@@ -38,6 +41,55 @@ export class AuthService {
         await this.usersService.updateById(user.id, { refreshToken: tokens.refreshToken });
 
         return { ...tokens, isNewUser };
+    }
+
+    async refresh(authorization: string, refreshTokenDto: RefreshTokenDto): Promise<GenerateTokenResponseDto> {
+        const accessToken = extractTokenFromHeader(authorization);
+
+        if (!accessToken) {
+            console.error("Access token not exists.");
+            throw new UnauthorizedException("Invalid token.");
+        }
+
+        const secretKey = this.configService.getOrThrow("auth.secretKey", { infer: true });
+
+        let accessTokenPayload: JwtPayload;
+        let refreshTokenPayload: JwtPayload;
+
+        try {
+            accessTokenPayload = this.jwtService.verify<JwtPayload>(accessToken, {
+                secret: secretKey,
+                ignoreExpiration: true,
+            });
+            refreshTokenPayload = this.jwtService.verify<JwtPayload>(refreshTokenDto.refreshToken, {
+                secret: secretKey,
+            });
+        } catch (err) {
+            console.error(err);
+            throw new UnauthorizedException("Invalid token.");
+        }
+
+        this.verifyTokenPayload(accessTokenPayload, refreshTokenPayload);
+
+        const user = await this.usersService.findByEmail(refreshTokenPayload.email);
+
+        if (!user) {
+            console.error("User not exists.");
+            throw new UnauthorizedException("Invalid token.");
+        }
+
+        if (user.refreshToken !== refreshTokenDto.refreshToken) {
+            console.error("Refresh token mismatch.");
+            throw new UnauthorizedException("Invalid token.");
+        }
+
+        const tokens = this.generateToken(user.id, user.email);
+
+        // NOTE:  RTR (Refresh Token Rotation)으로 구현했는데, 우선은 postgres에 업데이트를 해두자
+        // 추후 서비스가 커지면 Redis로 옮겨야함 (access token 발급 시 refresh token도 발급되므로 서버 부하가 올라감)
+        await this.usersService.updateRefreshToken(user.id, refreshTokenDto.refreshToken, tokens.refreshToken);
+
+        return tokens;
     }
 
     private generateToken(userId: number, email: string): GenerateTokenResponseDto {
@@ -77,5 +129,31 @@ export class AuthService {
         } while (exists);
 
         return temporaryNickname;
+    }
+
+    private verifyTokenPayload(accessTokenPayload: JwtPayload, refreshTokenPayload: JwtPayload): void {
+        try {
+            const requiredFields: Array<keyof JwtPayload> = ["email", "userId"];
+
+            // AccessToken, RefreshToken에 반드시 포함되어이야하는 값들이 있는지 체크한다.
+            const isValidAccessToken = requiredFields.every((field) => !!accessTokenPayload[field]);
+            if (!isValidAccessToken) {
+                throw new Error("Invalid access token.");
+            }
+
+            const isValidRefreshToken = requiredFields.every((field) => !!refreshTokenPayload[field]);
+            if (!isValidRefreshToken || !refreshTokenPayload.isRefresh) {
+                throw new Error("Invalid refresh token.");
+            }
+
+            // AccessToken, RefreshToken payload 값들이 동일한지 체크한다.
+            const isMatched = requiredFields.every((field) => accessTokenPayload[field] === refreshTokenPayload[field]);
+            if (!isMatched) {
+                throw new Error("Token payload mismatch.");
+            }
+        } catch (err) {
+            console.error(err);
+            throw new UnauthorizedException("Invalid token.");
+        }
     }
 }
