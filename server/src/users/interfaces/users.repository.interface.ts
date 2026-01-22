@@ -2,6 +2,7 @@ import { UserGetPayload, UserSelect } from "generated/prisma/models";
 import { CreateUserDto } from "../dtos/requests/create-user.dto";
 import { UpdateUserDto } from "../dtos/requests/update-user.dto";
 import { IUser } from "./users.interface";
+import { BatchPayload } from "generated/prisma/internal/prismaNamespace";
 
 export interface IUsersRepository {
     create(createUserDto: CreateUserDto): Promise<IUser>;
@@ -15,4 +16,5 @@ export interface IUsersRepository {
         updateUserDto: UpdateUserDto,
         select: T,
     ): Promise<UserGetPayload<{ select: T }>>;
+    updateRefreshToken(userId: number, oldRefreshToken: string, newRefreshToken: string): Promise<BatchPayload>;
 }

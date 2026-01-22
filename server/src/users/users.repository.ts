@@ -7,6 +7,7 @@ import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-pr
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserGetPayload, UserSelect } from "generated/prisma/models";
+import { BatchPayload } from "generated/prisma/internal/prismaNamespace";
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -61,6 +62,13 @@ export class UsersRepository implements IUsersRepository {
             where: { id: userId },
             data: updateUserDto,
             select,
+        });
+    }
+
+    async updateRefreshToken(userId: number, oldRefreshToken: string, newRefreshToken: string): Promise<BatchPayload> {
+        return this.txHost.tx.user.updateMany({
+            where: { id: userId, refreshToken: oldRefreshToken },
+            data: { refreshToken: newRefreshToken },
         });
     }
 }

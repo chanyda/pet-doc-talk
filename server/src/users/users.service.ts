@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersRepository } from "./users.repository";
 import { CreateUserDto } from "./dtos/requests/create-user.dto";
 import { UpdateUserDto } from "./dtos/requests/update-user.dto";
@@ -7,6 +7,7 @@ import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.d
 import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
 import { UserGetPayload } from "generated/prisma/models";
 import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
+import { BatchPayload } from "generated/prisma/internal/prismaNamespace";
 
 @Injectable()
 export class UsersService {
@@ -74,6 +75,16 @@ export class UsersService {
         }
 
         return this.usersRepository.updateById(userId, updateUserDto);
+    }
+
+    async updateRefreshToken(userId: number, oldRefreshToken: string, newRefreshToken: string): Promise<BatchPayload> {
+        const result = await this.usersRepository.updateRefreshToken(userId, oldRefreshToken, newRefreshToken);
+
+        if (result.count === 0) {
+            throw new ConflictException("Refresh token has already been updated.");
+        }
+
+        return result;
     }
 
     private toProfileResponse(user: UserGetPayload<{ select: UserProfileSelect }>): FindProfileResponseDto {
