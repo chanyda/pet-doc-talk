@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface Post {
     id: number;
     title: string;
@@ -62,12 +64,14 @@ export function CommunitySection() {
         <section className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
                 <h2 className="text-xl">🔥 지금 많이 보는 커뮤니티</h2>
-                <button
+                <Link
+                    href="/community"
                     className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    style={{ color: "#FF6B9D" }}>
+                    style={{ color: "#FF6B9D" }}
+                >
                     전체 커뮤니티 보기
                     <span className="text-lg">→</span>
-                </button>
+                </Link>
             </div>
 
             <div className="space-y-4">
