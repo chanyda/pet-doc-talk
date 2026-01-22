@@ -1,7 +1,30 @@
+"use client";
+
+import { useState } from "react";
+import { TopNavigation } from "./components/layout/TopNavigation";
+import { HeroSection } from "./components/HeroSection";
+import { QuickActions } from "./components/QuickActions";
+import { CommunitySection } from "./components/CommunitySection";
+import { InfoCards } from "./components/InfoCards";
+
 export default function Home() {
+    const [activeTab, setActiveTab] = useState("home");
+
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            메인페이지
+        <div className="min-h-screen bg-gray-50">
+            <TopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            <main className="max-w-6xl mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        <HeroSection />
+                        <QuickActions />
+                        <CommunitySection />
+                    </div>
+                    <div className="lg:col-span-1 space-y-6">
+                        <InfoCards />
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }
