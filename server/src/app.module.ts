@@ -16,6 +16,7 @@ import { PetsModule } from "./pets/pets.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
+import { AuthKakaoModule } from "./auth-kakao/auth-kakao.module";
 
 @Module({
     imports: [
@@ -39,6 +40,7 @@ import { CommentsModule } from "./comments/comments.module";
         PrismaModule,
         UsersModule,
         AuthModule,
+        AuthKakaoModule,
         PetsModule,
         CategoriesModule,
         PostsModule,
