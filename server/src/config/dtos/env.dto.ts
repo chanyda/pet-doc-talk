@@ -29,4 +29,13 @@ export class EnvironmentVariables {
 
     @IsString()
     JWT_REFRESH_TOKEN_EXP_TIME: string;
+
+    @IsString()
+    KAKAO_CLIENT_ID: string;
+
+    @IsString()
+    KAKAO_REDIRECT_URI: string;
+
+    @IsString()
+    KAKAO_CLIENT_SECRET: string;
 }

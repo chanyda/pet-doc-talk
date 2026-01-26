@@ -14,6 +14,9 @@ export type AuthConfigType = {
     secretKey: string;
     accessTokenExpTime: StringValue;
     refreshTokenExpTime: StringValue;
+    kakaoClientId: string;
+    kakaoRedirectUri: string;
+    kakaoClientSecret: string;
 };
 
 export type ConfigType = {
