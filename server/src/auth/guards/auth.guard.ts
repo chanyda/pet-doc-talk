@@ -10,11 +10,15 @@ import { AuthRequest } from "src/types/request.type";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+    private readonly secretKey: string;
+
     constructor(
         private jwtService: JwtService,
-        private configService: ConfigService<ConfigType, true>,
+        configService: ConfigService<ConfigType, true>,
         private reflector: Reflector,
-    ) {}
+    ) {
+        this.secretKey = configService.getOrThrow("auth.secretKey", { infer: true });
+    }
 
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest<AuthRequest>();
@@ -38,8 +42,7 @@ export class AuthGuard implements CanActivate {
         }
 
         try {
-            const secretKey = this.configService.getOrThrow("auth.secretKey", { infer: true });
-            const jwtPayload = this.jwtService.verify<JwtPayload>(token, { secret: secretKey });
+            const jwtPayload = this.jwtService.verify<JwtPayload>(token, { secret: this.secretKey });
 
             request.user = jwtPayload;
         } catch (err) {
