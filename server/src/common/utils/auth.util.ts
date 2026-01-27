@@ -1,4 +1,3 @@
-export function extractTokenFromHeader(authorization?: string): string | null {
-    const [type, token] = authorization?.split(" ") ?? [];
-    return type === "Bearer" ? token : null;
+export function extractTokenFromCookie(cookies: Record<string, string> | undefined, cookieName: string): string | null {
+    return cookies?.[cookieName] ?? null;
 }
