@@ -14,6 +14,7 @@ import { KakaoLoginQueryDto } from "./dtos/requests/kakao-login-query.dto";
 import { Response } from "express";
 import { ConfigType } from "src/types/config.type";
 import { ConfigService } from "@nestjs/config";
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
 
 @ApiTags("auth/kakao")
 @Controller("auth/kakao")
@@ -41,19 +42,8 @@ export class AuthKakaoController {
         const { email, name } = await this.authKakaoService.authenticate(query.code);
         const { accessToken, refreshToken } = await this.authService.login({ email, name, loginFrom: LoginFrom.KAKAO });
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 1000 * 60 * 60 * 24,
-        });
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 1000 * 60 * 60 * 24 * 30,
-        });
+        res.cookie("accessToken", accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+        res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
         return res.redirect(`${this.origin}`);
     }
