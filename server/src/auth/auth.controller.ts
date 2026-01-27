@@ -4,6 +4,8 @@ import { ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger
 import { Cookies } from "src/common/decorators/cookie.decorator";
 import { Response } from "express";
 import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
+import { User } from "src/common/decorators/user.decorator";
+import { Auth } from "src/common/decorators/auth.decorator";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -25,5 +27,18 @@ export class AuthController {
         res.cookie("refreshToken", tokens.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
         res.json({ message: "Token refreshed successfully." });
+    }
+
+    @Post("logout")
+    @Auth()
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Logout successfully." })
+    async logout(@User("userId") userId: number, @Res() res: Response): Promise<void> {
+        await this.authService.logout(userId);
+
+        res.clearCookie("accessToken", ACCESS_TOKEN_COOKIE_OPTIONS);
+        res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
+
+        res.json({ message: "Logout successfully." });
     }
 }

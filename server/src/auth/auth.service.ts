@@ -41,6 +41,10 @@ export class AuthService {
         return { ...tokens, isNewUser };
     }
 
+    async logout(userId: number): Promise<void> {
+        await this.usersService.updateById(userId, { refreshToken: "" });
+    }
+
     async refresh(accessToken: string, refreshToken: string): Promise<GenerateTokenResponseDto> {
         const secretKey = this.configService.getOrThrow("auth.secretKey", { infer: true });
 
