@@ -184,4 +184,8 @@
 
 html {
     font-size: var(--font-size);
+    /* 스크롤바 영역을 항상 확보하여 레이아웃 시프트 방지 */
+    overflow-y: scroll;
+    /* 최신 브라우저에서 스크롤바 공간만 확보 (더 나은 방법) */
+    scrollbar-gutter: stable;
 }
