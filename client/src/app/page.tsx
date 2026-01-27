@@ -1,8 +1,8 @@
-import { TopNavigation } from "./components/layout/TopNavigation";
-import { HeroSection } from "./components/HeroSection";
-import { QuickActions } from "./components/QuickActions";
-import { CommunitySection } from "./components/CommunitySection";
-import { InfoCards } from "./components/InfoCards";
+import { CommunitySection } from "@/components/home/CommunitySection";
+import { HeroSection } from "@/components/home/HeroSection";
+import { InfoCards } from "@/components/home/InfoCards";
+import { QuickActions } from "@/components/home/QuickActions";
+import { TopNavigation } from "@/components/layout/TopNavigation";
 
 export default function Home() {
     return (

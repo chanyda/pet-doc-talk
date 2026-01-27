@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TopNavigation } from "../components/layout/TopNavigation";
-import { CommunityHeader } from "../components/community/CommunityHeader";
-import { CommunityFilters } from "../components/community/CommunityFilters";
-import { PostList } from "../components/community/PostList";
+
+import { CommunityFilters } from "@/components/community/CommunityFilters";
+import { CommunityHeader } from "@/components/community/CommunityHeader";
+import { PostList } from "@/components/community/PostList";
+import { TopNavigation } from "@/components/layout/TopNavigation";
 
 export default function CommunityPage() {
     const [selectedCategory, setSelectedCategory] = useState("전체");

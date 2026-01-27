@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 interface Post {
@@ -67,13 +69,11 @@ export function CommunitySection() {
                 <Link
                     href="/community"
                     className="flex items-center gap-1 hover:opacity-80 transition-opacity"
-                    style={{ color: "#FF6B9D" }}
-                >
+                    style={{ color: "#FF6B9D" }}>
                     전체 커뮤니티 보기
                     <span className="text-lg">→</span>
                 </Link>
             </div>
-
             <div className="space-y-4">
                 {mockPosts.map((post) => (
                     <div
