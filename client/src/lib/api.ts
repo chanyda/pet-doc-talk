@@ -87,3 +87,11 @@ export async function getUser(): Promise<AxiosResponse<User>> {
 export async function tokenRefresh(): Promise<AxiosResponse<void>> {
     return apiClient.post("/auth/refresh");
 }
+
+export async function getPosts(params: FindPostListQuery): Promise<AxiosResponse<PostListResponse>> {
+    return apiClient.get<PostListResponse>("/posts", { params });
+}
+
+export async function getCategories(): Promise<AxiosResponse<Category[]>> {
+    return apiClient.get<Category[]>("/categories");
+}
