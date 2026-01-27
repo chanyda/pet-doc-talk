@@ -35,36 +35,20 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // refresh 요청 자체가 실패한 경우 무한 루프 방지
-        const isRefreshRequest =
-            originalRequest?.url?.includes("/auth/refresh") ||
-            originalRequest?.url === `${API_BASE_URL}/auth/refresh` ||
-            originalRequest?.url === "/auth/refresh";
-
-        if (isRefreshRequest) {
-            useAuthStore.getState().logout();
+        // refresh API에서 오류가 발생한 경우, 로그아웃 처리한다.
+        if (originalRequest?.url?.includes("/auth/refresh")) {
+            await logout();
             return Promise.reject(error);
         }
 
         // 401, 403 에러 (인증 실패) 처리
         if (error.response?.status === 401 || error.response?.status === 403) {
-            // 이미 재시도한 요청이면 에러 반환
-            if (originalRequest?._retry) {
-                useAuthStore.getState().logout();
-                return Promise.reject(error);
-            }
-
-            // refresh 시도
-            originalRequest._retry = true;
-
             try {
-                await apiClient.post(`${API_BASE_URL}/auth/refresh`);
+                await tokenRefresh();
 
                 // refresh 성공 시 원래 요청 재시도
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // refresh 실패 시 로그아웃 처리
-                useAuthStore.getState().logout();
                 return Promise.reject(refreshError);
             }
         }
@@ -91,10 +75,15 @@ apiClient.interceptors.response.use(
     },
 );
 
+export async function logout(): Promise<void> {
+    await apiClient.post("/auth/logout");
+    useAuthStore.getState().logout();
+}
+
 export async function getUser(): Promise<AxiosResponse<User>> {
     return apiClient.get<User>("/users/me");
 }
 
-export async function logout(): Promise<AxiosResponse<void>> {
-    return apiClient.post("/auth/logout");
+export async function tokenRefresh(): Promise<AxiosResponse<void>> {
+    return apiClient.post("/auth/refresh");
 }

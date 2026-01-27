@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
+import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 interface Tab {
@@ -14,7 +15,7 @@ interface Tab {
 export function TopNavigation() {
     const pathname = usePathname();
     const router = useRouter();
-    const { isAuthenticated, logout } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
 
     const tabs: Tab[] = [
         { id: "home", label: "홈", href: "/" },
@@ -24,7 +25,7 @@ export function TopNavigation() {
 
     const handleLogout = async () => {
         try {
-            await logout();
+            await api.logout();
             router.push("/");
         } catch (error) {
             console.error("Logout failed:", error);
