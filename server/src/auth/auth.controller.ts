@@ -1,8 +1,9 @@
-import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { RefreshTokenDto } from "./dtos/requests/refresh-token.dto";
-import { GenerateTokenResponseDto } from "./dtos/responses/login-response.dto";
 import { ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { Cookies } from "src/common/decorators/cookie.decorator";
+import { Response } from "express";
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -11,12 +12,18 @@ export class AuthController {
 
     @Post("refresh")
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: "Refresh token successful.", type: GenerateTokenResponseDto })
+    @ApiOkResponse({ description: "Token refreshed successfully." })
     @ApiUnauthorizedResponse({ description: "Invalid token." })
     async refresh(
-        @Headers("Authorization") authorization: string,
-        @Body() refreshTokenDto: RefreshTokenDto,
-    ): Promise<GenerateTokenResponseDto> {
-        return this.authService.refresh(authorization, refreshTokenDto);
+        @Cookies("accessToken") accessToken: string,
+        @Cookies("refreshToken") refreshToken: string,
+        @Res() res: Response,
+    ): Promise<void> {
+        const tokens = await this.authService.refresh(accessToken, refreshToken);
+
+        res.cookie("accessToken", tokens.accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+        res.cookie("refreshToken", tokens.refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+
+        res.json({ message: "Token refreshed successfully." });
     }
 }

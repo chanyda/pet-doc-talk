@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { LoginDto } from "./dtos/requests/login.dto";
-import { RefreshTokenDto } from "./dtos/requests/refresh-token.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -9,7 +8,6 @@ import { ConfigType } from "src/types/config.type";
 import { nanoid } from "nanoid";
 import { Transactional } from "@nestjs-cls/transactional";
 import { JwtPayload } from "src/types/auth.type";
-import { extractTokenFromHeader } from "src/common/utils/auth.util";
 
 @Injectable()
 export class AuthService {
@@ -43,14 +41,7 @@ export class AuthService {
         return { ...tokens, isNewUser };
     }
 
-    async refresh(authorization: string, refreshTokenDto: RefreshTokenDto): Promise<GenerateTokenResponseDto> {
-        const accessToken = extractTokenFromHeader(authorization);
-
-        if (!accessToken) {
-            console.error("Access token not exists.");
-            throw new UnauthorizedException("Invalid token.");
-        }
-
+    async refresh(accessToken: string, refreshToken: string): Promise<GenerateTokenResponseDto> {
         const secretKey = this.configService.getOrThrow("auth.secretKey", { infer: true });
 
         let accessTokenPayload: JwtPayload;
@@ -61,7 +52,7 @@ export class AuthService {
                 secret: secretKey,
                 ignoreExpiration: true,
             });
-            refreshTokenPayload = this.jwtService.verify<JwtPayload>(refreshTokenDto.refreshToken, {
+            refreshTokenPayload = this.jwtService.verify<JwtPayload>(refreshToken, {
                 secret: secretKey,
             });
         } catch (err) {
@@ -78,18 +69,18 @@ export class AuthService {
             throw new UnauthorizedException("Invalid token.");
         }
 
-        if (user.refreshToken !== refreshTokenDto.refreshToken) {
+        if (user.refreshToken !== refreshToken) {
             console.error("Refresh token mismatch.");
             throw new UnauthorizedException("Invalid token.");
         }
 
-        const tokens = this.generateToken(user.id, user.email);
+        const newTokens = this.generateToken(user.id, user.email);
 
         // NOTE:  RTR (Refresh Token Rotation)으로 구현했는데, 우선은 postgres에 업데이트를 해두자
         // 추후 서비스가 커지면 Redis로 옮겨야함 (access token 발급 시 refresh token도 발급되므로 서버 부하가 올라감)
-        await this.usersService.updateRefreshToken(user.id, refreshTokenDto.refreshToken, tokens.refreshToken);
+        await this.usersService.updateRefreshToken(user.id, refreshToken, newTokens.refreshToken);
 
-        return tokens;
+        return newTokens;
     }
 
     private generateToken(userId: number, email: string): GenerateTokenResponseDto {
