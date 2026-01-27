@@ -4,22 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { TopNavigation } from "@/components/layout/TopNavigation";
-
-type SocialLoginType = "KAKAO" | "GOOGLE" | "NAVER";
-
-type SocialLoginConfig = {
-    type: SocialLoginType;
-    imageSrc: string;
-    href: string;
-};
-
-const socialLoginConfigs: Array<SocialLoginConfig> = [
-    {
-        type: "KAKAO",
-        imageSrc: "/images/kakao-icon.png",
-        href: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI}`,
-    },
-];
+import { socialLoginConfigs } from "@/constants/config";
 
 export default function LoginPage() {
     return (
@@ -31,7 +16,6 @@ export default function LoginPage() {
                         로그인
                     </h1>
                     <p className="text-gray-600 text-center mb-8">펫케어에 오신 것을 환영합니다</p>
-
                     <div className="space-y-3">
                         {socialLoginConfigs.map((config) => (
                             <Link key={config.type} href={config.href} className="block w-full">
