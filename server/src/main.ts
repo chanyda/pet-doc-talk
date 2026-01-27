@@ -6,12 +6,14 @@ import helmet from "helmet";
 import { ValidationPipe } from "@nestjs/common";
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import cookieParser from "cookie-parser";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService<ConfigType, true>);
 
     app.use(helmet());
+    app.use(cookieParser());
     app.enableCors({
         origin: configService.getOrThrow("app.origin", { infer: true }),
         credentials: true,
