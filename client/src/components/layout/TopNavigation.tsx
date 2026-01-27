@@ -24,8 +24,7 @@ export function TopNavigation() {
 
     const handleLogout = async () => {
         try {
-            logout();
-
+            await logout();
             router.push("/");
         } catch (error) {
             console.error("Logout failed:", error);
