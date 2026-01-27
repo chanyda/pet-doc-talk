@@ -41,7 +41,7 @@ export class AuthService {
         return { ...tokens, isNewUser };
     }
 
-    async logout(userId: number): Promise<void> {
+    async clearRefreshToken(userId: number): Promise<void> {
         await this.usersService.updateById(userId, { refreshToken: "" });
     }
 

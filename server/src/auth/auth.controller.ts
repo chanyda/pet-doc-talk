@@ -1,11 +1,11 @@
-import { Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
+import { Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { Cookies } from "src/common/decorators/cookie.decorator";
 import { Response } from "express";
 import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
+import { LogoutGuard } from "./guards/logout.guard";
+import { AuthRequest } from "src/types/request.type";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -30,15 +30,24 @@ export class AuthController {
     }
 
     @Post("logout")
-    @Auth()
+    @UseGuards(LogoutGuard)
+    @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Logout successfully." })
-    async logout(@User("userId") userId: number, @Res() res: Response): Promise<void> {
-        await this.authService.logout(userId);
+    async logout(@Req() req: AuthRequest, @Res() res: Response): Promise<void> {
+        try {
+            // LogoutGuard에 의해 검증된 user가 있는 경우에만 refresh token을 초기화해준다.
+            if (req.user) {
+                await this.authService.clearRefreshToken(req.user.userId);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            // 무조건 cookie는 삭제해준다.
+            res.clearCookie("accessToken", ACCESS_TOKEN_COOKIE_OPTIONS);
+            res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        res.clearCookie("accessToken", ACCESS_TOKEN_COOKIE_OPTIONS);
-        res.clearCookie("refreshToken", REFRESH_TOKEN_COOKIE_OPTIONS);
-
-        res.json({ message: "Logout successfully." });
+            res.json({ message: "Logout successfully." });
+        }
     }
 }
