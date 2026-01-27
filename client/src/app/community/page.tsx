@@ -8,9 +8,9 @@ import { PostList } from "@/components/community/PostList";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 
 export default function CommunityPage() {
-    const [selectedCategory, setSelectedCategory] = useState("전체");
-    const [sortBy, setSortBy] = useState("latest");
-    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [orderBy, setOrderBy] = useState<OrderByType>("createdAt");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -18,14 +18,14 @@ export default function CommunityPage() {
             <main className="max-w-6xl mx-auto px-6 py-8">
                 <CommunityHeader />
                 <CommunityFilters
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={setSelectedCategory}
-                    sortBy={sortBy}
-                    onSortChange={setSortBy}
+                    selectedCategoryId={selectedCategoryId}
+                    onCategoryChange={setSelectedCategoryId}
+                    orderBy={orderBy}
+                    onOrderByChange={setOrderBy}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                 />
-                <PostList category={selectedCategory} sortBy={sortBy} searchQuery={searchQuery} />
+                <PostList categoryId={selectedCategoryId} orderBy={orderBy} searchQuery={searchQuery} />
             </main>
         </div>
     );
