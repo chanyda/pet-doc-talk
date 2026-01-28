@@ -1,7 +1,7 @@
 interface PostUser {
     id: number;
     nickname: string;
-    profileImageUrl: string;
+    profileImageUrl: string | null;
 }
 
 interface PostCategory {
@@ -26,14 +26,6 @@ interface PostListResponse {
 }
 
 type OrderByType = "createdAt" | "likeCount" | "viewCount";
-
-interface FindPostListQuery {
-    categoryId?: number;
-    keyword?: string;
-    orderBy?: OrderByType;
-    cursor?: number;
-    limit: number;
-}
 
 interface Category {
     id: number;
@@ -86,4 +78,16 @@ interface CommentReply {
 interface ReplyListResponse {
     replies: CommentReply[];
     nextCursor: number | null;
+}
+
+interface Comment {
+    id: number;
+    postId: number;
+    userId: number;
+    parentId: number | null;
+    mentionUserId: number | null;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
 }

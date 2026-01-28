@@ -1,7 +1,29 @@
-interface User {
-    id: number;
-    email: string;
-    name: string;
-    profileImage?: string;
-    // 필요한 다른 사용자 필드 추가
+interface PaginationQuery {
+    limit: number;
+    cursor?: number;
+}
+interface FindPostListQuery extends PaginationQuery {
+    categoryId?: number;
+    keyword?: string;
+    orderBy?: OrderByType;
+}
+
+interface PostListResponse {
+    posts: PostSummary[];
+    nextCursor: number | null;
+}
+
+interface CreateCommentBody {
+    content: string;
+    parentId: number | null;
+    mentionUserId: number | null;
+}
+
+interface CommentListResponse {
+    comments: PostComment[];
+    nextCursor: number | null;
+}
+interface ReplyListResponse {
+    replies: CommentReply[];
+    nextCursor: number | null;
 }
