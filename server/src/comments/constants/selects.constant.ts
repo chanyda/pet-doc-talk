@@ -1,14 +1,17 @@
-export const COMMENT_SELECT = {
+export const COMMENT_BASE_SELECT = {
     id: true,
     content: true,
     parentId: true,
-    user: {
-        select: { id: true, nickname: true, profileImageUrl: true },
-    },
-    _count: { select: { replies: true } },
+    user: { select: { id: true, nickname: true, profileImageUrl: true } },
+    mentionUser: { select: { id: true, nickname: true } },
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
+};
+
+export const COMMENT_SELECT = {
+    ...COMMENT_BASE_SELECT,
+    _count: { select: { replies: true } },
 };
 
 export const MY_COMMENT_SELECT = {
@@ -27,17 +30,6 @@ export const MY_COMMENT_SELECT = {
     },
     createdAt: true,
     updatedAt: true,
-};
-
-export const COMMENT_REPLY_SELECT = {
-    id: true,
-    content: true,
-    parentId: true,
-    user: { select: { id: true, nickname: true, profileImageUrl: true } },
-    mentionUser: { select: { id: true, nickname: true } },
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
 };
 
 export type CommentSelect = typeof COMMENT_SELECT;

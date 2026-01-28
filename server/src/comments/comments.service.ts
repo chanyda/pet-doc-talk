@@ -6,7 +6,7 @@ import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { UsersService } from "src/users/users.service";
 import { PostsService } from "src/posts/posts.service";
 import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
+import { COMMENT_BASE_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
@@ -61,7 +61,7 @@ export class CommentsService {
             cursor: query.cursor ? { id: query.cursor } : undefined,
             // 삭제된 댓글의 경우, '삭제된 댓글입니다' 라고 표시해줄 예정이므로 deletedAt: null에 대한 조건은 별도 설정하지 않음
             where: { parentId: parentCommentId },
-            select: COMMENT_REPLY_SELECT,
+            select: COMMENT_BASE_SELECT,
             orderBy: { createdAt: "asc" },
         });
         const nextCursor = getNextCursor(replies, query.limit);
@@ -198,6 +198,7 @@ export class CommentsService {
             content: comment.content,
             parentId: comment.parentId,
             user: comment.user,
+            mentionUser: comment.mentionUser,
             replyCount: comment._count.replies,
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt,

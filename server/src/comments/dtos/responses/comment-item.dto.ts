@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserPublicWithProfileDto } from "src/common/dtos/responses/users/user-public-with-profile.dto";
+import { UserPublicDto } from "src/common/dtos/responses/users/user-public.dto";
 
 export class CommentItemDto {
     @ApiProperty({ description: "The ID of comment." })
@@ -17,6 +18,9 @@ export class CommentItemDto {
 
     @ApiProperty({ description: "The user of comment.", type: UserPublicWithProfileDto })
     user: UserPublicWithProfileDto;
+
+    @ApiProperty({ description: "The mention user of comments.", type: UserPublicDto, nullable: true })
+    mentionUser: UserPublicDto | null;
 
     @ApiProperty({ description: "The reply count of comment." })
     replyCount: number;
