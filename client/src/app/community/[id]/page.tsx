@@ -6,18 +6,8 @@ import { useEffect, useState } from "react";
 import { CommentSection } from "@/components/community/comments/CommentSection";
 import { PostContent } from "@/components/community/posts/PostContent";
 import { TopNavigation } from "@/components/layout/TopNavigation";
+import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
-
-const mockPost: PostDetail = {
-    id: 1,
-    title: "Test",
-    content: "테스트입니다",
-    viewCount: 324,
-    createdAt: new Date().toString(),
-    updatedAt: new Date().toString(),
-    user: { id: 1, nickname: "chany", profileImageUrl: "" },
-    category: { id: 1, name: "건강·상담·병원" },
-};
 
 export default function PostDetailPage() {
     const params = useParams();
@@ -33,9 +23,9 @@ export default function PostDetailPage() {
             try {
                 setIsLoading(true);
                 setError(null);
-                // const response = await getPost(postId);
-                // setPost(response.data);
-                setPost(mockPost);
+
+                const response = await api.getPost(postId);
+                setPost(response.data);
             } catch (error) {
                 console.error("Failed to fetch post:", error);
                 setError("게시글을 불러오는데 실패했습니다.");
@@ -67,6 +57,7 @@ export default function PostDetailPage() {
         );
     }
 
+    // TODO: 오류 및 포스트 조회 실패 등에 대한 페이지 처리하기
     if (error || !post) {
         return (
             <div className="min-h-screen bg-gray-50">
@@ -90,8 +81,8 @@ export default function PostDetailPage() {
             <TopNavigation />
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="space-y-6">
-                    <PostContent post={post} currentUserId={user?.id || 0} onBack={handleBack} />
-                    <CommentSection postId={post.id} currentUserId={user?.id || 0} />
+                    <PostContent post={post} currentUserId={user?.id ?? null} onBack={handleBack} />
+                    <CommentSection postId={post.id} currentUserId={user?.id ?? null} />
                 </div>
             </div>
         </div>

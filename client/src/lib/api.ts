@@ -92,6 +92,10 @@ export async function getPosts(params: FindPostListQuery): Promise<AxiosResponse
     return apiClient.get<PostListResponse>("/posts", { params });
 }
 
+export async function getPost(postId: number): Promise<AxiosResponse<PostDetail>> {
+    return apiClient.get<PostDetail>(`/posts/${postId}`);
+}
+
 export async function getCategories(): Promise<AxiosResponse<Category[]>> {
     return apiClient.get<Category[]>("/categories");
 }

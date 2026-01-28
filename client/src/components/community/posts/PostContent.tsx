@@ -1,31 +1,33 @@
 "use client";
 
+import DeleteIcon from "public/icons/delete-icon.svg";
+import EditIcon from "public/icons/edit-icon.svg";
+import PrevIcon from "public/icons/prev-icon.svg";
+
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { formatRelativeTime } from "@/utils/date";
+import { formatLocalDateTime } from "@/utils/date";
 
 import { CategoryTag } from "./CategoryTag";
 
 interface PostContentProps {
     post: PostDetail;
-    currentUserId: number;
+    currentUserId: number | null;
     onBack?: () => void;
 }
 
 export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
-    const isAuthor = post.user.id === currentUserId;
+    const isAuthor = currentUserId && post.user.id === currentUserId;
 
+    // TODO: 게시글 수정 처리하기
     const handleEdit = () => {
         console.log("Edit post");
     };
 
+    // TODO: 게시글 삭제 처리하기
     const handleDelete = () => {
         if (window.confirm("정말 삭제하시겠습니까?")) {
             console.log("Delete post");
         }
-    };
-
-    const handleReport = () => {
-        console.log("Report post");
     };
 
     return (
@@ -35,7 +37,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                     <button
                         onClick={onBack}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors">
-                        {/* <ArrowLeftIcon /> */}
+                        <PrevIcon />
                         <span>목록으로</span>
                     </button>
                 )}
@@ -43,7 +45,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                 <h1 className="text-3xl mb-4 mt-3">{post.title}</h1>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-2">
                             <ProfileAvatar
                                 nickname={post.user.nickname}
                                 profileImageUrl={post.user.profileImageUrl}
@@ -52,38 +54,29 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                             <span className="font-medium text-gray-900">{post.user.nickname}</span>
                         </span>
                         <span>•</span>
-                        <span>{formatRelativeTime(post.createdAt)}</span>
+                        <span>{formatLocalDateTime(post.createdAt)}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
                             <span>조회</span>
                             {post.viewCount}
                         </span>
                     </div>
-
-                    {/* Actions */}
                     <div className="flex items-center gap-2">
-                        {isAuthor ? (
+                        {isAuthor && (
                             <>
                                 <button
                                     onClick={handleEdit}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                                    {/* <EditIcon /> */}
+                                    <EditIcon />
                                     <span>수정</span>
                                 </button>
                                 <button
                                     onClick={handleDelete}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    {/* <DeleteIcon /> */}
+                                    <DeleteIcon />
                                     <span>삭제</span>
                                 </button>
                             </>
-                        ) : (
-                            <button
-                                onClick={handleReport}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                                {/* <FlagIcon /> */}
-                                <span>신고</span>
-                            </button>
                         )}
                     </div>
                 </div>
@@ -105,7 +98,6 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                         ))}
                     </div>
                 )} */}
-
                 {/* Like Button */}
                 {/* <div className="flex items-center justify-center pt-6 border-t border-gray-100">
                     <button

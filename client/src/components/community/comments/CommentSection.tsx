@@ -8,7 +8,7 @@ import { CommentItem } from "./Comment";
 
 interface CommentSectionProps {
     postId: number;
-    currentUserId: number;
+    currentUserId: number | null;
     initialComments?: PostComment[];
 }
 
