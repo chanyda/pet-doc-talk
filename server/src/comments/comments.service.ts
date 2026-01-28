@@ -30,7 +30,7 @@ export class CommentsService {
             throw new NotFoundException("Post not exists.");
         }
 
-        const parentComments = await this.commentsRepository.findMany({
+        const { comments: parentComments, totalCount } = await this.commentsRepository.findManyAndCount({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
@@ -44,6 +44,7 @@ export class CommentsService {
 
         return {
             comments: parentComments.map((comment) => this.toCommentItem(comment)),
+            totalCommentCount: totalCount,
             nextCursor,
         };
     }

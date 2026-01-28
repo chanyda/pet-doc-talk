@@ -3,11 +3,15 @@ import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-pr
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { PrismaService } from "src/prisma/prisma.service";
 import { FindManyAndCountResult, ICommentsRepository } from "./interfaces/comments.repository.interface";
-import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { IComment } from "./interfaces/comments.interface";
 import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
-import { CommentGetPayload, SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import {
+    CommentCreateArgs,
+    CommentGetPayload,
+    CommentWhereInput,
+    SelectSubset,
+} from "generated/prisma/internal/prismaNamespace";
 
 @Injectable()
 export class CommentsRepository implements ICommentsRepository {
@@ -23,8 +27,14 @@ export class CommentsRepository implements ICommentsRepository {
         params: SelectSubset<T, CommentFindManyArgs>,
     ): Promise<FindManyAndCountResult<T>> {
         return this.txHost.withTransaction(async () => {
+            // 삭제된 댓글은 카운팅하면 안되므로 deletedAt: null 조건을 반드시 포함하고 있어야한다.
+            let countWhereInput: CommentWhereInput = { deletedAt: null };
+            if (params.where) {
+                countWhereInput = { ...countWhereInput, ...params.where };
+            }
+
             const comments = await this.findMany(params);
-            const totalCount = await this.txHost.tx.comment.count({ where: params.where });
+            const totalCount = await this.txHost.tx.comment.count({ where: countWhereInput });
 
             return { comments, totalCount };
         });

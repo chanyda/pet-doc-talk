@@ -7,7 +7,9 @@ export class CommentListResponseDto {
         type: [CommentItemDto],
     })
     comments: CommentItemDto[];
-    comments: CommentListItemDto[];
+
+    @ApiProperty({ description: "Total number of comments." })
+    totalCommentCount: number;
 
     @ApiPropertyOptional({
         description: "The cursor for the next page.",
