@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { POST_ORDER_BY_OPTIONS } from "@/constants/post";
+import { useOutsideClick } from "@/hooks/useClickOutside";
 
 interface SortSelectProps {
     value: OrderByType;
@@ -10,23 +11,26 @@ interface SortSelectProps {
 }
 
 export function SortSelect({ value, onChange }: SortSelectProps) {
-    const [showMenu, setShowMenu] = useState(false);
+    const [isActionMenuOption, setIsActionMenuOption] = useState(false);
+    const actionMenuRef = useOutsideClick(() => {
+        setIsActionMenuOption(false);
+    });
     const selectedOption = POST_ORDER_BY_OPTIONS.find((opt) => opt.id === value);
 
     const handleSelect = (order: OrderByType) => {
         onChange(order);
-        setShowMenu(false);
+        setIsActionMenuOption(false);
     };
 
     return (
-        <div className="relative">
+        <div className="relative" ref={actionMenuRef}>
             <button
-                onClick={() => setShowMenu(!showMenu)}
+                onClick={() => setIsActionMenuOption(!isActionMenuOption)}
                 className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
                 <span className="text-sm text-gray-700">{selectedOption?.label}</span>
                 <span className="text-gray-400 text-sm">▼</span>
             </button>
-            {showMenu && (
+            {isActionMenuOption && (
                 <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10">
                     {POST_ORDER_BY_OPTIONS.map((option) => (
                         <button
