@@ -1,8 +1,9 @@
 "use client";
 
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { POST_CATEGORY_COLOR } from "@/constants/style";
 import { formatRelativeTime } from "@/utils/date";
+
+import { CategoryTag } from "./CategoryTag";
 
 interface PostContentProps {
     post: PostDetail;
@@ -38,13 +39,8 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                         <span>목록으로</span>
                     </button>
                 )}
-                <div className="mb-3">
-                    <span
-                        className={`inline-block text-sm px-3 py-1 rounded-full ${POST_CATEGORY_COLOR[post.category.id]}`}>
-                        {post.category.name}
-                    </span>
-                </div>
-                <h1 className="text-3xl mb-4">{post.title}</h1>
+                <CategoryTag category={post.category} />
+                <h1 className="text-3xl mb-4 mt-3">{post.title}</h1>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-1.5">
