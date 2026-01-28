@@ -1,6 +1,7 @@
 interface PostUser {
     id: number;
     nickname: string;
+    profileImageUrl: string;
 }
 
 interface PostCategory {
