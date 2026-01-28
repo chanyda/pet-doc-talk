@@ -10,10 +10,10 @@ import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT,
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
-import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
+import { CommentItemDto } from "./dtos/responses/comment-item.dto";
 import { getNextCursor } from "src/common/utils/pagination.util";
 import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
-import { MyCommentListItemDto } from "./dtos/responses/my-comment-list-item.dto";
+import { MyCommentItemDto } from "./dtos/responses/my-comment-item.dto";
 
 @Injectable()
 export class CommentsService {
@@ -43,7 +43,7 @@ export class CommentsService {
         const nextCursor = getNextCursor(parentComments, query.limit);
 
         return {
-            comments: parentComments.map((comment) => this.toCommentListItem(comment)),
+            comments: parentComments.map((comment) => this.toCommentItem(comment)),
             nextCursor,
         };
     }
@@ -85,7 +85,7 @@ export class CommentsService {
         const nextCursor = getNextCursor(comments, query.limit);
 
         return {
-            comments: comments.map((comment) => this.toMyCommentListItem(comment)),
+            comments: comments.map((comment) => this.toMyCommentItem(comment)),
             nextCursor,
             totalCommentCount: totalCount,
         };
@@ -192,7 +192,7 @@ export class CommentsService {
         }
     }
 
-    private toCommentListItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentListItemDto {
+    private toCommentItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentItemDto {
         return {
             id: comment.id,
             content: comment.content,
@@ -205,7 +205,7 @@ export class CommentsService {
         };
     }
 
-    private toMyCommentListItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentListItemDto {
+    private toMyCommentItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentItemDto {
         return {
             id: comment.id,
             content: comment.content,

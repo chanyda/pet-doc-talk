@@ -11,7 +11,7 @@ class CommentedPostDto {
     commentCount: number;
 }
 
-export class MyCommentListItemDto {
+export class MyCommentItemDto {
     @ApiProperty({ description: "The ID of comment." })
     id: number;
 

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { UserPublicWithProfileDto } from "src/common/dtos/responses/users/user-public-with-profile.dto";
 
-export class CommentListItemDto {
+export class CommentItemDto {
     @ApiProperty({ description: "The ID of comment." })
     id: number;
 

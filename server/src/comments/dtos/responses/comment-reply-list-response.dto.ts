@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { CommentReplyListItemDto } from "./comment-reply-list-item.dto";
+import { CommentReplyItemDto } from "./comment-reply-item.dto";
 
 export class CommentReplyListResponseDto {
     @ApiProperty({
         description: "The list of comments (only parent comments).",
-        type: [CommentReplyListItemDto],
+        type: [CommentReplyItemDto],
     })
-    replies: CommentReplyListItemDto[];
+    replies: CommentReplyItemDto[];
 
     @ApiPropertyOptional({
         description: "The cursor for the next page.",

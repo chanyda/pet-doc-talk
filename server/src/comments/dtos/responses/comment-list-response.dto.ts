@@ -1,11 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { CommentListItemDto } from "./comment-list-item.dto";
+import { CommentItemDto } from "./comment-item.dto";
 
 export class CommentListResponseDto {
     @ApiProperty({
         description: "The list of comments (only parent comments).",
-        type: [CommentListItemDto],
+        type: [CommentItemDto],
     })
+    comments: CommentItemDto[];
     comments: CommentListItemDto[];
 
     @ApiPropertyOptional({
