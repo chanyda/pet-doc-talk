@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 
-import { ProfileAvatar } from "../ui/ProfileAvatar";
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
+
 import { CommentItem } from "./Comment";
 
 interface CommentSectionProps {

@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { formatRelativeTime } from "@/utils/date";
-
-import { ProfileAvatar } from "../ui/ProfileAvatar";
 
 interface CommentProps {
     comment: PostComment;

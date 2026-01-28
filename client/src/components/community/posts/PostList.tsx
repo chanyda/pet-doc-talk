@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { HasMoreButton } from "@/components/ui/HasMoreButton";
 import { POSTS_LIMIT } from "@/constants/post";
 import { getPosts } from "@/lib/api";
 
-import { HasMoreButton } from "../ui/HasMoreButton";
 import { PostItem } from "./PostItem";
 
 interface PostListProps {

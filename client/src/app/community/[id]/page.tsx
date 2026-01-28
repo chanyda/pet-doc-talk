@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { CommentSection } from "@/components/community/CommentSection";
-import { PostContent } from "@/components/community/PostContent";
+import { CommentSection } from "@/components/community/comments/CommentSection";
+import { PostContent } from "@/components/community/posts/PostContent";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 import { useAuthStore } from "@/store/authStore";
 

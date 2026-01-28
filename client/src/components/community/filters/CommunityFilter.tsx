@@ -2,7 +2,7 @@ import { CategoryFilter } from "./CategoryFilter";
 import { SearchBar } from "./SearchBar";
 import { SortSelect } from "./SortSelect";
 
-interface CommunityFiltersProps {
+interface CommunityFilterProps {
     selectedCategoryId: number | null;
     onCategoryChange: (categoryId: number | null) => void;
     orderBy: OrderByType;
@@ -11,14 +11,14 @@ interface CommunityFiltersProps {
     onSearchChange: (query: string) => void;
 }
 
-export function CommunityFilters({
+export function CommunityFilter({
     selectedCategoryId,
     onCategoryChange,
     orderBy,
     onOrderByChange,
     searchQuery,
     onSearchChange,
-}: CommunityFiltersProps) {
+}: CommunityFilterProps) {
     return (
         <div className="space-y-4 mb-6">
             <CategoryFilter selectedCategoryId={selectedCategoryId} onCategoryChange={onCategoryChange} />

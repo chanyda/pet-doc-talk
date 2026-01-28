@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-import { CommunityFilters } from "@/components/community/CommunityFilters";
-import { CommunityHeader } from "@/components/community/CommunityHeader";
-import { PostList } from "@/components/community/PostList";
+import { CommunityHeader } from "@/components/community/comments/CommunityHeader";
+import { CommunityFilter } from "@/components/community/filters/CommunityFilter";
+import { PostList } from "@/components/community/posts/PostList";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 
 export default function CommunityPage() {
@@ -17,7 +17,7 @@ export default function CommunityPage() {
             <TopNavigation />
             <main className="max-w-6xl mx-auto px-6 py-8">
                 <CommunityHeader />
-                <CommunityFilters
+                <CommunityFilter
                     selectedCategoryId={selectedCategoryId}
                     onCategoryChange={setSelectedCategoryId}
                     orderBy={orderBy}

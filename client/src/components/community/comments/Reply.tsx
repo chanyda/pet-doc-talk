@@ -1,8 +1,7 @@
 "use client";
 
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { formatRelativeTime } from "@/utils/date";
-
-import { ProfileAvatar } from "../ui/ProfileAvatar";
 
 interface ReplyProps {
     reply: CommentReply;

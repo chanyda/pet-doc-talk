@@ -4,10 +4,9 @@ import { useRouter } from "next/navigation";
 import ClockIcon from "public/icons/clock-icon.svg";
 import CommentIcon from "public/icons/comment-icon.svg";
 
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { POST_CATEGORY_COLOR } from "@/constants/style";
 import { formatRelativeTime } from "@/utils/date";
-
-import { ProfileAvatar } from "../ui/ProfileAvatar";
 
 interface PostItemProps {
     post: PostSummary;

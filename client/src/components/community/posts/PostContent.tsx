@@ -1,9 +1,8 @@
 "use client";
 
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { POST_CATEGORY_COLOR } from "@/constants/style";
 import { formatRelativeTime } from "@/utils/date";
-
-import { ProfileAvatar } from "../ui/ProfileAvatar";
 
 interface PostContentProps {
     post: PostDetail;
