@@ -20,11 +20,6 @@ interface PostSummary {
     category: PostCategory;
 }
 
-interface PostListResponse {
-    posts: PostSummary[];
-    nextCursor: number | null;
-}
-
 type OrderByType = "createdAt" | "likeCount" | "viewCount";
 
 interface Category {
@@ -54,11 +49,6 @@ interface PostComment {
     deletedAt: string | null;
 }
 
-interface CommentListResponse {
-    comments: PostComment[];
-    nextCursor: number | null;
-}
-
 interface MentionUser {
     id: number;
     nickname: string;
@@ -75,11 +65,6 @@ interface CommentReply {
     mentionUser: MentionUser;
 }
 
-interface ReplyListResponse {
-    replies: CommentReply[];
-    nextCursor: number | null;
-}
-
 interface Comment {
     id: number;
     postId: number;
@@ -91,3 +76,5 @@ interface Comment {
     updatedAt: string;
     deletedAt: string | null;
 }
+
+type CommentActionMenuClickType = "reply" | "edit" | "delete";

@@ -82,7 +82,7 @@ export default function PostDetailPage() {
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="space-y-6">
                     <PostContent post={post} currentUserId={user?.id ?? null} onBack={handleBack} />
-                    <CommentSection postId={post.id} currentUserId={user?.id ?? null} />
+                    <CommentSection postId={post.id} currentUser={user} />
                 </div>
             </div>
         </div>
