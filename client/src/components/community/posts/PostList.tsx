@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { HasMoreButton } from "@/components/ui/HasMoreButton";
-import { POSTS_LIMIT } from "@/constants/post";
+import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
 import { getPosts } from "@/lib/api";
 
 import { PostItem } from "./PostItem";
@@ -24,7 +24,7 @@ export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
         async (cursor?: number) => {
             try {
                 const params: FindPostListQuery = {
-                    limit: POSTS_LIMIT,
+                    limit: DEFAULT_PAGE_LIMIT,
                     orderBy,
                 };
 

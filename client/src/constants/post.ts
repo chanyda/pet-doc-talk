@@ -1,5 +1,3 @@
-export const POSTS_LIMIT = 10 as const;
-
 export const POST_ORDER_BY_OPTIONS = [
     { id: "createdAt", label: "최신순" },
     { id: "likeCount", label: "인기순" },
