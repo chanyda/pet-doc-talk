@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import ClockIcon from "public/icons/clock-icon.svg";
 import CommentIcon from "public/icons/comment-icon.svg";
 
@@ -11,8 +14,16 @@ interface PostItemProps {
 }
 
 export function PostItem({ post }: PostItemProps) {
+    const router = useRouter();
+
+    const handleClick = () => {
+        router.push(`/community/${post.id}`);
+    };
+
     return (
-        <article className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 hover:border-pink-200 p-5">
+        <article
+            onClick={handleClick}
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 hover:border-pink-200 p-5">
             <div className="flex gap-4">
                 <div className="flex-1 min-w-0 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
