@@ -39,3 +39,51 @@ interface Category {
     id: number;
     name: string;
 }
+
+interface PostDetail {
+    id: number;
+    title: string;
+    content: string;
+    viewCount: number;
+    createdAt: string;
+    updatedAt: string;
+    user: PostUser;
+    category: PostCategory;
+}
+
+interface PostComment {
+    id: number;
+    content: string;
+    parentId: number | null;
+    user: PostUser;
+    replyCount: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+}
+
+interface CommentListResponse {
+    comments: PostComment[];
+    nextCursor: number | null;
+}
+
+interface MentionUser {
+    id: number;
+    nickname: string;
+}
+
+interface CommentReply {
+    id: number;
+    content: string;
+    parentId: number | null;
+    user: PostUser;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    mentionUser: MentionUser;
+}
+
+interface ReplyListResponse {
+    replies: CommentReply[];
+    nextCursor: number | null;
+}
