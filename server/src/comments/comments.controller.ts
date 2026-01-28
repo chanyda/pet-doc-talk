@@ -19,6 +19,7 @@ import { Public } from "src/common/decorators/public.decorator";
 import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
 import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
+import { CommentItemDto } from "./dtos/responses/comment-item.dto";
 
 @ApiTags("comments")
 @Auth()
@@ -59,7 +60,7 @@ export class CommentsController {
 
     @Post("posts/:postId/comments")
     @HttpCode(HttpStatus.CREATED)
-    @ApiCreatedResponse({ description: "Create comment successful.", type: CommentResponseDto })
+    @ApiCreatedResponse({ description: "Create comment successful.", type: CommentItemDto })
     @ApiBadRequestResponse({
         description: "Cannot reply to a deleted parent comment or Parent comment does not belong to this post.",
     })
@@ -68,7 +69,7 @@ export class CommentsController {
         @Param("postId") postId: number,
         @User("userId") userId: number,
         @Body() createCommentDto: CreateCommentDto,
-    ): Promise<CommentResponseDto> {
+    ): Promise<CommentItemDto> {
         return this.commentsService.create(postId, userId, createCommentDto);
     }
 

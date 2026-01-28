@@ -37,22 +37,10 @@ export class CommentsRepository implements ICommentsRepository {
         });
     }
 
-    async create(
-        postId: number,
-        userId: number,
-        createCommentDto: CreateCommentDto,
-        select?: CommentSelect,
-    ): Promise<IComment> {
-        return this.txHost.tx.comment.create({
-            data: {
-                userId,
-                postId,
-                content: createCommentDto.content,
-                parentId: createCommentDto.parentId ?? null,
-                mentionUserId: createCommentDto.mentionUserId ?? null,
-            },
-            select,
-        });
+    async create<T extends CommentCreateArgs>(
+        params: SelectSubset<T, CommentCreateArgs>,
+    ): Promise<CommentGetPayload<T>> {
+        return this.txHost.tx.comment.create(params);
     }
 
     async update(commentId: number, updateCommentDto: UpdateCommentDto, select?: CommentSelect): Promise<IComment> {

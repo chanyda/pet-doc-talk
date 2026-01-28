@@ -104,7 +104,7 @@ export class CommentsService {
      * @param createCommentDto
      * @returns
      */
-    async create(postId: number, userId: number, createCommentDto: CreateCommentDto): Promise<CommentResponseDto> {
+    async create(postId: number, userId: number, createCommentDto: CreateCommentDto): Promise<CommentItemDto> {
         const postExists = await this.postsService.existsByPostId(postId);
         if (!postExists) {
             throw new NotFoundException("Post not exists.");
@@ -125,7 +125,18 @@ export class CommentsService {
             await this.validateMentionUserId(createCommentDto.mentionUserId);
         }
 
-        return this.commentsRepository.create(postId, userId, createCommentDto);
+        const newComment = await this.commentsRepository.create({
+            data: {
+                userId,
+                postId,
+                content: createCommentDto.content,
+                parentId: createCommentDto.parentId ?? null,
+                mentionUserId: createCommentDto.mentionUserId ?? null,
+            },
+            select: COMMENT_SELECT,
+        });
+
+        return this.toCommentItem(newComment);
     }
 
     async update(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<CommentResponseDto> {
