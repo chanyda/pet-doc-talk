@@ -1,6 +1,8 @@
 import { POST_CATEGORY_COLOR } from "@/constants/post";
 import { formatRelativeTime } from "@/utils/date";
 
+import { ProfileAvatar } from "../ui/ProfileAvatar";
+
 interface PostItemProps {
     post: PostSummary;
 }
@@ -19,9 +21,16 @@ export function PostItem({ post }: PostItemProps) {
                             {formatRelativeTime(post.createdAt)}
                         </span>
                     </div>
-                    <h3 className="text-lg mb-2 line-clamp-1 hover:text-pink-600 transition-colors">{post.title}</h3>
+                    <h3 className="text-lg mb-3 line-clamp-1 hover:text-pink-600 transition-colors">{post.title}</h3>
                     <div className="flex items-center justify-between mt-auto">
-                        <span className="text-sm text-gray-700">{post.user.nickname}</span>
+                        <div className="flex items-center gap-2">
+                            <ProfileAvatar
+                                nickname={post.user.nickname}
+                                profileImageUrl={post.user.profileImageUrl}
+                                size="sm"
+                            />
+                            <span className="text-sm text-gray-700">{post.user.nickname}</span>
+                        </div>
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1.5">
                                 <span>👁️</span>
