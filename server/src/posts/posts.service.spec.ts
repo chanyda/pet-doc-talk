@@ -125,6 +125,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: i + 1,
@@ -164,6 +165,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: i + 1,
@@ -205,6 +207,7 @@ describe("PostsService", () => {
                         user: {
                             id: 1,
                             nickname: "닉네임1",
+                            profileImageUrl: null,
                         },
                         category: {
                             id: 1,
@@ -244,6 +247,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: 2,
@@ -281,6 +285,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: 2,
@@ -320,6 +325,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: i + 1,
@@ -360,6 +366,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: 1,
@@ -398,6 +405,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: 1,
@@ -438,6 +446,7 @@ describe("PostsService", () => {
                     user: {
                         id: i + 1,
                         nickname: `닉네임${i + 1}`,
+                        profileImageUrl: null,
                     },
                     category: {
                         id: i + 1,

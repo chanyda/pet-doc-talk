@@ -8,7 +8,7 @@ export const POST_SUMMARY_SELECT = {
     createdAt: true,
     updatedAt: true,
     user: {
-        select: { id: true, nickname: true },
+        select: { id: true, nickname: true, profileImageUrl: true },
     },
     category: {
         select: { id: true, name: true },

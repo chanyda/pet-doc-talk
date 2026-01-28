@@ -71,6 +71,7 @@ describe("PostsController", () => {
                 user: {
                     id: i + 1,
                     nickname: `닉네임${i + 1}`,
+                    profileImageUrl: null,
                 },
                 category: {
                     id: i + 1,
@@ -99,6 +100,7 @@ describe("PostsController", () => {
                 user: {
                     id: i + 1,
                     nickname: `닉네임${i + 1}`,
+                    profileImageUrl: null,
                 },
                 category: {
                     id: i + 1,
