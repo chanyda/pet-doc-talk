@@ -22,6 +22,7 @@ interface CreateCommentBody {
 interface CommentListResponse {
     comments: PostComment[];
     nextCursor: number | null;
+    totalCommentCount: number;
 }
 interface ReplyListResponse {
     replies: CommentReply[];
