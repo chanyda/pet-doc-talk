@@ -1,4 +1,4 @@
-import { POST_CATEGORY_COLOR } from "@/constants/post";
+import { POST_CATEGORY_COLOR } from "@/constants/style";
 import { formatRelativeTime } from "@/utils/date";
 
 import { ProfileAvatar } from "../ui/ProfileAvatar";

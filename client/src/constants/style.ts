@@ -1,3 +1,10 @@
+export const POST_CATEGORY_COLOR: { [key: number]: string } = {
+    1: "bg-blue-100 text-blue-700",
+    2: "bg-purple-100 text-purple-700",
+    3: "bg-green-100 text-green-700",
+    4: "bg-orange-100 text-orange-700",
+};
+
 export const PROFILE_AVATAR_GRADIENTS = [
     "bg-gradient-to-br from-blue-300 via-sky-300 to-cyan-400",
     "bg-gradient-to-br from-purple-300 via-violet-300 to-indigo-400",
