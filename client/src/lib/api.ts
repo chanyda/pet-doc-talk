@@ -97,6 +97,10 @@ export async function tokenRefresh(): Promise<AxiosResponse<void>> {
     return apiClient.post("/auth/refresh");
 }
 
+export async function getCategories(): Promise<AxiosResponse<Category[]>> {
+    return apiClient.get<Category[]>("/categories");
+}
+
 export async function getPosts(params: FindPostListQuery): Promise<AxiosResponse<PostListResponse>> {
     return apiClient.get<PostListResponse>("/posts", { params });
 }
@@ -105,6 +109,13 @@ export async function getPost(postId: number): Promise<AxiosResponse<PostDetail>
     return apiClient.get<PostDetail>(`/posts/${postId}`);
 }
 
-export async function getCategories(): Promise<AxiosResponse<Category[]>> {
-    return apiClient.get<Category[]>("/categories");
+export async function getComments(
+    postId: number,
+    params: PaginationQuery,
+): Promise<AxiosResponse<CommentListResponse>> {
+    return apiClient.get<CommentListResponse>(`/posts/${postId}/comments`, { params });
+}
+
+export async function createComment(postId: number, body: CreateCommentBody): Promise<AxiosResponse<Comment>> {
+    return apiClient.post<Comment>(`/posts/${postId}/comments`, body);
 }
