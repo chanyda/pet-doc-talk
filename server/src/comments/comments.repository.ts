@@ -6,12 +6,8 @@ import { FindManyAndCountResult, ICommentsRepository } from "./interfaces/commen
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { IComment } from "./interfaces/comments.interface";
 import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
-import {
-    CommentCreateArgs,
-    CommentGetPayload,
-    CommentWhereInput,
-    SelectSubset,
-} from "generated/prisma/internal/prismaNamespace";
+import { CommentGetPayload, CommentWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 
 @Injectable()
 export class CommentsRepository implements ICommentsRepository {
@@ -45,10 +41,22 @@ export class CommentsRepository implements ICommentsRepository {
         return this.txHost.tx.comment.count({ where: whereInput });
     }
 
-    async create<T extends CommentCreateArgs>(
-        params: SelectSubset<T, CommentCreateArgs>,
-    ): Promise<CommentGetPayload<T>> {
-        return this.txHost.tx.comment.create(params);
+    async create(
+        postId: number,
+        userId: number,
+        createCommentDto: CreateCommentDto,
+        select?: CommentSelect,
+    ): Promise<IComment> {
+        return this.txHost.tx.comment.create({
+            data: {
+                userId,
+                postId,
+                content: createCommentDto.content,
+                parentId: createCommentDto.parentId ?? null,
+                mentionUserId: createCommentDto.mentionUserId ?? null,
+            },
+            select,
+        });
     }
 
     async update(commentId: number, updateCommentDto: UpdateCommentDto, select?: CommentSelect): Promise<IComment> {
