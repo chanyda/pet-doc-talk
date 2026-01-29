@@ -66,6 +66,7 @@ describe("CommentsController", () => {
                     content: "Test",
                     parentId: null,
                     user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    mentionUser: null,
                     replyCount: 0,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -74,6 +75,7 @@ describe("CommentsController", () => {
                 const commentsResponse = {
                     comments: mockComments,
                     nextCursor: mockComments[mockComments.length - 1].id,
+                    totalCommentCount: 10,
                 };
 
                 findCommentsSpy.mockResolvedValue(commentsResponse);
@@ -91,12 +93,13 @@ describe("CommentsController", () => {
                     content: "Test",
                     parentId: null,
                     user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
+                    mentionUser: null,
                     replyCount: 0,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const commentsResponse = { comments: mockComments, nextCursor: null };
+                const commentsResponse = { comments: mockComments, nextCursor: null, totalCommentCount: 10 };
 
                 findCommentsSpy.mockResolvedValue(commentsResponse);
 
@@ -108,7 +111,7 @@ describe("CommentsController", () => {
             });
 
             it("댓글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-                const commentsResponse = { comments: [], nextCursor: null };
+                const commentsResponse = { comments: [], nextCursor: null, totalCommentCount: 0 };
 
                 findCommentsSpy.mockResolvedValue(commentsResponse);
 
@@ -257,10 +260,10 @@ describe("CommentsController", () => {
             it("댓글이 정상적으로 생성되어 생성된 댓글을 반환한다.", async () => {
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    postId: TEST_POST_ID,
-                    userId: TEST_USER_ID,
                     parentId: null,
-                    mentionUserId: null,
+                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
+                    mentionUser: null,
+                    replyCount: 0,
                     content: createCommentDto.content,
                     createdAt: new Date(),
                     updatedAt: new Date(),

@@ -5,9 +5,9 @@ import { PostsService } from "src/posts/posts.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_REPLY_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
-import { CommentListItemDto } from "./dtos/responses/comment-list-item.dto";
-import { MyCommentListItemDto } from "./dtos/responses/my-comment-list-item.dto";
+import { COMMENT_BASE_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
+import { CommentItemDto } from "./dtos/responses/comment-item.dto";
+import { MyCommentItemDto } from "./dtos/responses/my-comment-item.dto";
 import { getNextCursor } from "src/common/utils/pagination.util";
 
 describe("CommentsService", () => {
@@ -91,6 +91,7 @@ describe("CommentsService", () => {
                     id: i + 1,
                     content: "Test",
                     parentId: null,
+                    mentionUser: null,
                     user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
                     _count: { replies: 10 },
                     createdAt: new Date(),
@@ -98,19 +99,20 @@ describe("CommentsService", () => {
                     deletedAt: null,
                 }));
                 const commentsResponse = {
-                    comments: mockComments.map((comment) => toCommentResponse(comment)),
+                    comments: mockComments.map((comment) => toCommentItem(comment)),
+                    totalCommentCount: 20,
                     nextCursor: mockComments[mockComments.length - 1].id,
                 };
 
                 existsByPostIdSpy.mockResolvedValue(true);
-                findManySpy.mockResolvedValue(mockComments);
+                findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 20 });
 
                 const result = await commentsService.findComments(TEST_POST_ID, requiredQuery);
 
                 expect(result).toEqual(commentsResponse);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
@@ -118,7 +120,7 @@ describe("CommentsService", () => {
                     select: COMMENT_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
 
             it("댓글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다. (cursor 전달)", async () => {
@@ -128,6 +130,7 @@ describe("CommentsService", () => {
                     id: i + 10,
                     content: "Test",
                     parentId: null,
+                    mentionUser: null,
                     user: { id: i + 1, nickname: `닉네임${i + 1}`, profileImageUrl: null },
                     _count: { replies: 10 },
                     createdAt: new Date(),
@@ -135,19 +138,20 @@ describe("CommentsService", () => {
                     deletedAt: null,
                 }));
                 const commentsResponse = {
-                    comments: mockComments.map((comment) => toCommentResponse(comment)),
+                    comments: mockComments.map((comment) => toCommentItem(comment)),
+                    totalCommentCount: 10,
                     nextCursor: null,
                 };
 
                 existsByPostIdSpy.mockResolvedValue(true);
-                findManySpy.mockResolvedValue(mockComments);
+                findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 10 });
 
                 const result = await commentsService.findComments(TEST_POST_ID, query);
 
                 expect(result).toEqual(commentsResponse);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: 1,
                     cursor: { id: query.cursor },
@@ -155,19 +159,19 @@ describe("CommentsService", () => {
                     select: COMMENT_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
 
             it("댓글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
                 existsByPostIdSpy.mockResolvedValue(true);
-                findManySpy.mockResolvedValue([]);
+                findManyAndCountSpy.mockResolvedValue({ comments: [], totalCount: 0 });
 
                 const result = await commentsService.findComments(TEST_POST_ID, requiredQuery);
 
-                expect(result).toEqual({ comments: [], nextCursor: null });
+                expect(result).toEqual({ comments: [], totalCommentCount: 0, nextCursor: null });
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
@@ -175,7 +179,7 @@ describe("CommentsService", () => {
                     select: COMMENT_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
         });
 
@@ -188,7 +192,7 @@ describe("CommentsService", () => {
                 );
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).not.toHaveBeenCalled();
+                expect(findManyAndCountSpy).not.toHaveBeenCalled();
             });
         });
     });
@@ -223,7 +227,7 @@ describe("CommentsService", () => {
                     skip: undefined,
                     cursor: undefined,
                     where: { parentId: TEST_COMMENT_ID },
-                    select: COMMENT_REPLY_SELECT,
+                    select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
@@ -257,7 +261,7 @@ describe("CommentsService", () => {
                     skip: 1,
                     cursor: { id: query.cursor },
                     where: { parentId: TEST_COMMENT_ID },
-                    select: COMMENT_REPLY_SELECT,
+                    select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
@@ -277,7 +281,7 @@ describe("CommentsService", () => {
                     skip: undefined,
                     cursor: undefined,
                     where: { parentId: TEST_COMMENT_ID },
-                    select: COMMENT_REPLY_SELECT,
+                    select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManySpy).toHaveBeenCalledTimes(1);
@@ -320,7 +324,7 @@ describe("CommentsService", () => {
             const result = await commentsService.findMyComments(TEST_USER_ID, query);
 
             expect(result).toEqual({
-                comments: mockComments.map((comment) => toMyCommentListItem(comment)),
+                comments: mockComments.map((comment) => toMyCommentItem(comment)),
                 nextCursor: getNextCursor(mockComments, query.limit),
                 totalCommentCount: 20,
             });
@@ -354,7 +358,7 @@ describe("CommentsService", () => {
             const result = await commentsService.findMyComments(TEST_USER_ID, query);
 
             expect(result).toEqual({
-                comments: mockComments.map((comment) => toMyCommentListItem(comment)),
+                comments: mockComments.map((comment) => toMyCommentItem(comment)),
                 nextCursor: null,
                 totalCommentCount: 20,
             });
@@ -393,11 +397,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test" };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    postId: TEST_POST_ID,
-                    userId: TEST_USER_ID,
-                    parentId: null,
-                    mentionUserId: null,
                     content: createCommentDto.content,
+                    parentId: null,
+                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
+                    mentionUser: null,
+                    _count: { replies: 0 },
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -409,13 +413,22 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(mockComment);
+                expect(result).toEqual(toCommentItem(mockComment));
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByIdSpy).not.toHaveBeenCalled();
-                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
+                expect(createSpy).toHaveBeenCalledWith({
+                    data: {
+                        userId: TEST_USER_ID,
+                        postId: TEST_POST_ID,
+                        content: createCommentDto.content,
+                        parentId: null,
+                        mentionUserId: null,
+                    },
+                    select: COMMENT_SELECT,
+                });
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -423,11 +436,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test", parentId: 2 };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    postId: TEST_POST_ID,
-                    userId: TEST_USER_ID,
-                    parentId: createCommentDto.parentId,
-                    mentionUserId: null,
                     content: createCommentDto.content,
+                    parentId: createCommentDto.parentId,
+                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
+                    mentionUser: null,
+                    _count: { replies: 0 },
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -440,7 +453,7 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(mockComment);
+                expect(result).toEqual(toCommentItem(mockComment));
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
@@ -451,7 +464,16 @@ describe("CommentsService", () => {
                     deletedAt: true,
                 });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
+                expect(createSpy).toHaveBeenCalledWith({
+                    data: {
+                        userId: TEST_USER_ID,
+                        postId: TEST_POST_ID,
+                        content: createCommentDto.content,
+                        parentId: createCommentDto.parentId,
+                        mentionUserId: null,
+                    },
+                    select: COMMENT_SELECT,
+                });
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -459,11 +481,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test", parentId: 2, mentionUserId: 2 };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    postId: TEST_POST_ID,
-                    userId: TEST_USER_ID,
-                    parentId: createCommentDto.parentId,
-                    mentionUserId: createCommentDto.mentionUserId,
                     content: createCommentDto.content,
+                    parentId: createCommentDto.parentId,
+                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
+                    mentionUser: { id: createCommentDto.mentionUserId, nickname: "Tester2" },
+                    _count: { replies: 0 },
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -476,7 +498,7 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(mockComment);
+                expect(result).toEqual(toCommentItem(mockComment));
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
@@ -489,7 +511,16 @@ describe("CommentsService", () => {
                     deletedAt: true,
                 });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
+                expect(createSpy).toHaveBeenCalledWith({
+                    data: {
+                        userId: TEST_USER_ID,
+                        postId: TEST_POST_ID,
+                        content: createCommentDto.content,
+                        parentId: createCommentDto.parentId,
+                        mentionUserId: createCommentDto.mentionUserId,
+                    },
+                    select: COMMENT_SELECT,
+                });
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
@@ -747,12 +778,13 @@ describe("CommentsService", () => {
 });
 
 // Note: 추후 해당 함수가 변경되면 테스트 코드도 변경 필요
-function toCommentResponse(comment: CommentGetPayload<{ select: CommentSelect }>): CommentListItemDto {
+function toCommentItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentItemDto {
     return {
         id: comment.id,
         content: comment.content,
         parentId: comment.parentId,
         user: comment.user,
+        mentionUser: comment.mentionUser,
         replyCount: comment._count.replies,
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt,
@@ -760,7 +792,7 @@ function toCommentResponse(comment: CommentGetPayload<{ select: CommentSelect }>
     };
 }
 
-function toMyCommentListItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentListItemDto {
+function toMyCommentItem(comment: CommentGetPayload<{ select: MyCommentSelect }>): MyCommentItemDto {
     return {
         id: comment.id,
         content: comment.content,
