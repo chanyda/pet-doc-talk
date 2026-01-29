@@ -234,7 +234,13 @@ describe("CommentsService", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const repliesResponse = { replies: mockReplies, nextCursor: mockReplies[mockReplies.length - 1].id };
+                const repliesResponse = {
+                    replies: mockReplies.map((reply) => ({
+                        ...reply,
+                        content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
+                    })),
+                    nextCursor: mockReplies[mockReplies.length - 1].id,
+                };
 
                 findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
                 findManySpy.mockResolvedValue(mockReplies);
@@ -268,7 +274,13 @@ describe("CommentsService", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const repliesResponse = { replies: mockReplies, nextCursor: null };
+                const repliesResponse = {
+                    replies: mockReplies.map((reply) => ({
+                        ...reply,
+                        content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
+                    })),
+                    nextCursor: null,
+                };
 
                 findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
                 findManySpy.mockResolvedValue(mockReplies);
@@ -776,7 +788,7 @@ describe("CommentsService", () => {
 function toCommentItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentItemDto {
     return {
         id: comment.id,
-        content: comment.content,
+        content: comment.deletedAt ? "삭제된 댓글입니다." : comment.content,
         parentId: comment.parentId,
         user: comment.user,
         mentionUser: comment.mentionUser,

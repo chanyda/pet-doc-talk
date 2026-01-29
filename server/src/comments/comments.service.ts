@@ -75,7 +75,10 @@ export class CommentsService {
         const nextCursor = getNextCursor(replies, query.limit);
 
         return {
-            replies,
+            replies: replies.map((reply) => ({
+                ...reply,
+                content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
+            })),
             nextCursor,
         };
     }
@@ -203,7 +206,8 @@ export class CommentsService {
     private toCommentItem(comment: CommentGetPayload<{ select: CommentSelect }>): CommentItemDto {
         return {
             id: comment.id,
-            content: comment.content,
+            // 삭제된 댓글도 조회하고 삭제된 댓글입니다. 로 보여줄 예정인데 네트워크 탭에서 기존 댓글을 볼수도 있으므로 값을 "삭제된 댓글입니다."로 변경하여 리턴해줌
+            content: comment.deletedAt ? "삭제된 댓글입니다." : comment.content,
             parentId: comment.parentId,
             user: comment.user,
             mentionUser: comment.mentionUser,
