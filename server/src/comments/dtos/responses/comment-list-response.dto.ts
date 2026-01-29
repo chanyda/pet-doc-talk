@@ -8,6 +8,9 @@ export class CommentListResponseDto {
     })
     comments: CommentItemDto[];
 
+    @ApiProperty({ description: "Total number of parent comments." })
+    totalParentCommentCount: number;
+
     @ApiProperty({ description: "Total number of comments." })
     totalCommentCount: number;
 

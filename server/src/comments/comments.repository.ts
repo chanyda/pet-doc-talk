@@ -27,14 +27,8 @@ export class CommentsRepository implements ICommentsRepository {
         params: SelectSubset<T, CommentFindManyArgs>,
     ): Promise<FindManyAndCountResult<T>> {
         return this.txHost.withTransaction(async () => {
-            // 삭제된 댓글은 카운팅하면 안되므로 deletedAt: null 조건을 반드시 포함하고 있어야한다.
-            let countWhereInput: CommentWhereInput = { deletedAt: null };
-            if (params.where) {
-                countWhereInput = { ...countWhereInput, ...params.where };
-            }
-
             const comments = await this.findMany(params);
-            const totalCount = await this.txHost.tx.comment.count({ where: countWhereInput });
+            const totalCount = await this.count(params.where);
 
             return { comments, totalCount };
         });
@@ -45,6 +39,10 @@ export class CommentsRepository implements ICommentsRepository {
             where: { id: commentId },
             select,
         });
+    }
+
+    async count(whereInput?: CommentWhereInput): Promise<number> {
+        return this.txHost.tx.comment.count({ where: whereInput });
     }
 
     async create<T extends CommentCreateArgs>(

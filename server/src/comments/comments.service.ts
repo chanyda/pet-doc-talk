@@ -30,21 +30,28 @@ export class CommentsService {
             throw new NotFoundException("Post not exists.");
         }
 
-        const { comments: parentComments, totalCount } = await this.commentsRepository.findManyAndCount({
-            take: query.limit,
-            skip: query.cursor ? 1 : undefined,
-            cursor: query.cursor ? { id: query.cursor } : undefined,
-            // 댓글만 가져오기 때문에 parentId는 null이다. (답글 혹은 대댓글인 경우 parentId를 가지고 있음)
-            // 삭제된 댓글의 경우, '삭제된 댓글입니다' 라고 표시해줄 예정이므로 deletedAt: null에 대한 조건은 별도 설정하지 않음
-            where: { postId: postId, parentId: null },
-            select: COMMENT_SELECT,
-            orderBy: { createdAt: "asc" },
-        });
+        // 답글을 제외한 댓글 목록과 댓글 수를 가져온다.
+        const { comments: parentComments, totalCount: totalParentCommentCount } =
+            await this.commentsRepository.findManyAndCount({
+                take: query.limit,
+                skip: query.cursor ? 1 : undefined,
+                cursor: query.cursor ? { id: query.cursor } : undefined,
+                // 댓글만 가져오기 때문에 parentId는 null이다. (답글 혹은 대댓글인 경우 parentId를 가지고 있음)
+                // 삭제된 댓글의 경우, '삭제된 댓글입니다' 라고 표시해줄 예정이므로 deletedAt: null에 대한 조건은 별도 설정하지 않음
+                where: { postId: postId, parentId: null },
+                select: COMMENT_SELECT,
+                orderBy: { createdAt: "asc" },
+            });
+        // 댓글과 답글을 포함한 전체 댓글 수를 보여줘야 하므로 전체 댓글 수를 가져온다.
+        // 삭제된 댓글도 표시해주므로 댓글 수에 포함된다.
+        const totalCommentCount = await this.commentsRepository.count({ postId });
+
         const nextCursor = getNextCursor(parentComments, query.limit);
 
         return {
             comments: parentComments.map((comment) => this.toCommentItem(comment)),
-            totalCommentCount: totalCount,
+            totalParentCommentCount,
+            totalCommentCount,
             nextCursor,
         };
     }

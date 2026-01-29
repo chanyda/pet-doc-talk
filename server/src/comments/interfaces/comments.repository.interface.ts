@@ -1,7 +1,12 @@
 import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
 import { UpdateCommentDto } from "../dtos/requests/update-comment.dto";
 import { IComment } from "./comments.interface";
-import { CommentCreateArgs, CommentGetPayload, SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import {
+    CommentCreateArgs,
+    CommentGetPayload,
+    CommentWhereInput,
+    SelectSubset,
+} from "generated/prisma/internal/prismaNamespace";
 
 export type FindManyAndCountResult<T extends CommentFindManyArgs> = {
     comments: CommentGetPayload<T>[];
@@ -16,6 +21,7 @@ export interface ICommentsRepository {
         params: SelectSubset<T, CommentFindManyArgs>,
     ): Promise<FindManyAndCountResult<T>>;
     findById(commentId: number, select?: CommentSelect): Promise<IComment | null>;
+    count(whereInput: CommentWhereInput): Promise<number>;
     create<T extends CommentCreateArgs>(params: SelectSubset<T, CommentCreateArgs>): Promise<CommentGetPayload<T>>;
     update(commentId: number, updateCommentDto: UpdateCommentDto, select?: CommentSelect): Promise<IComment>;
     delete(commentId: number): Promise<{ id: number }>;
