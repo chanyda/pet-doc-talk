@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { POST_SEARCH_KEYWORD_LIMIT } from "@/constants/post";
+
 interface SearchBarProps {
     value: string;
     onChange: (value: string) => void;
@@ -28,6 +30,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
                 type="text"
                 placeholder="게시글 검색..."
                 value={inputValue}
+                maxLength={POST_SEARCH_KEYWORD_LIMIT}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 className="w-full pl-5 pr-20 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"

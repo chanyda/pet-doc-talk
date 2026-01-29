@@ -4,4 +4,6 @@ export const POST_ORDER_BY_OPTIONS = [
     { id: "viewCount", label: "조회순" },
 ] as Array<{ id: OrderByType; label: string }>;
 
+export const POST_SEARCH_KEYWORD_LIMIT = 100 as const;
+
 export const COMMENT_CONTENT_LIMIT = 500 as const;
