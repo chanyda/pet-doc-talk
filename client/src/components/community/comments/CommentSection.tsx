@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
+import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
 import * as api from "@/lib/api";
 
 import { CommentItem } from "./CommentItem";
@@ -225,6 +226,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                             onSubmit={handleSubmitComment}
                             placeholder={currentUser ? "댓글을 입력하세요..." : "로그인 후 이용해주세요."}
                             disabled={!currentUser}
+                            maxLength={COMMENT_CONTENT_LIMIT}
                         />
                     </div>
                 </div>

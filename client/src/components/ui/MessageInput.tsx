@@ -9,6 +9,7 @@ interface MessageInputProps {
     onSubmit: () => void;
     placeholder?: string;
     disabled?: boolean;
+    maxLength?: number;
 }
 
 export function MessageInput({
@@ -17,8 +18,10 @@ export function MessageInput({
     onSubmit,
     placeholder = "댓글을 입력하세요...",
     disabled = false,
+    maxLength,
 }: MessageInputProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const isOverLimit = maxLength !== undefined && value.length > maxLength;
 
     // textarea 높이 자동 조절 및 스크롤
     useEffect(() => {
@@ -42,36 +45,51 @@ export function MessageInput({
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // 한글의 경우 keydown 이벤트가 두번씩 실행되는 오류가 있어서 해당 분기문이 필수로 필요
         if (e.nativeEvent.isComposing) return;
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            onSubmit();
+
+        const isSubmitKey = e.key === "Enter" && !e.shiftKey;
+        if (!isSubmitKey) return;
+
+        e.preventDefault();
+
+        if (isOverLimit) {
+            alert(`최대 ${maxLength}자까지 작성할 수 있어요.`);
+            return;
         }
+
+        onSubmit();
     };
 
     return (
-        <div className={"flex gap-2 items-center flex-1"}>
-            <textarea
-                ref={textareaRef}
-                disabled={disabled}
-                value={value}
-                onChange={handleChange}
-                placeholder={placeholder}
-                className={
-                    "flex-1 px-4 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all overflow-hidden py-2.5 rounded-xl"
-                }
-                rows={1}
-                style={{ minHeight: "42px", maxHeight: "120px" }}
-                onKeyDown={handleKeyDown}
-            />
-            <button
-                onClick={onSubmit}
-                disabled={!value.trim() || disabled}
-                className={
-                    "text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2.5 flex-shrink-0"
-                }
-                style={{ backgroundColor: "#FF6B9D", minHeight: "42px" }}>
-                <SendIcon />
-            </button>
+        <div className={"flex flex-col gap-1 flex-1"}>
+            <div className="flex gap-2 items-center">
+                <textarea
+                    ref={textareaRef}
+                    disabled={disabled}
+                    value={value}
+                    onChange={handleChange}
+                    placeholder={placeholder}
+                    className={`flex-1 px-4 border rounded-xl resize-none focus:outline-none focus:ring-2 transition-all overflow-hidden py-2.5 ${
+                        isOverLimit ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-pink-200"
+                    }`}
+                    rows={1}
+                    style={{ minHeight: "42px", maxHeight: "120px" }}
+                    onKeyDown={handleKeyDown}
+                />
+                <button
+                    onClick={onSubmit}
+                    disabled={!value.trim() || disabled || isOverLimit}
+                    className={
+                        "text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2.5 flex-shrink-0"
+                    }
+                    style={{ backgroundColor: "#FF6B9D", minHeight: "42px" }}>
+                    <SendIcon />
+                </button>
+            </div>
+            {maxLength !== undefined && value.length > 0 && (
+                <span className={`text-xs text-right ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
+                    {value.length}/{maxLength}
+                </span>
+            )}
         </div>
     );
 }

@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
+import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
 import { useOutsideClick } from "@/hooks/useClickOutside";
 import { formatRelativeTime } from "@/utils/date";
 
@@ -97,6 +98,7 @@ export function CommentItem({ comment, currentUserId }: CommentProps) {
                                 onChange={setReplyContent}
                                 onSubmit={handleSubmitReply}
                                 placeholder="답글을 입력하세요..."
+                                maxLength={COMMENT_CONTENT_LIMIT}
                             />
                         </div>
                     )}

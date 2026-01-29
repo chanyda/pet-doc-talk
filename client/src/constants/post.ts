@@ -3,3 +3,5 @@ export const POST_ORDER_BY_OPTIONS = [
     { id: "likeCount", label: "인기순" },
     { id: "viewCount", label: "조회순" },
 ] as Array<{ id: OrderByType; label: string }>;
+
+export const COMMENT_CONTENT_LIMIT = 500 as const;
