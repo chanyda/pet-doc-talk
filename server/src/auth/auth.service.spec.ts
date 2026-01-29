@@ -241,7 +241,7 @@ describe("AuthService", () => {
                 expect(result).toEqual({ accessToken, refreshToken });
                 expect(userFindByEmailSpy).toHaveBeenCalledWith(mockRefreshTokenPayload.email);
                 expect(userFindByEmailSpy).toHaveBeenCalledTimes(1);
-                expect(userUpdateRefreshTokenSpy).toHaveBeenCalledWith(mockUser.id, refreshToken);
+                expect(userUpdateRefreshTokenSpy).toHaveBeenCalledWith(mockUser.id, oldRefreshToken, refreshToken);
                 expect(userUpdateRefreshTokenSpy).toHaveBeenCalledTimes(1);
             });
         });
