@@ -271,10 +271,10 @@ describe("CommentsController", () => {
             it("댓글이 정상적으로 생성되어 생성된 댓글을 반환한다.", async () => {
                 const mockComment = {
                     id: TEST_COMMENT_ID,
+                    postId: TEST_POST_ID,
+                    userId: TEST_USER_ID,
                     parentId: null,
-                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
-                    mentionUser: null,
-                    replyCount: 0,
+                    mentionUserId: null,
                     content: createCommentDto.content,
                     createdAt: new Date(),
                     updatedAt: new Date(),

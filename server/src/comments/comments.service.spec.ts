@@ -419,11 +419,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test" };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    content: createCommentDto.content,
+                    postId: TEST_POST_ID,
+                    userId: TEST_USER_ID,
                     parentId: null,
-                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
-                    mentionUser: null,
-                    _count: { replies: 0 },
+                    mentionUserId: null,
+                    content: createCommentDto.content,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -435,22 +435,13 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(toCommentItem(mockComment));
+                expect(result).toEqual(mockComment);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
                 expect(findByIdSpy).not.toHaveBeenCalled();
-                expect(createSpy).toHaveBeenCalledWith({
-                    data: {
-                        userId: TEST_USER_ID,
-                        postId: TEST_POST_ID,
-                        content: createCommentDto.content,
-                        parentId: null,
-                        mentionUserId: null,
-                    },
-                    select: COMMENT_SELECT,
-                });
+                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -458,11 +449,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test", parentId: 2 };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    content: createCommentDto.content,
+                    postId: TEST_POST_ID,
+                    userId: TEST_USER_ID,
                     parentId: createCommentDto.parentId,
-                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
-                    mentionUser: null,
-                    _count: { replies: 0 },
+                    mentionUserId: null,
+                    content: createCommentDto.content,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -475,7 +466,7 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(toCommentItem(mockComment));
+                expect(result).toEqual(mockComment);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
@@ -486,16 +477,7 @@ describe("CommentsService", () => {
                     deletedAt: true,
                 });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith({
-                    data: {
-                        userId: TEST_USER_ID,
-                        postId: TEST_POST_ID,
-                        content: createCommentDto.content,
-                        parentId: createCommentDto.parentId,
-                        mentionUserId: null,
-                    },
-                    select: COMMENT_SELECT,
-                });
+                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
 
@@ -503,11 +485,11 @@ describe("CommentsService", () => {
                 const createCommentDto = { content: "Test", parentId: 2, mentionUserId: 2 };
                 const mockComment = {
                     id: TEST_COMMENT_ID,
-                    content: createCommentDto.content,
+                    postId: TEST_POST_ID,
+                    userId: TEST_USER_ID,
                     parentId: createCommentDto.parentId,
-                    user: { id: TEST_USER_ID, nickname: "Tester", profileImageUrl: null },
-                    mentionUser: { id: createCommentDto.mentionUserId, nickname: "Tester2" },
-                    _count: { replies: 0 },
+                    mentionUserId: createCommentDto.mentionUserId,
+                    content: createCommentDto.content,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                     deletedAt: null,
@@ -520,7 +502,7 @@ describe("CommentsService", () => {
 
                 const result = await commentsService.create(TEST_POST_ID, TEST_USER_ID, createCommentDto);
 
-                expect(result).toEqual(toCommentItem(mockComment));
+                expect(result).toEqual(mockComment);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
@@ -533,16 +515,7 @@ describe("CommentsService", () => {
                     deletedAt: true,
                 });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(createSpy).toHaveBeenCalledWith({
-                    data: {
-                        userId: TEST_USER_ID,
-                        postId: TEST_POST_ID,
-                        content: createCommentDto.content,
-                        parentId: createCommentDto.parentId,
-                        mentionUserId: createCommentDto.mentionUserId,
-                    },
-                    select: COMMENT_SELECT,
-                });
+                expect(createSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID, createCommentDto);
                 expect(createSpy).toHaveBeenCalledTimes(1);
             });
         });
