@@ -44,8 +44,19 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // 401, 403 에러 (인증 실패) 처리
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        // 403 에러 (권한 없음) - token refresh로 해결 불가하므로 바로 reject
+        if (error.response?.status === 403) {
+            return Promise.reject({
+                message: (error.response?.data as { message?: string })?.message || "권한이 없습니다.",
+                status: 403,
+                data: error.response?.data,
+            });
+        }
+
+        // 401 에러 (인증 만료) - token refresh 후 재시도
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
             try {
                 // 이미 refresh가 진행 중이면 해당 Promise를 재사용한다.
                 if (!refreshPromise) {
