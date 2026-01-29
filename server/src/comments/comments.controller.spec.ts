@@ -75,6 +75,7 @@ describe("CommentsController", () => {
                 const commentsResponse = {
                     comments: mockComments,
                     nextCursor: mockComments[mockComments.length - 1].id,
+                    totalParentCommentCount: 10,
                     totalCommentCount: 10,
                 };
 
@@ -99,7 +100,12 @@ describe("CommentsController", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const commentsResponse = { comments: mockComments, nextCursor: null, totalCommentCount: 10 };
+                const commentsResponse = {
+                    comments: mockComments,
+                    nextCursor: null,
+                    totalParentCommentCount: 10,
+                    totalCommentCount: 10,
+                };
 
                 findCommentsSpy.mockResolvedValue(commentsResponse);
 
@@ -111,7 +117,12 @@ describe("CommentsController", () => {
             });
 
             it("댓글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-                const commentsResponse = { comments: [], nextCursor: null, totalCommentCount: 0 };
+                const commentsResponse = {
+                    comments: [],
+                    nextCursor: null,
+                    totalParentCommentCount: 0,
+                    totalCommentCount: 0,
+                };
 
                 findCommentsSpy.mockResolvedValue(commentsResponse);
 

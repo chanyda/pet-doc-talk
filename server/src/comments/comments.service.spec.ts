@@ -19,6 +19,7 @@ describe("CommentsService", () => {
     let findManySpy: jest.SpyInstance;
     let findManyAndCountSpy: jest.SpyInstance;
     let findByIdSpy: jest.SpyInstance;
+    let countSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
     let updateSpy: jest.SpyInstance;
     let deleteSpy: jest.SpyInstance;
@@ -40,6 +41,7 @@ describe("CommentsService", () => {
                         findMany: jest.fn(),
                         findManyAndCount: jest.fn(),
                         findById: jest.fn(),
+                        count: jest.fn(),
                         create: jest.fn(),
                         update: jest.fn(),
                         delete: jest.fn(),
@@ -69,6 +71,7 @@ describe("CommentsService", () => {
         findManySpy = jest.spyOn(commentsRepository, "findMany");
         findManyAndCountSpy = jest.spyOn(commentsRepository, "findManyAndCount");
         findByIdSpy = jest.spyOn(commentsRepository, "findById");
+        countSpy = jest.spyOn(commentsRepository, "count");
         createSpy = jest.spyOn(commentsRepository, "create");
         updateSpy = jest.spyOn(commentsRepository, "update");
         deleteSpy = jest.spyOn(commentsRepository, "delete");
@@ -98,17 +101,20 @@ describe("CommentsService", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const commentsResponse = {
-                    comments: mockComments.map((comment) => toCommentItem(comment)),
-                    totalCommentCount: 20,
-                    nextCursor: mockComments[mockComments.length - 1].id,
-                };
 
                 existsByPostIdSpy.mockResolvedValue(true);
                 findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 20 });
+                // 5개의 댓글이 달려있다고 가정
+                countSpy.mockResolvedValue(25);
 
                 const result = await commentsService.findComments(TEST_POST_ID, requiredQuery);
 
+                const commentsResponse = {
+                    comments: mockComments.map((comment) => toCommentItem(comment)),
+                    totalParentCommentCount: 20,
+                    totalCommentCount: 25,
+                    nextCursor: mockComments[mockComments.length - 1].id,
+                };
                 expect(result).toEqual(commentsResponse);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
@@ -121,6 +127,8 @@ describe("CommentsService", () => {
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
+                expect(countSpy).toHaveBeenCalledWith({ postId: TEST_POST_ID });
+                expect(countSpy).toHaveBeenCalledTimes(1);
             });
 
             it("댓글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다. (cursor 전달)", async () => {
@@ -137,16 +145,20 @@ describe("CommentsService", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const commentsResponse = {
-                    comments: mockComments.map((comment) => toCommentItem(comment)),
-                    totalCommentCount: 10,
-                    nextCursor: null,
-                };
 
                 existsByPostIdSpy.mockResolvedValue(true);
                 findManyAndCountSpy.mockResolvedValue({ comments: mockComments, totalCount: 10 });
+                // 댓글이 아무것도 달리지 않았다고 가정
+                countSpy.mockResolvedValue(10);
 
                 const result = await commentsService.findComments(TEST_POST_ID, query);
+
+                const commentsResponse = {
+                    comments: mockComments.map((comment) => toCommentItem(comment)),
+                    totalParentCommentCount: 10,
+                    totalCommentCount: 10,
+                    nextCursor: null,
+                };
 
                 expect(result).toEqual(commentsResponse);
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
@@ -160,15 +172,23 @@ describe("CommentsService", () => {
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
+                expect(countSpy).toHaveBeenCalledWith({ postId: TEST_POST_ID });
+                expect(countSpy).toHaveBeenCalledTimes(1);
             });
 
             it("댓글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
                 existsByPostIdSpy.mockResolvedValue(true);
                 findManyAndCountSpy.mockResolvedValue({ comments: [], totalCount: 0 });
+                countSpy.mockResolvedValue(0);
 
                 const result = await commentsService.findComments(TEST_POST_ID, requiredQuery);
 
-                expect(result).toEqual({ comments: [], totalCommentCount: 0, nextCursor: null });
+                expect(result).toEqual({
+                    comments: [],
+                    totalParentCommentCount: 0,
+                    totalCommentCount: 0,
+                    nextCursor: null,
+                });
                 expect(existsByPostIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
                 expect(existsByPostIdSpy).toHaveBeenCalledTimes(1);
                 expect(findManyAndCountSpy).toHaveBeenCalledWith({
@@ -180,6 +200,8 @@ describe("CommentsService", () => {
                     orderBy: { createdAt: "asc" },
                 });
                 expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
+                expect(countSpy).toHaveBeenCalledWith({ postId: TEST_POST_ID });
+                expect(countSpy).toHaveBeenCalledTimes(1);
             });
         });
 
