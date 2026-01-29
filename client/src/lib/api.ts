@@ -18,6 +18,9 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     return config;
 });
 
+// 동시에 여러 API가 401을 받았을 때 refresh를 한 번만 호출하기 위한 변수
+let refreshPromise: Promise<AxiosResponse<void>> | null = null;
+
 apiClient.interceptors.response.use(
     (response: AxiosResponse) => {
         return response;
@@ -44,12 +47,18 @@ apiClient.interceptors.response.use(
         // 401, 403 에러 (인증 실패) 처리
         if (error.response?.status === 401 || error.response?.status === 403) {
             try {
-                await tokenRefresh();
+                // 이미 refresh가 진행 중이면 해당 Promise를 재사용한다.
+                if (!refreshPromise) {
+                    refreshPromise = tokenRefresh();
+                }
+                await refreshPromise;
 
                 // refresh 성공 시 원래 요청 재시도
                 return apiClient(originalRequest);
             } catch (refreshError) {
                 return Promise.reject(refreshError);
+            } finally {
+                refreshPromise = null;
             }
         }
 
