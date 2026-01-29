@@ -15,9 +15,10 @@ export class CreatePostDto {
     @MaxLength(255)
     title: string;
 
-    @ApiProperty({ description: "The content of post.", minLength: 1 })
+    @ApiProperty({ description: "The content of post.", minLength: 1, maxLength: 10000 })
     @IsString()
     @IsNotEmpty()
     @MinLength(1)
+    @MaxLength(10000)
     content: string;
 }
