@@ -37,7 +37,8 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
             />
             <button
                 onClick={handleSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition-colors">
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 text-sm rounded-lg text-white hover:opacity-90 transition-opacity shadow-md hover:shadow-lg cursor-pointer"
+                style={{ backgroundColor: "#FF6B9D" }}>
                 검색
             </button>
         </div>

@@ -67,7 +67,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                                 <button
                                     onClick={handleEdit}
                                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                                    <EditIcon />
+                                    <EditIcon fill={"#505050"} stroke={"#505050"} />
                                     <span>수정</span>
                                 </button>
                                 <button

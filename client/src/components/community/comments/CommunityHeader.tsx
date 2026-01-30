@@ -1,3 +1,5 @@
+import EditIcon from "public/icons/edit-icon.svg";
+
 export function CommunityHeader() {
     return (
         <div className="flex items-center justify-between mb-8">
@@ -8,6 +10,7 @@ export function CommunityHeader() {
             <button
                 className="flex items-center gap-2 px-6 py-3 rounded-xl text-white hover:opacity-90 transition-opacity shadow-md hover:shadow-lg cursor-pointer"
                 style={{ backgroundColor: "#FF6B9D" }}>
+                <EditIcon fill={"#ffffff"} stroke={"#ffffff"} />
                 <span>게시글 작성하기</span>
             </button>
         </div>
