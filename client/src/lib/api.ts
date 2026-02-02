@@ -138,3 +138,7 @@ export async function createPost(body: CreatePostBody): Promise<AxiosResponse<Po
 export async function updatePost(postId: number, body: UpdatePostBody): Promise<AxiosResponse<PostDetail>> {
     return apiClient.patch<PostDetail>(`/posts/${postId}`, body);
 }
+
+export async function deletePost(postId: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete<void>(`/posts/${postId}`);
+}

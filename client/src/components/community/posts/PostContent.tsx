@@ -9,6 +9,8 @@ import PrevIcon from "public/icons/prev-icon.svg";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { formatLocalDateTime } from "@/utils/date";
 
+import * as api from "@/lib/api";
+
 import { CategoryTag } from "./CategoryTag";
 
 interface PostContentProps {
@@ -25,10 +27,15 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
         router.push(`/community/${post.id}/edit`);
     };
 
-    // TODO: 게시글 삭제 처리하기
-    const handleDelete = () => {
-        if (window.confirm("정말 삭제하시겠습니까?")) {
-            console.log("Delete post");
+    const handleDelete = async () => {
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+        try {
+            await api.deletePost(post.id);
+            router.push("/community");
+        } catch (error) {
+            console.error("Failed to delete post:", error);
+            alert("게시글 삭제에 실패했습니다.");
         }
     };
 
