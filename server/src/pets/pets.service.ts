@@ -4,9 +4,8 @@ import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/responses/pet-detail-response.dto";
 import { UsersService } from "src/users/users.service";
-import { PetListResponseDto } from "./dtos/responses/pet-list-response.dto";
 import { PET_DETAIL_SELECT, PET_SUMMARY_SELECT } from "./constants";
-import { getNextCursor } from "src/common/utils/pagination.util";
+import { PetSummaryDto } from "./dtos/responses/pet-summary.dto";
 
 @Injectable()
 export class PetsService {
@@ -15,16 +14,8 @@ export class PetsService {
         private readonly usersService: UsersService,
     ) {}
 
-    async findMany(userId: number, cursor: number | undefined, limit: number): Promise<PetListResponseDto> {
-        const pets = await this.petsRepository.findMany(userId, cursor, limit, PET_SUMMARY_SELECT);
-
-        // 조회된 pet의 수가 limit와 동일한 경우, 다음 페이지가 있다고 판단하여 nextCursor를 리턴해주고
-        // 동일하지 않은 경우 다음 페이지는 없다고 판단하여 null를 리턴한다.
-        const nextCursor = getNextCursor(pets, limit);
-        return {
-            pets,
-            nextCursor,
-        };
+    async findMany(userId: number): Promise<Array<PetSummaryDto>> {
+        return this.petsRepository.findMany(userId, PET_SUMMARY_SELECT);
     }
 
     async findById(petId: number, userId: number): Promise<PetDetailResponseDto> {

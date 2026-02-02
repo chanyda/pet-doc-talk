@@ -1,13 +1,12 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
 import { PetsService } from "./pets.service";
 import { ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
 import { PetDetailResponseDto } from "./dtos/responses/pet-detail-response.dto";
-import { PetListResponseDto } from "./dtos/responses/pet-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { User } from "src/common/decorators/user.decorator";
 import { Auth } from "src/common/decorators/auth.decorator";
+import { PetSummaryDto } from "./dtos/responses/pet-summary.dto";
 
 @ApiTags("pets")
 @Auth()
@@ -17,12 +16,9 @@ export class PetsController {
 
     @Get()
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: "Find pets successful.", type: PetListResponseDto })
-    findMany(
-        @User("userId") userId: number,
-        @Query() paginationQuery: PaginationQueryDto,
-    ): Promise<PetListResponseDto> {
-        return this.petsService.findMany(userId, paginationQuery.cursor, paginationQuery.limit);
+    @ApiOkResponse({ description: "Find pets successful.", type: Array<PetSummaryDto> })
+    findMany(@User("userId") userId: number): Promise<Array<PetSummaryDto>> {
+        return this.petsService.findMany(userId);
     }
 
     @Get(":id")

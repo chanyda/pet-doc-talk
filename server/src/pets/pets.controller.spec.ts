@@ -5,7 +5,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { NotFoundException } from "@nestjs/common";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { Decimal } from "@prisma/client/runtime/index-browser";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 
 describe("PetsController", () => {
     let petsController: PetsController;
@@ -55,11 +54,8 @@ describe("PetsController", () => {
     });
 
     describe("findMany", () => {
-        // 우선 넘어온 cursor는 없다고 가정
-        const paginationQuery: PaginationQueryDto = { limit: 10 };
-
-        it("펫 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
-            const mockPets = Array.from({ length: paginationQuery.limit }, (_, i) => ({
+        it("내가 등록한 펫의 목록을 반환한다.", async () => {
+            const mockPets = Array.from({ length: 5 }, (_, i) => ({
                 id: i + 1,
                 name: `펫${i + 1}`,
                 type: PetType.DOG,
@@ -67,75 +63,23 @@ describe("PetsController", () => {
                 breed: "믹스",
                 imageUrl: null,
             }));
-            const mockPetListResponse = { pets: mockPets, nextCursor: mockPets[mockPets.length - 1].id };
 
-            findManySpy.mockResolvedValue(mockPetListResponse);
+            findManySpy.mockResolvedValue(mockPets);
 
-            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
+            const result = await petsController.findMany(TEST_USER_ID);
 
-            expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
+            expect(result).toEqual(mockPets);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
-        it("펫 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
-            // 다음 페이지가 없으려면 조회된 펫 객체의 수가 limit보다 작아야하므로 -1 처리
-            const mockPets = Array.from({ length: paginationQuery.limit - 1 }, (_, i) => ({
-                id: i + 1,
-                name: `펫${i + 1}`,
-                type: PetType.DOG,
-                gender: PetGender.MALE,
-                breed: "믹스",
-                imageUrl: null,
-            }));
-            const mockPetListResponse = { pets: mockPets, nextCursor: null };
+        it("등록한 펫이 없어서 빈 배열을 반환한다.", async () => {
+            findManySpy.mockResolvedValue([]);
 
-            findManySpy.mockResolvedValue(mockPetListResponse);
+            const result = await petsController.findMany(TEST_USER_ID);
 
-            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
-
-            expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
-            expect(findManySpy).toHaveBeenCalledTimes(1);
-        });
-
-        it("펫 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-            const mockPetListResponse = { pets: [], nextCursor: null };
-
-            findManySpy.mockResolvedValue(mockPetListResponse);
-
-            const result = await petsController.findMany(TEST_USER_ID, paginationQuery);
-
-            expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, paginationQuery.limit);
-            expect(findManySpy).toHaveBeenCalledTimes(1);
-        });
-
-        it("cursor를 사용하여 다음 페이지의 펫 목록을 반환한다.", async () => {
-            const mockPetListResponse = {
-                pets: [
-                    {
-                        id: 11,
-                        name: "호두11",
-                        type: PetType.DOG,
-                        gender: PetGender.MALE,
-                        breed: "믹스",
-                        imageUrl: null,
-                    },
-                ],
-                nextCursor: null,
-            };
-            const cursor = 10;
-
-            findManySpy.mockResolvedValue(mockPetListResponse);
-
-            const result = await petsController.findMany(TEST_USER_ID, {
-                ...paginationQuery,
-                cursor,
-            });
-
-            expect(result).toEqual(mockPetListResponse);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, cursor, paginationQuery.limit);
+            expect(result).toEqual([]);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
     });

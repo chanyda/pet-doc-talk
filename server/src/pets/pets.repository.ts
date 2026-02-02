@@ -12,14 +12,9 @@ import { PetSelect } from "generated/prisma/models";
 export class PetsRepository implements IPetsRepository {
     constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>) {}
 
-    async findMany(userId: number, cursor: number | undefined, limit: number, select?: PetSelect): Promise<IPet[]> {
+    async findMany(userId: number, select?: PetSelect): Promise<IPet[]> {
         return this.txHost.tx.pet.findMany({
-            take: limit,
-            // cursor가 있는 경우는 자기자신(cursor값과 동일한 id는 이미 조회가 된 row)은 제외해야하므로 skip: 1로 설정한다.
-            // cursor가 없는 경우는 건너뛰어야할 row가 없으므로 undefined로 설정한다.
-            skip: cursor ? 1 : undefined,
             where: { userId },
-            cursor: cursor ? { id: cursor } : undefined,
             select,
             orderBy: { createdAt: "desc" },
         });

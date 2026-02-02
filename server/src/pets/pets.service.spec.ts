@@ -71,10 +71,8 @@ describe("PetsService", () => {
     });
 
     describe("findMany", () => {
-        const PAGE_SIZE = 10;
-
-        it("펫 목록을 조회하여 다음 페이지가 존재할 때 nextCursor를 반환한다.", async () => {
-            const mockPets = Array.from({ length: PAGE_SIZE }, (_, i) => ({
+        it("내가 등록한 펫의 목록을 반환한다.", async () => {
+            const mockPets = Array.from({ length: 5 }, (_, i) => ({
                 id: i + 1,
                 name: `호두${i + 1}`,
                 type: PetType.DOG,
@@ -85,62 +83,20 @@ describe("PetsService", () => {
 
             findManySpy.mockResolvedValue(mockPets);
 
-            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
+            const result = await petsService.findMany(TEST_USER_ID);
 
-            expect(result).toEqual({ pets: mockPets, nextCursor: mockPets[mockPets.length - 1].id });
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(result).toEqual(mockPets);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_SUMMARY_SELECT);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
-        it("펫 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다.", async () => {
-            // PAGE_SIZE보다 덜 조회되었다고 가정
-            const mockPets = Array.from({ length: PAGE_SIZE - 1 }, (_, i) => ({
-                id: i + 1,
-                name: `호두${i + 1}`,
-                type: PetType.DOG,
-                gender: PetGender.MALE,
-                breed: "믹스",
-                imageUrl: null,
-            }));
-
-            findManySpy.mockResolvedValue(mockPets);
-
-            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
-
-            expect(result).toEqual({ pets: mockPets, nextCursor: null });
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
-            expect(findManySpy).toHaveBeenCalledTimes(1);
-        });
-
-        it("펫 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
+        it("등록한 펫이 없어서 빈 배열을 반환한다.", async () => {
             findManySpy.mockResolvedValue([]);
 
-            const result = await petsService.findMany(TEST_USER_ID, undefined, PAGE_SIZE);
+            const result = await petsService.findMany(TEST_USER_ID);
 
-            expect(result).toEqual({ pets: [], nextCursor: null });
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, undefined, PAGE_SIZE, PET_SUMMARY_SELECT);
-            expect(findManySpy).toHaveBeenCalledTimes(1);
-        });
-
-        it("cursor를 사용하여 다음 페이지의 펫 목록을 조회한다.", async () => {
-            const mockPets = [
-                {
-                    id: 11,
-                    name: "호두11",
-                    type: PetType.DOG,
-                    gender: PetGender.MALE,
-                    breed: "믹스",
-                    imageUrl: null,
-                },
-            ];
-            const cursor = 10;
-
-            findManySpy.mockResolvedValue(mockPets);
-
-            const result = await petsService.findMany(TEST_USER_ID, cursor, PAGE_SIZE);
-
-            expect(result).toEqual({ pets: mockPets, nextCursor: null });
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, cursor, PAGE_SIZE, PET_SUMMARY_SELECT);
+            expect(result).toEqual([]);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_SUMMARY_SELECT);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
     });
