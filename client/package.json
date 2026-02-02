@@ -20,6 +20,7 @@
         "@tiptap/starter-kit": "^3.18.0",
         "axios": "^1.13.2",
         "cookies-next": "^6.1.1",
+        "dompurify": "^3.3.1",
         "next": "16.1.4",
         "react": "19.2.3",
         "react-dom": "19.2.3",
