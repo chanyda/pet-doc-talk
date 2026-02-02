@@ -57,7 +57,7 @@ export function CommentItem({ comment, currentUserId }: CommentProps) {
                     profileImageUrl={comment.user.profileImageUrl}
                     size="md"
                 />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900">{comment.user.nickname}</span>
@@ -81,7 +81,7 @@ export function CommentItem({ comment, currentUserId }: CommentProps) {
                         <p className="text-gray-400 mb-3 leading-relaxed italic">삭제된 댓글입니다.</p>
                     ) : (
                         <>
-                            <p className="text-gray-800 mb-3 leading-relaxed">{comment.content}</p>
+                            <p className="text-gray-800 mb-3 leading-relaxed break-words">{comment.content}</p>
                             <button
                                 onClick={() => setShowReplyInput(!showReplyInput)}
                                 className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3">

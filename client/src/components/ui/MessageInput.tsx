@@ -23,6 +23,8 @@ export function MessageInput({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const isOverLimit = maxLength !== undefined && value.length > maxLength;
 
+    const prevHeightRef = useRef<number>(0);
+
     // textarea 높이 자동 조절 및 스크롤
     useEffect(() => {
         if (textareaRef.current) {
@@ -30,11 +32,14 @@ export function MessageInput({
             const newHeight = textareaRef.current.scrollHeight;
             textareaRef.current.style.height = `${newHeight}px`;
 
-            // 높이 조절 후 textarea가 화면에 다 보이도록 스크롤
-            textareaRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest",
-            });
+            // 높이가 실제로 변경되었을 때만 스크롤
+            if (prevHeightRef.current !== 0 && newHeight !== prevHeightRef.current) {
+                textareaRef.current.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                });
+            }
+            prevHeightRef.current = newHeight;
         }
     }, [value]);
 
