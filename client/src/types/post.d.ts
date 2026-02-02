@@ -78,3 +78,5 @@ interface Comment {
 }
 
 type CommentActionMenuClickType = "reply" | "edit" | "delete";
+
+type PostMode = "create" | "edit";
