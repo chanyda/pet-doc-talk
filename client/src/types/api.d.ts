@@ -29,3 +29,9 @@ interface ReplyListResponse {
     replies: CommentReply[];
     nextCursor: number | null;
 }
+
+interface CreatePostBody {
+    categoryId: number;
+    title: string;
+    content: string;
+}

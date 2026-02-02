@@ -130,3 +130,7 @@ export async function getComments(
 export async function createComment(postId: number, body: CreateCommentBody): Promise<AxiosResponse<Comment>> {
     return apiClient.post<Comment>(`/posts/${postId}/comments`, body);
 }
+
+export async function createPost(body: CreatePostBody): Promise<AxiosResponse<PostDetail>> {
+    return apiClient.post<PostDetail>("/posts", body);
+}
