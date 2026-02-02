@@ -9,13 +9,19 @@ import * as api from "@/lib/api";
 
 import { CategorySelect } from "./CategorySelect";
 
-export function CreatePostForm() {
+interface PostFormProps {
+    mode: PostMode;
+    initialData?: PostDetail;
+}
+
+export function PostForm({ mode, initialData }: PostFormProps) {
     const router = useRouter();
-    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-    const [title, setTitle] = useState<string>("");
-    const [content, setContent] = useState<string>("");
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialData?.category.id ?? null);
+    const [title, setTitle] = useState<string>(initialData?.title ?? "");
+    const [content, setContent] = useState<string>(initialData?.content ?? "");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    const isEdit = mode === "edit";
     const isTitleOver = title.length > POST_TITLE_LIMIT;
     const isContentOver = content.length > POST_CONTENT_LIMIT;
     const isFormValid = selectedCategoryId && title.trim() && content.trim() && !isTitleOver && !isContentOver;
@@ -45,27 +51,43 @@ export function CreatePostForm() {
         try {
             setIsSubmitting(true);
 
-            const response = await api.createPost({
+            const body = {
                 categoryId: selectedCategoryId,
                 title: title.trim(),
                 content: content.trim(),
-            });
-            router.push(`/community/${response.data.id}`);
+            };
+
+            let postId: number | null = null;
+            switch (mode) {
+                case "edit":
+                    if (!initialData) throw new Error("Post data not exists.");
+                    await api.updatePost(initialData.id, body);
+                    postId = initialData.id;
+
+                    break;
+                case "create":
+                    const response = await api.createPost(body);
+                    postId = response.data.id;
+
+                    break;
+            }
+
+            router.push(`/community/${postId}`);
         } catch (error) {
-            console.error("Failed to create post:", error);
-            alert("게시글 등록에 실패했습니다. 다시 시도해주세요.");
+            console.error(`Failed to ${mode} post:`, error);
+            alert(`게시글 ${isEdit ? "수정" : "등록"}에 실패했습니다. 다시 시도해주세요.`);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleCancel = () => {
-        if (title || content) {
-            if (window.confirm("작성 중인 내용이 있습니다. 정말 나가시겠습니까?")) {
-                router.push("/community");
-            }
-        } else {
-            router.push("/community");
+        const hasUnsavedChanges = Boolean(title || content);
+        const exitPath = isEdit && initialData ? `/community/${initialData.id}` : "/community";
+
+        if (!hasUnsavedChanges || window.confirm("작성 중인 내용이 있습니다. 정말 나가시겠습니까?")) {
+            router.push(exitPath);
+            return;
         }
     };
 
@@ -92,7 +114,7 @@ export function CreatePostForm() {
                     {title.length}/{POST_TITLE_LIMIT}
                 </div>
             </div>
-            <Tiptap onChange={setContent} />
+            <Tiptap onChange={setContent} initialContent={initialData?.content} />
             <div className={`text-xs mt-1 text-right ${isContentOver ? "text-red-500" : "text-gray-500"}`}>
                 {content.length}/{POST_CONTENT_LIMIT}
             </div>
@@ -112,7 +134,7 @@ export function CreatePostForm() {
                                 ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
                                 : "#d1d5db",
                     }}>
-                    {isSubmitting ? "등록 중..." : "게시글 등록"}
+                    {isEdit ? "게시글 수정" : "게시글 등록"}
                 </button>
             </div>
         </div>

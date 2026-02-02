@@ -35,3 +35,9 @@ interface CreatePostBody {
     title: string;
     content: string;
 }
+
+interface UpdatePostBody {
+    categoryId?: number;
+    title?: string;
+    content?: string;
+}

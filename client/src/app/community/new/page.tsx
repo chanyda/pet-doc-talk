@@ -1,7 +1,7 @@
 "use client";
 
 import { PostForm } from "@/components/community/posts/PostForm";
-import { CreatePostHeader } from "@/components/community/posts/CreatePostHeader";
+import { PostFormHeader } from "@/components/community/posts/PostFormHeader";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 
 export default function CreatePostPage() {
@@ -11,7 +11,7 @@ export default function CreatePostPage() {
             <main className="max-w-4xl mx-auto px-6 py-8">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
                     <PostFormHeader mode="create" />
-                    <CreatePostForm />
+                    <PostForm mode="create" />
                 </div>
             </main>
         </div>

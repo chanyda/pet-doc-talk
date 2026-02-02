@@ -5,15 +5,17 @@ import StarterKit from "@tiptap/starter-kit";
 
 interface TiptapProps {
     onChange: (html: string) => void;
+    initialContent?: string;
 }
 
-export function Tiptap({ onChange }: TiptapProps) {
+export function Tiptap({ onChange, initialContent = "" }: TiptapProps) {
     const handleContent = (newContent: string) => {
         onChange(newContent);
     };
 
     const editor = useEditor({
         // TODO: toolbar 생성 시 extension 추가하기
+        content: initialContent,
         extensions: [StarterKit],
         editorProps: {
             attributes: {
