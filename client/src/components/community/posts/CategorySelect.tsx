@@ -46,7 +46,7 @@ export function CategorySelect({ selectedCategoryId, onCategoryChange }: Categor
                     <span className={selectedCategory ? "text-gray-900" : "text-gray-400"}>
                         {selectedCategory?.name || "카테고리를 선택하세요."}
                     </span>
-                    {showDropdown ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                    {showDropdown ? <ArrowUpIcon fill={"#505050"} /> : <ArrowDownIcon fill={"#505050"} />}
                 </button>
 
                 {showDropdown && (
