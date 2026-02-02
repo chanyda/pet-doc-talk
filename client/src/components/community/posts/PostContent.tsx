@@ -1,5 +1,6 @@
 "use client";
 
+import DOMPurify from "dompurify";
 import DeleteIcon from "public/icons/delete-icon.svg";
 import EditIcon from "public/icons/edit-icon.svg";
 import PrevIcon from "public/icons/prev-icon.svg";
@@ -82,7 +83,12 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                 </div>
             </div>
             <div className="p-6">
-                <div className="text-gray-800 leading-relaxed whitespace-pre-wrap mb-6">{post.content}</div>
+                <div
+                    className="prose max-w-full text-gray-800 leading-relaxed mb-6"
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(post.content),
+                    }}
+                />
                 {/* {post.images && post.images.length > 0 && (
                     <div className="grid grid-cols-1 gap-4 mb-6">
                         {post.images.map((image, index) => (
