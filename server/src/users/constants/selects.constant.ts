@@ -7,6 +7,8 @@ export const USER_PROFILE_SELECT = {
     _count: {
         select: {
             posts: true,
+            comments: true,
+            // TODO: 상담 기능 추가되면 내가 요청한 상담개수도 보여주도록 하자
         },
     },
 };

@@ -152,6 +152,7 @@ describe("UsersService", () => {
                 profileImageUrl: null,
                 _count: {
                     posts: 10,
+                    comments: 30,
                 },
             };
             const profileResponse = toProfileResponse(mockUserProfile);
@@ -188,6 +189,7 @@ describe("UsersService", () => {
                     profileImageUrl: null,
                     _count: {
                         posts: 10,
+                        comments: 30,
                     },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
@@ -219,6 +221,7 @@ describe("UsersService", () => {
                     profileImageUrl: updateProfileDto.profileImageUrl,
                     _count: {
                         posts: 10,
+                        comments: 30,
                     },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
@@ -246,6 +249,7 @@ describe("UsersService", () => {
                     profileImageUrl: updateProfileDto.profileImageUrl,
                     _count: {
                         posts: 10,
+                        comments: 30,
                     },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
@@ -277,6 +281,7 @@ describe("UsersService", () => {
                     profileImageUrl: null,
                     _count: {
                         posts: 10,
+                        comments: 30,
                     },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
@@ -381,5 +386,6 @@ function toProfileResponse(user: UserGetPayload<{ select: UserProfileSelect }>):
         nickname: user.nickname,
         profileImageUrl: user.profileImageUrl,
         postCount: user._count.posts,
+        commentCount: user._count.comments,
     };
 }

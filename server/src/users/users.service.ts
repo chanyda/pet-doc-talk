@@ -92,6 +92,7 @@ export class UsersService {
             nickname: user.nickname,
             profileImageUrl: user.profileImageUrl,
             postCount: user._count.posts,
+            commentCount: user._count.comments,
         };
     }
 }

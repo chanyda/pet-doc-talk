@@ -19,6 +19,8 @@ describe("UsersController", () => {
         name: "Tester",
         nickname: "Tester",
         profileImageUrl: null,
+        postCount: 10,
+        commentCount: 35,
     };
 
     beforeEach(async () => {

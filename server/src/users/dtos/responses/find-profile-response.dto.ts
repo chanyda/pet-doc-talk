@@ -18,4 +18,7 @@ export class FindProfileResponseDto {
 
     @ApiProperty()
     postCount: number;
+
+    @ApiProperty()
+    commentCount: number;
 }
