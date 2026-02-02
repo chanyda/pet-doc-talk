@@ -12,9 +12,7 @@ interface SortSelectProps {
 
 export function SortSelect({ value, onChange }: SortSelectProps) {
     const [isActionMenuOption, setIsActionMenuOption] = useState(false);
-    const actionMenuRef = useOutsideClick(() => {
-        setIsActionMenuOption(false);
-    });
+    const actionMenuRef = useOutsideClick(() => setIsActionMenuOption(false));
     const selectedOption = POST_ORDER_BY_OPTIONS.find((opt) => opt.id === value);
 
     const handleSelect = (order: OrderByType) => {

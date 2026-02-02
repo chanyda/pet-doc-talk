@@ -23,9 +23,7 @@ export function CommentItem({ comment, currentUserId }: CommentProps) {
     const [showReplies, setShowReplies] = useState<boolean>(false);
     const [replyContent, setReplyContent] = useState<string>("");
     const [isActionMenuOpen, setIsActionMenuOpen] = useState<boolean>(false);
-    const actionMenuRef = useOutsideClick(() => {
-        setIsActionMenuOpen(false);
-    });
+    const actionMenuRef = useOutsideClick(() => setIsActionMenuOpen(false));
 
     const isAuthor = comment.user.id === currentUserId;
     const isDeleted = !!comment.deletedAt;
