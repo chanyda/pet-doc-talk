@@ -1,6 +1,7 @@
 "use client";
 
 import DOMPurify from "dompurify";
+import { useRouter } from "next/navigation";
 import DeleteIcon from "public/icons/delete-icon.svg";
 import EditIcon from "public/icons/edit-icon.svg";
 import PrevIcon from "public/icons/prev-icon.svg";
@@ -17,11 +18,11 @@ interface PostContentProps {
 }
 
 export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
+    const router = useRouter();
     const isAuthor = currentUserId && post.user.id === currentUserId;
 
-    // TODO: 게시글 수정 처리하기
     const handleEdit = () => {
-        console.log("Edit post");
+        router.push(`/community/${post.id}/edit`);
     };
 
     // TODO: 게시글 삭제 처리하기
