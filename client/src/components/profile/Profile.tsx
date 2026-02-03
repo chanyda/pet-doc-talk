@@ -1,14 +1,28 @@
 "use client";
 
 import SettingIcon from "public/icons/setting-icon.svg";
+import { useEffect, useState } from "react";
 
-import { useAuthStore } from "@/store/authStore";
+import * as api from "@/lib/api";
 
 import { ProfileAvatar } from "../ui/ProfileAvatar";
 import { MyPets } from "./MyPets";
 
 export function Profile() {
-    const { user } = useAuthStore();
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await api.getUser();
+                setUser(response.data);
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     if (!user) return null;
 
