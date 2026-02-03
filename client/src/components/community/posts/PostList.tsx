@@ -31,24 +31,35 @@ export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
         return params;
     }, [categoryId, orderBy, searchQuery]);
 
-    const { posts, nextCursor, isLoading, isInitialLoading, totalPostCount, handleLoadMore } = useCursorPostList({
+    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = useCursorPostList({
         fetchFn: api.getPosts,
         queryParams,
     });
 
-    return isInitialLoading ? (
-        <LoadingSpinner />
-    ) : (
-        <div>
+    const renderPostList = () => {
+        if (posts.length === 0 && isLoading) {
+            return <LoadingSpinner />;
+        }
+
+        if (posts.length === 0) {
+            return <CommunityEmptyState type="post" />;
+        }
+
+        return (
             <div className="space-y-3">
                 {posts.map((post) => (
                     <PostItem key={post.id} post={post} />
                 ))}
             </div>
-            {posts.length === 0 && <CommunityEmptyState type="post" />}
+        );
+    };
+
+    return (
+        <>
+            {renderPostList()}
             {nextCursor && posts.length < totalPostCount && (
                 <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
             )}
-        </div>
+        </>
     );
 }

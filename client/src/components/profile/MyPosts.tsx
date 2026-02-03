@@ -11,31 +11,38 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export function MyPosts() {
     const { user } = useAuthStore();
-    const { posts, nextCursor, isLoading, isInitialLoading, totalPostCount, handleLoadMore } = useCursorPostList({
+    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = useCursorPostList({
         fetchFn: api.getMyPosts,
     });
 
     if (!user) return null;
+
+    const renderMyPostList = () => {
+        if (posts.length === 0 && isLoading) {
+            return <LoadingSpinner />;
+        }
+
+        if (posts.length === 0) {
+            return <CommunityEmptyState type="post" />;
+        }
+
+        return (
+            <div className="space-y-3">
+                {posts.map((post) => (
+                    <PostItem key={post.id} post={post} />
+                ))}
+            </div>
+        );
+    };
 
     return (
         <div>
             <div className="mb-6">
                 <h3 className="text-xl mb-1">내 게시글</h3>
             </div>
-            {isInitialLoading ? (
-                <LoadingSpinner />
-            ) : (
-                <div>
-                    <div className="space-y-3">
-                        {posts.map((post) => (
-                            <PostItem key={post.id} post={post} />
-                        ))}
-                    </div>
-                    {posts.length === 0 && <CommunityEmptyState type="post" />}
-                    {nextCursor && posts.length < totalPostCount && (
-                        <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
-                    )}
-                </div>
+            {renderMyPostList()}
+            {nextCursor && posts.length < totalPostCount && (
+                <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
             )}
         </div>
     );

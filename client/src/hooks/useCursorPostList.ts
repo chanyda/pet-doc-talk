@@ -11,12 +11,13 @@ export function useCursorPostList({ fetchFn, queryParams }: UseCursorPostListPro
     const [posts, setPosts] = useState<PostSummary[]>([]);
     const [nextCursor, setNextCursor] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
     const [totalPostCount, setTotalPostCount] = useState<number>(0);
 
     const fetchPosts = useCallback(
         async (cursor?: number) => {
             try {
+                setIsLoading(true);
+
                 const params: FindPostListQuery = {
                     limit: DEFAULT_PAGE_LIMIT,
                     ...queryParams,
@@ -36,34 +37,27 @@ export function useCursorPostList({ fetchFn, queryParams }: UseCursorPostListPro
                 setPosts([]);
                 setNextCursor(null);
                 console.error("Failed to fetch posts:", error);
+            } finally {
+                setIsLoading(false);
             }
         },
         [fetchFn, queryParams],
     );
 
     useEffect(() => {
-        const loadPosts = async () => {
-            setIsInitialLoading(true);
-            await fetchPosts();
-            setIsInitialLoading(false);
-        };
-
-        loadPosts();
+        fetchPosts();
     }, [fetchPosts]);
 
     const handleLoadMore = async () => {
         if (!nextCursor || isLoading) return;
 
-        setIsLoading(true);
         await fetchPosts(nextCursor);
-        setIsLoading(false);
     };
 
     return {
         posts,
         nextCursor,
         isLoading,
-        isInitialLoading,
         totalPostCount,
         handleLoadMore,
     };
