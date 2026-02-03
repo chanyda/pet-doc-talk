@@ -142,3 +142,8 @@ export async function updatePost(postId: number, body: UpdatePostBody): Promise<
 export async function deletePost(postId: number): Promise<AxiosResponse<void>> {
     return apiClient.delete<void>(`/posts/${postId}`);
 }
+
+export async function getPets(): Promise<AxiosResponse<Pet[]>> {
+    return apiClient.get<Pet[]>("/pets");
+}
+
