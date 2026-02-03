@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import ArrowDownIcon from "public/icons/arrow-down-icon.svg";
 import ArrowUpIcon from "public/icons/arrow-up-icon.svg";
 import LogoutIcon from "public/icons/logout-icon.svg";
+import ProfileIcon from "public/icons/profile-icon.svg";
 import { useState } from "react";
 
 import { useOutsideClick } from "@/hooks/useClickOutside";
@@ -79,14 +80,13 @@ export function TopNavigation() {
                                             <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
                                         </div>
                                         <div className="py-1">
-                                            {/* TODO: 마이페이지 만들면 Link 추가하기 */}
-                                            {/* <Link
+                                            <Link
                                                 href="/mypage"
                                                 onClick={() => setIsMenuOpen(false)}
                                                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                                 <ProfileIcon />
                                                 마이페이지
-                                            </Link> */}
+                                            </Link>
                                             <button
                                                 onClick={() => {
                                                     setIsMenuOpen(false);
