@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 
+import { CommunityEmptyState } from "@/components/ui/CommunityEmptyState";
 import { HasMoreButton } from "@/components/ui/HasMoreButton";
-import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
-import { getPosts } from "@/lib/api";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useCursorPostList } from "@/hooks/useCursorPostList";
+import * as api from "@/lib/api";
 
 import { PostItem } from "./PostItem";
 
@@ -15,87 +17,38 @@ interface PostListProps {
 }
 
 export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
-    const [posts, setPosts] = useState<PostSummary[]>([]);
-    const [nextCursor, setNextCursor] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const queryParams = useMemo(() => {
+        const params: Partial<FindPostListQuery> = { orderBy };
 
-    const fetchPosts = useCallback(
-        async (cursor?: number) => {
-            try {
-                const params: FindPostListQuery = {
-                    limit: DEFAULT_PAGE_LIMIT,
-                    orderBy,
-                };
+        if (categoryId) {
+            params.categoryId = categoryId;
+        }
 
-                if (categoryId) {
-                    params.categoryId = categoryId;
-                }
+        if (searchQuery) {
+            params.keyword = searchQuery;
+        }
 
-                if (searchQuery) {
-                    params.keyword = searchQuery;
-                }
+        return params;
+    }, [categoryId, orderBy, searchQuery]);
 
-                if (cursor) {
-                    params.cursor = cursor;
-                }
-
-                const response = await getPosts(params);
-                const { posts: newPosts, nextCursor: newNextCursor } = response.data;
-
-                if (cursor) {
-                    setPosts((prev) => [...prev, ...newPosts]);
-                } else {
-                    setPosts(newPosts);
-                }
-
-                setNextCursor(newNextCursor);
-            } catch (error) {
-                setPosts([]);
-                console.error("Failed to fetch posts:", error);
-            }
-        },
-        [categoryId, orderBy, searchQuery],
-    );
-
-    useEffect(() => {
-        const loadPosts = async () => {
-            setIsInitialLoading(true);
-            await fetchPosts();
-            setIsInitialLoading(false);
-        };
-
-        loadPosts();
-    }, [fetchPosts]);
-
-    const handleLoadMore = async () => {
-        if (!nextCursor || isLoading) return;
-
-        setIsLoading(true);
-        await fetchPosts(nextCursor);
-        setIsLoading(false);
-    };
+    const { posts, nextCursor, isLoading, isInitialLoading, totalPostCount, handleLoadMore } = useCursorPostList({
+        fetchFn: api.getPosts,
+        queryParams,
+    });
 
     return isInitialLoading ? (
-        <div className="flex justify-center items-center py-20">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 border-3 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
-                <span className="text-gray-600">게시글을 불러오는 중...</span>
-            </div>
-        </div>
+        <LoadingSpinner />
     ) : (
         <div>
-            <div className="space-y-3 mb-8">
+            <div className="space-y-3">
                 {posts.map((post) => (
                     <PostItem key={post.id} post={post} />
                 ))}
             </div>
-            {posts.length === 0 && (
-                <div className="text-center py-16">
-                    <p className="text-gray-500 text-lg mb-2">작성된 게시글이 없어요.</p>
-                </div>
+            {posts.length === 0 && <CommunityEmptyState type="post" />}
+            {nextCursor && posts.length < totalPostCount && (
+                <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
             )}
-            {nextCursor && <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />}
         </div>
     );
 }
