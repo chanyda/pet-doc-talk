@@ -77,6 +77,20 @@ interface Comment {
     deletedAt: string | null;
 }
 
+interface MyCommentPost {
+    id: number;
+    title: string;
+    commentCount: number;
+}
+
+interface MyComment {
+    id: number;
+    content: string;
+    post: MyCommentPost;
+    createdAt: string;
+    updatedAt: string;
+}
+
 type CommentActionMenuClickType = "reply" | "edit" | "delete";
 
 type PostMode = "create" | "edit";

@@ -26,6 +26,13 @@ interface CommentListResponse {
     totalParentCommentCount: number;
     totalCommentCount: number;
 }
+
+interface MyCommentListResponse {
+    comments: MyComment[];
+    nextCursor: number | null;
+    totalCommentCount: number;
+}
+
 interface ReplyListResponse {
     replies: CommentReply[];
     nextCursor: number | null;

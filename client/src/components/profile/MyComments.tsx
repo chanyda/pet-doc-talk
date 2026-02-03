@@ -1,87 +1,107 @@
 "use client";
 
-const mockComments = [
-    {
-        id: 1,
-        postTitle: "강아지 산책 시간은 얼마나 하시나요?",
-        content: "저는 하루에 30분씩 2번 산책시켜요. 날씨가 좋으면 조금 더 길게 하기도 하구요!",
-        createdAt: "2시간 전",
-    },
-    {
-        id: 2,
-        postTitle: "고양이가 밥을 잘 안먹어요",
-        content: "저희 고양이도 그랬는데 사료를 바꿔보니까 잘 먹더라구요. 입맛이 까다로운가봐요 ㅎㅎ",
-        createdAt: "5시간 전",
-    },
-    {
-        id: 3,
-        postTitle: "반려동물 보험 추천해주세요",
-        content: "저는 OO보험 쓰고 있는데 괜찮아요. 병원비 부담이 많이 줄었어요!",
-        createdAt: "1일 전",
-    },
-    {
-        id: 4,
-        postTitle: "강아지 미용 어디서 하시나요?",
-        content: "XX동물병원에서 하는데 선생님이 너무 친절하세요. 강아지도 스트레스 안 받는 것 같아요",
-        createdAt: "2일 전",
-    },
-    {
-        id: 5,
-        postTitle: "고양이 장난감 추천",
-        content: "터널 장난감이랑 레이저 포인터 좋아해요! 운동량도 늘고 스트레스 해소에도 좋더라구요",
-        createdAt: "3일 전",
-    },
-];
+import { useRouter } from "next/navigation";
+import CommentIcon from "public/icons/comment-icon.svg";
+import { useEffect, useState } from "react";
+
+import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
+import * as api from "@/lib/api";
+import { formatLocalDateTime } from "@/utils/date";
+
+import { CommunityEmptyState } from "../ui/CommunityEmptyState";
+import { HasMoreButton } from "../ui/HasMoreButton";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export function MyComments() {
-    return (
-        <div>
-            {/* Header */}
-            <div className="mb-6">
-                <h3 className="text-xl mb-1">내 댓글</h3>
-                <p className="text-sm text-gray-600">총 {mockComments.length}개의 댓글을 작성했습니다</p>
-            </div>
+    const router = useRouter();
+    const [comments, setComments] = useState<MyComment[]>([]);
+    const [nextCursor, setNextCursor] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [totalCommentCount, setTotalCommentCount] = useState<number>(0);
 
-            {/* Comments List */}
+    const fetchMyComments = async (cursor?: number) => {
+        try {
+            setIsLoading(true);
+
+            const params: PaginationQuery = {
+                limit: DEFAULT_PAGE_LIMIT,
+            };
+
+            if (cursor !== undefined) {
+                params.cursor = cursor;
+            }
+
+            const response = await api.getMyComments(params);
+            const { comments: newComments, nextCursor: newNextCursor, totalCommentCount } = response.data;
+
+            setComments((prev) => (cursor !== undefined ? [...prev, ...newComments] : newComments));
+            setNextCursor(newNextCursor);
+            setTotalCommentCount(totalCommentCount);
+        } catch (error) {
+            setComments([]);
+            setNextCursor(null);
+            console.error("Failed to fetch comments:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchMyComments();
+    }, []);
+
+    const handleLoadMore = async () => {
+        if (!nextCursor || isLoading) return;
+
+        await fetchMyComments(nextCursor);
+    };
+
+    const handleCommentClick = (postId: number, commentId: number) => {
+        router.push(`/community/${postId}#comment-${commentId}`);
+    };
+
+    const renderMyCommentList = () => {
+        // 초기 로딩: 내가 작성한 댓글이 없고 로딩 중일 때만 스피너 표시
+        if (comments.length === 0 && isLoading) {
+            return <LoadingSpinner />;
+        }
+
+        if (comments.length === 0) {
+            return <CommunityEmptyState type="comment" />;
+        }
+
+        return (
             <div className="space-y-3">
-                {mockComments.map((comment) => (
-                    <button
+                {comments.map((comment) => (
+                    <div
                         key={comment.id}
-                        className="w-full p-5 bg-gray-50 rounded-xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-orange-50 transition-all border border-transparent hover:border-pink-200 group text-left">
-                        <div className="flex items-start gap-4">
-                            <div className="flex-1">
-                                {/* Post Title */}
-                                <div className="flex items-center gap-2 mb-2">
-                                    {/* <MessageSquare size={14} className="text-pink-600 flex-shrink-0" /> */}
-                                    <h4 className="text-sm text-gray-600 line-clamp-1">{comment.postTitle}</h4>
+                        onClick={() => handleCommentClick(comment.post.id, comment.id)}
+                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 hover:border-pink-200 p-5">
+                        <div className="flex flex-col flex-1 gap-2">
+                            <p className="line-clamp-2">{comment.content}</p>
+                            <div className="text-xs text-gray-500">{formatLocalDateTime(comment.createdAt)}</div>
+                            <div className="flex items-center gap-2">
+                                <h4 className="text-sm text-gray-700 line-clamp-1">{comment.post.title}</h4>
+                                <div className="flex items-center gap-1">
+                                    <CommentIcon width="15px" height="15px" />
+                                    <span className="text-xs text-gray-700">{comment.post.commentCount}</span>
                                 </div>
-
-                                {/* Comment Content */}
-                                <p className="text-gray-900 mb-2 line-clamp-2">{comment.content}</p>
-
-                                {/* Time */}
-                                <span className="text-xs text-gray-500">{comment.createdAt}</span>
                             </div>
-
-                            {/* Arrow */}
-                            {/* <ChevronRight
-                                size={20}
-                                className="text-gray-400 group-hover:text-pink-600 transition-colors flex-shrink-0 mt-2"
-                            /> */}
                         </div>
-                    </button>
+                    </div>
                 ))}
             </div>
+        );
+    };
 
-            {/* Empty State */}
-            {mockComments.length === 0 && (
-                <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                        {/* <MessageSquare size={32} className="text-gray-400" /> */}
-                    </div>
-                    <p className="text-gray-600 mb-2">작성한 댓글이 없습니다</p>
-                    <p className="text-sm text-gray-500">다른 사람의 게시글에 댓글을 남겨보세요!</p>
-                </div>
+    return (
+        <div>
+            <div className="mb-6">
+                <h3 className="text-xl mb-1">내 댓글</h3>
+            </div>
+            {renderMyCommentList()}
+            {nextCursor && comments.length < totalCommentCount && (
+                <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
             )}
         </div>
     );

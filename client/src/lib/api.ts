@@ -150,3 +150,7 @@ export async function getPets(): Promise<AxiosResponse<Pet[]>> {
 export async function getMyPosts(params: PaginationQuery): Promise<AxiosResponse<PostListResponse>> {
     return apiClient.get<PostListResponse>("/posts/me", { params });
 }
+
+export async function getMyComments(params: PaginationQuery): Promise<AxiosResponse<MyCommentListResponse>> {
+    return apiClient.get<MyCommentListResponse>("/comments/me", { params });
+}
