@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import EditIcon from "public/icons/edit-icon.svg";
+import WriteIcon from "public/icons/write-icon.svg";
 
 export function CommunityHeader() {
     const router = useRouter();
@@ -16,7 +16,7 @@ export function CommunityHeader() {
                 onClick={() => router.push("/community/new")}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl text-white hover:opacity-90 transition-opacity shadow-md hover:shadow-lg cursor-pointer"
                 style={{ backgroundColor: "#FF6B9D" }}>
-                <EditIcon fill={"#ffffff"} stroke={"#ffffff"} />
+                <WriteIcon stroke="#ffffff" width="20px" height="20px" />
                 <span>게시글 작성하기</span>
             </button>
         </div>
