@@ -78,7 +78,11 @@ describe("PostsController", () => {
                     name: `카테고리${i + 1}`,
                 },
             }));
-            const postListResponse = { posts: mockPosts, nextCursor: mockPosts[mockPosts.length - 1].id };
+            const postListResponse = {
+                posts: mockPosts,
+                totalPostCount: 20,
+                nextCursor: mockPosts[mockPosts.length - 1].id,
+            };
 
             findManySpy.mockResolvedValue(postListResponse);
 
@@ -107,7 +111,7 @@ describe("PostsController", () => {
                     name: `카테고리${i + 1}`,
                 },
             }));
-            const postListResponse = { posts: mockPosts, nextCursor: null };
+            const postListResponse = { posts: mockPosts, totalPostCount: 9, nextCursor: null };
 
             findManySpy.mockResolvedValue(postListResponse);
 
@@ -119,7 +123,7 @@ describe("PostsController", () => {
         });
 
         it("게시글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-            const postListResponse = { posts: [], nextCursor: null };
+            const postListResponse = { posts: [], totalPostCount: 0, nextCursor: null };
 
             findManySpy.mockResolvedValue(postListResponse);
 

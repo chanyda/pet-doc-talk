@@ -7,4 +7,7 @@ export class PostListResponseDto {
 
     @ApiPropertyOptional({ type: Number, nullable: true })
     nextCursor: number | null;
+
+    @ApiProperty({ description: "Total number of posts written by the user" })
+    totalPostCount: number;
 }

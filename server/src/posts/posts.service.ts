@@ -36,7 +36,7 @@ export class PostsService {
         const whereInput = this.buildFindManyWhereInput(query.categoryId, query.keyword);
 
         // TODO: 좋아요 기능 추가 시 likeCount, isLiked도 보여줘야함
-        const posts = await this.postsRepository.findMany({
+        const { posts, totalCount: totalPostCount } = await this.postsRepository.findManyAndCount({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
@@ -51,11 +51,12 @@ export class PostsService {
         return {
             posts: posts.map((post) => this.toPostSummary(post)),
             nextCursor,
+            totalPostCount,
         };
     }
 
     async findMyPosts(userId: number, query: PaginationQueryDto): Promise<MyPostListResponseDto> {
-        const { posts, totalCount } = await this.postsRepository.findManyAndCount({
+        const { posts, totalCount: totalPostCount } = await this.postsRepository.findManyAndCount({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
@@ -68,7 +69,7 @@ export class PostsService {
         return {
             posts: posts.map((post) => this.toMyPostSummary(post)),
             nextCursor,
-            totalPostCount: totalCount,
+            totalPostCount,
         };
     }
 
