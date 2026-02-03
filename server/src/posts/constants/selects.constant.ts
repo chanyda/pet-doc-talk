@@ -22,24 +22,6 @@ export const POST_SUMMARY_SELECT = {
     },
 } as PostSelect;
 
-export const MY_POST_SUMMARY_SELECT = {
-    id: true,
-    title: true,
-    viewCount: true,
-    createdAt: true,
-    updatedAt: true,
-    category: {
-        select: { id: true, name: true },
-    },
-    _count: {
-        select: {
-            comments: {
-                where: { deletedAt: null },
-            },
-        },
-    },
-} as PostSelect;
-
 export const POST_DETAIL_SELECT = {
     id: true,
     title: true,
@@ -56,4 +38,3 @@ export const POST_DETAIL_SELECT = {
 } as PostSelect;
 
 export type PostSummarySelect = typeof POST_SUMMARY_SELECT;
-export type MyPostSummarySelect = typeof MY_POST_SUMMARY_SELECT;

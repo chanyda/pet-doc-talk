@@ -146,6 +146,11 @@ describe("PostsController", () => {
                 commentCount: 5,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                user: {
+                    id: TEST_USER_ID,
+                    nickname: "Tester",
+                    profileImageUrl: null,
+                },
                 category: {
                     id: i + 1,
                     name: `카테고리${i + 1}`,

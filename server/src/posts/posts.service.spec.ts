@@ -6,16 +6,9 @@ import { CategoriesService } from "src/categories/categories.service";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
 import { PostOrderBy } from "./posts.enums";
-import {
-    MY_POST_SUMMARY_SELECT,
-    MyPostSummarySelect,
-    POST_DETAIL_SELECT,
-    POST_SUMMARY_SELECT,
-    PostSummarySelect,
-} from "./constants/selects.constant";
+import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT, PostSummarySelect } from "./constants/selects.constant";
 import { PostGetPayload } from "generated/prisma/models";
 import { PostSummaryDto } from "./dtos/responses/post-summary-dto";
-import { MyPostSummaryDto } from "./dtos/responses/my-post-summary-dto";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -511,19 +504,24 @@ describe("PostsService", () => {
                 viewCount: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                user: {
+                    id: TEST_USER_ID,
+                    nickname: "Tester",
+                    profileImageUrl: null,
+                },
                 category: {
                     id: 1,
                     name: "카테고리1",
                 },
                 _count: { comments: 5 },
-            })) as PostGetPayload<{ select: MyPostSummarySelect }>[];
+            })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
             findManyAndCountSpy.mockResolvedValue({ posts: mockPosts, totalCount: 20 });
 
             const result = await postsService.findMyPosts(TEST_USER_ID, query);
 
             expect(result).toEqual({
-                posts: mockPosts.map((post) => toMyPostSummary(post)),
+                posts: mockPosts.map((post) => toPostSummary(post)),
                 nextCursor: mockPosts[mockPosts.length - 1].id,
                 totalPostCount: 20,
             });
@@ -531,7 +529,7 @@ describe("PostsService", () => {
                 take: query.limit,
                 skip: 1,
                 cursor: { id: query.cursor },
-                select: MY_POST_SUMMARY_SELECT,
+                select: POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
@@ -546,19 +544,24 @@ describe("PostsService", () => {
                 viewCount: 0,
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                user: {
+                    id: TEST_USER_ID,
+                    nickname: "Tester",
+                    profileImageUrl: null,
+                },
                 category: {
                     id: 1,
                     name: "카테고리1",
                 },
                 _count: { comments: 5 },
-            })) as PostGetPayload<{ select: MyPostSummarySelect }>[];
+            })) as PostGetPayload<{ select: PostSummarySelect }>[];
 
             findManyAndCountSpy.mockResolvedValue({ posts: mockPosts, totalCount: 20 });
 
             const result = await postsService.findMyPosts(TEST_USER_ID, query);
 
             expect(result).toEqual({
-                posts: mockPosts.map((post) => toMyPostSummary(post)),
+                posts: mockPosts.map((post) => toPostSummary(post)),
                 nextCursor: null,
                 totalPostCount: 20,
             });
@@ -566,7 +569,7 @@ describe("PostsService", () => {
                 take: query.limit,
                 skip: 1,
                 cursor: { id: query.cursor },
-                select: MY_POST_SUMMARY_SELECT,
+                select: POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
@@ -583,7 +586,7 @@ describe("PostsService", () => {
                 take: requiredQuery.limit,
                 skip: undefined,
                 cursor: undefined,
-                select: MY_POST_SUMMARY_SELECT,
+                select: POST_SUMMARY_SELECT,
                 where: { userId: TEST_USER_ID },
                 orderBy: { createdAt: "desc" },
             });
@@ -859,7 +862,7 @@ describe("PostsService", () => {
     });
 });
 
-// NOTE: toPostSummary, toMyPostSummary 함수 변경 시 테스트 코드도 변경 필요
+// NOTE: toPostSummary 함수 변경 시 테스트 코드도 변경 필요
 function toPostSummary(post: PostGetPayload<{ select: PostSummarySelect }>): PostSummaryDto {
     return {
         id: post.id,
@@ -869,18 +872,6 @@ function toPostSummary(post: PostGetPayload<{ select: PostSummarySelect }>): Pos
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
         user: post.user,
-        category: post.category,
-    };
-}
-
-function toMyPostSummary(post: PostGetPayload<{ select: MyPostSummarySelect }>): MyPostSummaryDto {
-    return {
-        id: post.id,
-        title: post.title,
-        viewCount: post.viewCount,
-        commentCount: post._count.comments,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
         category: post.category,
     };
 }
