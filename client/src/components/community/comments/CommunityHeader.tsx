@@ -16,7 +16,7 @@ export function CommunityHeader() {
                 onClick={() => router.push("/community/new")}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl text-white hover:opacity-90 transition-opacity shadow-md hover:shadow-lg cursor-pointer"
                 style={{ backgroundColor: "#FF6B9D" }}>
-                <WriteIcon stroke="#ffffff" width="20px" height="20px" />
+                <WriteIcon stroke="#ffffff" />
                 <span>게시글 작성하기</span>
             </button>
         </div>

@@ -25,31 +25,65 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const [nextCursor, setNextCursor] = useState<number | null>(null);
     const [newContent, setNewContent] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
     const [newCommentId, setNewCommentId] = useState<number | null>(null);
 
     const newCommentRef = useRef<HTMLDivElement>(null);
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
-        const fetchComments = async () => {
-            try {
-                setIsLoading(true);
+    const fetchComments = async (cursor?: number) => {
+        try {
+            setIsLoading(true);
 
-                const { data } = await api.getComments(postId, { limit: DEFAULT_PAGE_LIMIT });
-                setComments(data.comments);
-                setTotalCommentCount(data.totalCommentCount);
-                setTotalParentCommentCount(data.totalParentCommentCount);
-                setNextCursor(data.nextCursor);
-            } catch (error) {
-                console.error("Failed to fetch comments:", error);
-            } finally {
-                setIsLoading(false);
+            const params: PaginationQuery = {
+                limit: DEFAULT_PAGE_LIMIT,
+            };
+
+            if (cursor !== undefined) {
+                params.cursor = cursor;
             }
+
+            const { data } = await api.getComments(postId, params);
+
+            setComments((prev) => (cursor !== undefined ? [...prev, ...data.comments] : data.comments));
+            setTotalCommentCount(data.totalCommentCount);
+            setTotalParentCommentCount(data.totalParentCommentCount);
+            setNextCursor(data.nextCursor);
+        } catch (error) {
+            console.error("Failed to fetch comments:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const loadComments = async () => {
+            await fetchComments();
+            setIsInitialLoadComplete(true);
         };
 
-        fetchComments();
+        loadComments();
     }, [postId]);
+
+    // URL hash에서 commentId를 읽어 해당 댓글로 스크롤 및 하이라이트
+    // 마이페이지-내댓글에서 내가 작성한 댓글을 클릭하면 해당 댓글로 스크롤 및 하이라이트 해주기 위함
+    useEffect(() => {
+        if (!isInitialLoadComplete) return;
+
+        const hash = window.location.hash;
+        if (hash.startsWith("#comment-")) {
+            const commentId = parseInt(hash.replace("#comment-", ""), 10);
+
+            // hash 제거
+            window.history.replaceState(null, "", window.location.pathname + window.location.search);
+
+            if (!isNaN(commentId) && comments.some((c) => c.id === commentId)) {
+                setNewCommentId(commentId);
+                handleNewCommentEffect();
+            }
+        }
+    }, [isInitialLoadComplete]);
 
     // 컴포넌트 언마운트 시 timeout 정리
     useEffect(() => {
@@ -133,17 +167,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const handleLoadMore = async () => {
         if (!nextCursor || isLoading) return;
 
-        try {
-            setIsLoading(true);
-
-            const response = await api.getComments(postId, { cursor: nextCursor, limit: DEFAULT_PAGE_LIMIT });
-            setComments([...comments, ...response.data.comments]);
-            setNextCursor(response.data.nextCursor);
-        } catch (error) {
-            console.error("Failed to load more comments:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        await fetchComments(nextCursor);
     };
 
     const handleReply = (commentId: number) => {
@@ -198,7 +222,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
             )}
             {
                 <div className="border-t border-gray-100 pt-6 mt-8">
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-3 items-start">
                         <ProfileAvatar
                             nickname={currentUser?.nickname ?? "U"}
                             profileImageUrl={currentUser?.profileImageUrl}
