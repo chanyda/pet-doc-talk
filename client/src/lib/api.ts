@@ -147,6 +147,10 @@ export async function getPets(): Promise<AxiosResponse<Pet[]>> {
     return apiClient.get<Pet[]>("/pets");
 }
 
+export async function createPet(body: PetRegistrationFormData): Promise<AxiosResponse<Pet>> {
+    return apiClient.post<Pet>("/pets", body);
+}
+
 export async function getMyPosts(params: PaginationQuery): Promise<AxiosResponse<PostListResponse>> {
     return apiClient.get<PostListResponse>("/posts/me", { params });
 }

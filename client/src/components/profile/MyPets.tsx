@@ -14,7 +14,7 @@ import * as api from "@/lib/api";
 export function MyPets() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
-    const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
+    const [canScrollRight, setCanScrollRight] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -31,6 +31,18 @@ export function MyPets() {
 
         fetchPets();
     }, []);
+
+    const checkScrollAbility = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollWidth > clientWidth + 10);
+        }
+    };
+
+    useEffect(() => {
+        checkScrollAbility();
+    }, [pets]);
 
     const handleScroll = () => {
         if (scrollContainerRef.current) {
@@ -61,16 +73,21 @@ export function MyPets() {
         setIsModalOpen(false);
     };
 
-    const handlePetSubmit = (petData: any) => {
-        console.log("반려동물 등록 데이터:", petData);
-        // TODO: API 연결 시 여기서 API 호출
+    const handlePetSubmit = async (petData: PetRegistrationFormData) => {
+        try {
+            const response = await api.createPet(petData);
+            setPets((prev) => [response.data, ...prev]);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("반려동물 등록 실패:", error);
+        }
     };
 
     return (
         <div className="border-t border-gray-100 pt-6">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-medium">나의 반려들</h3>
+                    <h3 className="text-lg font-medium">소중한 우리 아이들 ({pets.length})</h3>
                 </div>
                 <button
                     onClick={handleOpenModal}
