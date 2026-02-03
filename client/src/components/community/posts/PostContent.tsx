@@ -2,14 +2,13 @@
 
 import DOMPurify from "dompurify";
 import { useRouter } from "next/navigation";
+import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import DeleteIcon from "public/icons/delete-icon.svg";
 import EditIcon from "public/icons/edit-icon.svg";
-import PrevIcon from "public/icons/prev-icon.svg";
 
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { formatLocalDateTime } from "@/utils/date";
-
 import * as api from "@/lib/api";
+import { formatLocalDateTime } from "@/utils/date";
 
 import { CategoryTag } from "./CategoryTag";
 
@@ -46,7 +45,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                     <button
                         onClick={onBack}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors">
-                        <PrevIcon />
+                        <ArrowLeftIcon />
                         <span>목록으로</span>
                     </button>
                 )}
