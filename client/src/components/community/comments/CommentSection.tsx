@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { CommunityEmptyState } from "@/components/ui/CommunityEmptyState";
+import { HasMoreButton } from "@/components/ui/HasMoreButton";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
@@ -159,23 +162,11 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const renderCommentList = () => {
         // 초기 로딩: 댓글이 없고 로딩 중일 때만 스피너 표시
         if (comments.length === 0 && isLoading) {
-            return (
-                <div className="flex justify-center items-center py-12">
-                    <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 border-2 border-pink-300 border-t-pink-600 rounded-full animate-spin"></div>
-                        <span className="text-gray-600">댓글을 불러오는 중...</span>
-                    </div>
-                </div>
-            );
+            return <LoadingSpinner />;
         }
 
         if (comments.length === 0) {
-            return (
-                <div className="text-center py-12 mb-8">
-                    <p className="text-gray-400">아직 댓글이 없습니다</p>
-                    <p className="text-sm text-gray-400 mt-1">첫 댓글을 남겨보세요!</p>
-                </div>
-            );
+            return <CommunityEmptyState type="comment" />;
         }
 
         return (
@@ -203,17 +194,10 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
             </div>
             {renderCommentList()}
             {nextCursor && comments.length < totalParentCommentCount && (
-                <div className="flex justify-center mb-8">
-                    <button
-                        onClick={handleLoadMore}
-                        disabled={isLoading}
-                        className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                        {isLoading ? "불러오는 중..." : "댓글 더보기"}
-                    </button>
-                </div>
+                <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
             )}
             {
-                <div className="border-t border-gray-100 pt-6">
+                <div className="border-t border-gray-100 pt-6 mt-8">
                     <div className="flex gap-3 items-center">
                         <ProfileAvatar
                             nickname={currentUser?.nickname ?? "U"}

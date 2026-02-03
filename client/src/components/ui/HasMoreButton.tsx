@@ -5,7 +5,7 @@ interface HasMoreButtonProps {
 
 export function HasMoreButton({ isLoading, onClick }: HasMoreButtonProps) {
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-8">
             <button
                 onClick={onClick}
                 disabled={isLoading}
