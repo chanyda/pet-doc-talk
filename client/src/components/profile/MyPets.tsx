@@ -3,17 +3,19 @@
 import Image from "next/image";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import ArrowRightIcon from "public/icons/arrow-right-icon.svg";
-import CatIcon from "public/icons/cat-icon.svg";
-import DogIcon from "public/icons/dog-icon.svg";
+import CatFaceIcon from "public/icons/cat-face-icon.svg";
+import DogFaceIcon from "public/icons/dog-face-icon.svg";
 import PlusIcon from "public/icons/plus-icon.svg";
 import { useEffect, useRef, useState } from "react";
 
+import { PetRegistrationModal } from "@/components/modals/PetRegistrationModal";
 import * as api from "@/lib/api";
 
 export function MyPets() {
     const [pets, setPets] = useState<Pet[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
     const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -51,13 +53,28 @@ export function MyPets() {
     const genderStyle = (gender: PetGender) =>
         gender === "MALE" ? "bg-blue-100 text-blue-700" : "bg-pink-200 text-pink-700";
 
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handlePetSubmit = (petData: any) => {
+        console.log("반려동물 등록 데이터:", petData);
+        // TODO: API 연결 시 여기서 API 호출
+    };
+
     return (
         <div className="border-t border-gray-100 pt-6">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <h3 className="text-lg font-medium">나의 반려들</h3>
                 </div>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-pink-600 hover:bg-pink-50 rounded-lg transition-colors">
+                <button
+                    onClick={handleOpenModal}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-pink-600 hover:bg-pink-50 rounded-lg transition-colors">
                     <PlusIcon stroke="#e60076" />
                     <span>추가</span>
                 </button>
@@ -105,7 +122,11 @@ export function MyPets() {
                                             style={{
                                                 background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
                                             }}>
-                                            {pet.type === "CAT" ? <CatIcon /> : <DogIcon />}
+                                            {pet.type === "CAT" ? (
+                                                <CatFaceIcon width="30px" height="30px" />
+                                            ) : (
+                                                <DogFaceIcon width="30px" height="30px" />
+                                            )}
                                         </div>
                                     )}
                                     <div className="flex-1 text-left">
@@ -127,6 +148,8 @@ export function MyPets() {
                     </div>
                 </div>
             )}
+
+            <PetRegistrationModal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handlePetSubmit} />
         </div>
     );
 }
