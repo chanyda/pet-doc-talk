@@ -11,6 +11,7 @@ interface FindPostListQuery extends PaginationQuery {
 interface PostListResponse {
     posts: PostSummary[];
     nextCursor: number | null;
+    totalPostCount: number;
 }
 
 interface CreateCommentBody {
