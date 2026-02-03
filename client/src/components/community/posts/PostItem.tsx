@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import ClockIcon from "public/icons/clock-icon.svg";
 import CommentIcon from "public/icons/comment-icon.svg";
 
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { formatRelativeTime } from "@/utils/date";
+import { formatPostDate } from "@/utils/date";
 
 import { CategoryTag } from "./CategoryTag";
 
@@ -29,25 +28,26 @@ export function PostItem({ post }: PostItemProps) {
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <CategoryTag category={post.category} />
-                            <span className="flex items-center gap-1 text-xs text-gray-500">
-                                <ClockIcon />
-                                {formatRelativeTime(post.createdAt)}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <span>조회</span>
-                            <span>{post.viewCount}</span>
                         </div>
                     </div>
                     <h3 className="text-lg mb-3 line-clamp-1 hover:text-pink-600 transition-colors">{post.title}</h3>
                     <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-2">
-                            <ProfileAvatar
-                                nickname={post.user.nickname}
-                                profileImageUrl={post.user.profileImageUrl}
-                                size="sm"
-                            />
-                            <span className="text-sm text-gray-700">{post.user.nickname}</span>
+                        <div className="flex gap-4">
+                            <div className="flex items-center gap-2">
+                                <ProfileAvatar
+                                    nickname={post.user.nickname}
+                                    profileImageUrl={post.user.profileImageUrl}
+                                    size="sm"
+                                />
+                                <span className="text-sm text-gray-700">{post.user.nickname}</span>
+                            </div>
+                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                                {formatPostDate(post.createdAt)}
+                            </span>
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                                <span>조회</span>
+                                <span>{post.viewCount}</span>
+                            </div>
                         </div>
                         <div className="flex items-center gap-1.5 text-sm text-gray-500">
                             <CommentIcon />

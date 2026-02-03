@@ -1,7 +1,7 @@
 "use client";
 
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { formatRelativeTime } from "@/utils/date";
+import { formatLocalDateTime } from "@/utils/date";
 
 interface ReplyProps {
     reply: CommentReply;
@@ -36,7 +36,7 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-medium text-gray-900">{reply.user.nickname}</span>
-                    <span className="text-xs text-gray-500">{formatRelativeTime(reply.createdAt)}</span>
+                    <span className="text-xs text-gray-500">{formatLocalDateTime(reply.createdAt)}</span>
                     {reply.updatedAt !== reply.createdAt && !isDeleted && (
                         <span className="text-xs text-gray-400">(수정됨)</span>
                     )}

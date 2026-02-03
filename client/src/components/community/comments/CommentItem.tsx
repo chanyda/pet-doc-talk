@@ -8,7 +8,7 @@ import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
 import { useOutsideClick } from "@/hooks/useClickOutside";
-import { formatRelativeTime } from "@/utils/date";
+import { formatLocalDateTime } from "@/utils/date";
 
 import { CommentActionMenu } from "./CommentActionMenu";
 
@@ -61,7 +61,7 @@ export function CommentItem({ comment, currentUserId }: CommentProps) {
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900">{comment.user.nickname}</span>
-                            <span className="text-xs text-gray-500">{formatRelativeTime(comment.createdAt)}</span>
+                            <span className="text-xs text-gray-500">{formatLocalDateTime(comment.createdAt)}</span>
                             {comment.updatedAt !== comment.createdAt && !isDeleted && (
                                 <span className="text-xs text-gray-400">(수정됨)</span>
                             )}
