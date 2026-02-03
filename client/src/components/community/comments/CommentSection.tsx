@@ -51,6 +51,8 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
             setTotalParentCommentCount(data.totalParentCommentCount);
             setNextCursor(data.nextCursor);
         } catch (error) {
+            setComments([]);
+            setNextCursor(null);
             console.error("Failed to fetch comments:", error);
         } finally {
             setIsLoading(false);
