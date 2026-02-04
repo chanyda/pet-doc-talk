@@ -70,13 +70,17 @@ export function TopNavigation() {
                                     onClick={() => setIsMenuOpen((prev) => !prev)}
                                     className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white transition-all">
                                     <ProfileAvatar nickname={user.nickname} size="sm" />
-                                    <span className="text-sm font-medium text-gray-700">{user.nickname}</span>
+                                    <span className="text-sm font-medium text-gray-700 truncate max-w-16">
+                                        {user.nickname}
+                                    </span>
                                     {isMenuOpen ? <ArrowUpIcon fill={"#505050"} /> : <ArrowDownIcon fill={"#505050"} />}
                                 </button>
                                 {isMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-30 animate-in fade-in slide-in-from-top-1">
                                         <div className="px-4 py-2.5 border-b border-gray-100">
-                                            <p className="text-sm font-medium text-gray-900">{user.nickname}</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate max-w-16">
+                                                {user.nickname}
+                                            </p>
                                             <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
                                         </div>
                                         <div className="py-1">
