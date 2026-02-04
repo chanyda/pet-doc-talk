@@ -17,17 +17,24 @@ interface PetRegistrationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (petData: PetRegistrationFormData) => void;
+    initialFormData?: Partial<PetRegistrationFormData>;
+    isEditMode?: boolean;
 }
 
-const initialFormData: Partial<PetRegistrationFormData> = {
+const defaultFormData: Partial<PetRegistrationFormData> = {
     name: "",
     breed: "",
 };
 
-export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrationModalProps) {
+export function PetRegistrationModal({
+    isOpen,
+    onClose,
+    onSubmit,
+    initialFormData = defaultFormData,
+    isEditMode = false,
+}: PetRegistrationModalProps) {
     const [formData, setFormData] = useState<Partial<PetRegistrationFormData>>(initialFormData);
     const [step, setStep] = useState<number>(1);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isBreedSelectOpen, setIsBreedSelectOpen] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const breedDropdownRef = useOutsideClick(() => setIsBreedSelectOpen(false));
@@ -66,7 +73,6 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
     const handleClose = () => {
         setStep(1);
         setFormData(initialFormData);
-        setImagePreview(null);
         onClose();
     };
 
@@ -87,7 +93,7 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                         </button>
                         <div className="text-center">
                             <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-3">
-                                우리 아이 등록
+                                {isEditMode ? "우리 아이 수정" : "우리 아이 등록"}
                             </h2>
                         </div>
                     </div>
@@ -119,11 +125,12 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: "DOG" })}
+                                        disabled={isEditMode}
                                         className={`py-4 rounded-xl border-2 transition-all ${
                                             formData.type === "DOG"
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
-                                        }`}>
+                                        } ${isEditMode ? "opacity-50 cursor-not-allowed" : ""}`}>
                                         <div className="flex items-center justify-center gap-3">
                                             <DogFaceIcon width="40px" height="40px" />
                                             <div className="font-medium text-base text-gray-900">강아지</div>
@@ -132,11 +139,12 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: "CAT" })}
+                                        disabled={isEditMode}
                                         className={`py-4 rounded-xl border-2 transition-all ${
                                             formData.type === "CAT"
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
-                                        }`}>
+                                        } ${isEditMode ? "opacity-50 cursor-not-allowed" : ""}`}>
                                         <div className="flex items-center justify-center gap-3">
                                             <CatFaceIcon width="40px" height="40px" />
                                             <div className="font-medium text-base text-gray-900">고양이</div>
@@ -203,9 +211,9 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
                                     className="relative w-40 h-40 rounded-full cursor-pointer group">
-                                    {imagePreview ? (
+                                    {initialFormData.imageUrl ? (
                                         <img
-                                            src={imagePreview}
+                                            src={initialFormData.imageUrl}
                                             alt="Preview"
                                             className="w-full h-full object-cover rounded-full border-4 border-pink-200"
                                         />
@@ -280,15 +288,18 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                 <div className="relative">
                                     <input
                                         type="number"
-                                        step="0.1"
+                                        step="0.01"
                                         min={0.1}
                                         value={formData.weight || ""}
                                         onChange={(e) => {
                                             const value = e.target.value;
                                             if (value === "" || Number(value) >= 0) {
+                                                // 소수점 2자리까지만 허용
+                                                const match = value.match(/^\d+\.?\d{0,2}/);
+                                                const trimmed = match ? match[0] : value;
                                                 setFormData({
                                                     ...formData,
-                                                    weight: value ? Number(value) : undefined,
+                                                    weight: trimmed ? Number(trimmed) : null,
                                                 });
                                             }
                                         }}
@@ -304,11 +315,12 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                 <label className="block text-base font-medium text-gray-700 mb-3">생일 (선택)</label>
                                 <input
                                     type="date"
-                                    value={formData.birthday ? formData.birthday.toISOString().split("T")[0] : ""}
+                                    value={formData.birthDate ? formData.birthDate.split("T")[0] : ""}
+                                    max={new Date().toISOString().split("T")[0]}
                                     onChange={(e) =>
                                         setFormData({
                                             ...formData,
-                                            birthday: e.target.value ? new Date(e.target.value) : undefined,
+                                            birthDate: e.target.value || null,
                                         })
                                     }
                                     className="w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-300 focus:bg-pink-50 transition-all"
@@ -348,7 +360,7 @@ export function PetRegistrationModal({ isOpen, onClose, onSubmit }: PetRegistrat
                                         ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
                                         : "#d1d5db",
                                 }}>
-                                <span>등록 완료</span>
+                                <span>{isEditMode ? "수정 완료" : "등록 완료"}</span>
                             </button>
                         )}
                     </div>

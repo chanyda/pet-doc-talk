@@ -16,6 +16,7 @@ export function MyPets() {
     const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
     const [canScrollRight, setCanScrollRight] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [editingPet, setEditingPet] = useState<Pet | null>(null);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -67,19 +68,38 @@ export function MyPets() {
 
     const handleOpenModal = () => {
         setIsModalOpen(true);
+        setEditingPet(null);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setEditingPet(null);
+    };
+
+    const handleEditPet = (pet: Pet) => {
+        setIsModalOpen(true);
+        setEditingPet(pet);
     };
 
     const handlePetSubmit = async (petData: PetRegistrationFormData) => {
         try {
-            const response = await api.createPet(petData);
-            setPets((prev) => [response.data, ...prev]);
+            // 몸무게의 경우 소수점 두자리까지만 저장해줘야하므로, 두자리를 초과한 경우 두자리까지 잘라준다.
+            if (petData.weight != null) {
+                petData.weight = Math.trunc(petData.weight * 100) / 100;
+            }
+
+            if (editingPet) {
+                const response = await api.updatePet(editingPet.id, petData);
+                setPets((prev) => prev.map((p) => (p.id === editingPet.id ? response.data : p)));
+            } else {
+                const response = await api.createPet(petData);
+                setPets((prev) => [response.data, ...prev]);
+            }
+
             setIsModalOpen(false);
+            setEditingPet(null);
         } catch (error) {
-            console.error("반려동물 등록 실패:", error);
+            console.error(editingPet ? "반려동물 수정 실패:" : "반려동물 등록 실패:", error);
         }
     };
 
@@ -127,6 +147,7 @@ export function MyPets() {
                         {pets.map((pet) => (
                             <button
                                 key={pet.id}
+                                onClick={() => handleEditPet(pet)}
                                 className="flex-shrink-0 w-64 p-4 rounded-2xl bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50 border-2 border-pink-200 hover:border-pink-300 hover:shadow-lg transition-all group">
                                 <div className="flex items-center gap-3 mb-3">
                                     {pet.imageUrl ? (
@@ -166,7 +187,14 @@ export function MyPets() {
                 </div>
             )}
 
-            <PetRegistrationModal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handlePetSubmit} />
+            <PetRegistrationModal
+                key={editingPet?.id ?? "new"}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSubmit={handlePetSubmit}
+                isEditMode={!!editingPet}
+                initialFormData={editingPet ? editingPet : undefined}
+            />
         </div>
     );
 }

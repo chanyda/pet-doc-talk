@@ -8,7 +8,10 @@ interface Pet {
     type: PetType;
     gender: PetGender;
     breed: string;
-    imageUrl: string | null;
+    imageUrl?: string | null;
+    weight?: number | null;
+    birthDate?: string | null;
+    isNeutered?: boolean | null;
 }
 
 interface PetRegistrationFormData {
@@ -16,8 +19,8 @@ interface PetRegistrationFormData {
     type: PetType;
     gender: PetGender;
     breed: string;
-    imageUrl?: string;
-    weight?: number;
-    birthday?: Date;
-    isNeutered?: boolean;
+    imageUrl?: string | null;
+    weight?: number | null;
+    birthDate?: string | null;
+    isNeutered?: boolean | null;
 }
