@@ -27,6 +27,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
     const [newCommentId, setNewCommentId] = useState<number | null>(null);
+    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
 
     const newCommentRef = useRef<HTMLDivElement>(null);
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -185,6 +186,20 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
         );
     };
 
+    const handleEdit = (updatedComment: Comment) => {
+        setComments(
+            comments.map((c) =>
+                c.id === updatedComment.id
+                    ? {
+                          ...c,
+                          content: updatedComment.content,
+                          updatedAt: updatedComment.updatedAt,
+                      }
+                    : c,
+            ),
+        );
+    };
+
     const renderCommentList = () => {
         // 초기 로딩: 댓글이 없고 로딩 중일 때만 스피너 표시
         if (comments.length === 0 && isLoading) {
@@ -204,7 +219,14 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                         className={`transition-all duration-500 ${
                             comment.id === newCommentId ? "bg-pink-50 -mx-4 px-4 py-3 rounded-lg" : ""
                         }`}>
-                        <CommentItem comment={comment} currentUserId={currentUser?.id ?? null} />
+                        <CommentItem
+                            comment={comment}
+                            currentUserId={currentUser?.id ?? null}
+                            onEdit={handleEdit}
+                            isEditing={editingCommentId === comment.id}
+                            onStartEdit={() => setEditingCommentId(comment.id)}
+                            onCancelEdit={() => setEditingCommentId(null)}
+                        />
                     </div>
                 ))}
             </div>

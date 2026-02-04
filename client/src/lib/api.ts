@@ -131,6 +131,10 @@ export async function createComment(postId: number, body: CreateCommentBody): Pr
     return apiClient.post<Comment>(`/posts/${postId}/comments`, body);
 }
 
+export async function updateComment(commentId: number, body: UpdateCommentBody): Promise<AxiosResponse<Comment>> {
+    return apiClient.patch<Comment>(`/comments/${commentId}`, body);
+}
+
 export async function createPost(body: CreatePostBody): Promise<AxiosResponse<PostDetail>> {
     return apiClient.post<PostDetail>("/posts", body);
 }

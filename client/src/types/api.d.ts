@@ -25,6 +25,10 @@ interface CreateCommentBody {
     mentionUserId: number | null;
 }
 
+interface UpdateCommentBody {
+    content: string;
+}
+
 interface CommentListResponse {
     comments: PostComment[];
     nextCursor: number | null;
