@@ -200,6 +200,20 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
         );
     };
 
+    const handleDelete = (commentId: number) => {
+        // 애초에 삭제된 댓글들도 보여주고 있기 때문에 totalCommentCount에 대한 처리는 생략한다.
+        setComments(
+            comments.map((c) =>
+                c.id === commentId
+                    ? {
+                          ...c,
+                          deletedAt: new Date().toISOString(),
+                      }
+                    : c,
+            ),
+        );
+    };
+
     const renderCommentList = () => {
         // 초기 로딩: 댓글이 없고 로딩 중일 때만 스피너 표시
         if (comments.length === 0 && isLoading) {
@@ -223,6 +237,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                             comment={comment}
                             currentUserId={currentUser?.id ?? null}
                             onEdit={handleEdit}
+                            onDelete={handleDelete}
                             isEditing={editingCommentId === comment.id}
                             onStartEdit={() => setEditingCommentId(comment.id)}
                             onCancelEdit={() => setEditingCommentId(null)}

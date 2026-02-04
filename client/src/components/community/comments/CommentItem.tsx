@@ -17,13 +17,14 @@ interface CommentProps {
     comment: PostComment;
     currentUserId: number | null;
     onEdit: (updatedComment: Comment) => void;
+    onDelete: (commentId: number) => void;
     isEditing: boolean;
     onStartEdit: () => void;
     onCancelEdit: () => void;
 }
 
 // TODO: 댓글 삭제, 답글 관련 처리 필요
-export function CommentItem({ comment, currentUserId, onEdit, isEditing, onStartEdit, onCancelEdit }: CommentProps) {
+export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditing, onStartEdit, onCancelEdit }: CommentProps) {
     const [showReplyInput, setShowReplyInput] = useState<boolean>(false);
     const [showReplies, setShowReplies] = useState<boolean>(false);
     const [replyContent, setReplyContent] = useState<string>("");
@@ -63,6 +64,18 @@ export function CommentItem({ comment, currentUserId, onEdit, isEditing, onStart
         setEditContent(comment.content);
     };
 
+    const handleDelete = async () => {
+        if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+        try {
+            await api.deleteComment(comment.id);
+            onDelete(comment.id);
+        } catch (error) {
+            console.error("Failed to delete comment:", error);
+            alert("댓글 삭제에 실패했습니다. 다시 시도해주세요.");
+        }
+    };
+
     const handleActionMenuClick = (action: CommentActionMenuClickType) => {
         switch (action) {
             case "reply":
@@ -73,9 +86,8 @@ export function CommentItem({ comment, currentUserId, onEdit, isEditing, onStart
                 setEditContent(comment.content);
                 setIsActionMenuOpen(false);
                 break;
-            // TODO: 댓글 삭제 처리
             case "delete":
-                console.log("Delete comment", comment.id);
+                handleDelete();
                 break;
         }
     };

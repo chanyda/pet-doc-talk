@@ -135,6 +135,10 @@ export async function updateComment(commentId: number, body: UpdateCommentBody):
     return apiClient.patch<Comment>(`/comments/${commentId}`, body);
 }
 
+export async function deleteComment(commentId: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete<void>(`/comments/${commentId}`);
+}
+
 export async function createPost(body: CreatePostBody): Promise<AxiosResponse<PostDetail>> {
     return apiClient.post<PostDetail>("/posts", body);
 }
