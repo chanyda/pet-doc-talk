@@ -5,7 +5,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { PetGender, PetType } from "generated/prisma/enums";
 import { NotFoundException } from "@nestjs/common";
 import { Decimal } from "@prisma/client/runtime/index-browser";
-import { PET_DETAIL_SELECT, PET_SUMMARY_SELECT } from "./constants";
+import { PET_DETAIL_SELECT } from "./constants";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {
@@ -79,6 +79,9 @@ describe("PetsService", () => {
                 gender: PetGender.MALE,
                 breed: "믹스",
                 imageUrl: null,
+                weight: null,
+                birthDate: null,
+                isNeutered: null,
             }));
 
             findManySpy.mockResolvedValue(mockPets);
@@ -86,7 +89,7 @@ describe("PetsService", () => {
             const result = await petsService.findMany(TEST_USER_ID);
 
             expect(result).toEqual(mockPets);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_DETAIL_SELECT);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
 
@@ -96,7 +99,7 @@ describe("PetsService", () => {
             const result = await petsService.findMany(TEST_USER_ID);
 
             expect(result).toEqual([]);
-            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_SUMMARY_SELECT);
+            expect(findManySpy).toHaveBeenCalledWith(TEST_USER_ID, PET_DETAIL_SELECT);
             expect(findManySpy).toHaveBeenCalledTimes(1);
         });
     });
@@ -119,7 +122,7 @@ describe("PetsService", () => {
 
             const result = await petsService.findById(TEST_PET_ID, TEST_USER_ID);
 
-            expect(result).toEqual(mockPet);
+            expect(result).toEqual({ ...mockPet, weight: 5.85 });
             expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, PET_DETAIL_SELECT);
             expect(findByIdSpy).toHaveBeenCalledTimes(1);
         });
@@ -184,7 +187,7 @@ describe("PetsService", () => {
 
                 const result = await petsService.create(TEST_USER_ID, createPetDto);
 
-                expect(result).toEqual(mockPet);
+                expect(result).toEqual({ ...mockPet, weight: 5.85 });
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
                 expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, PET_DETAIL_SELECT);
@@ -209,7 +212,7 @@ describe("PetsService", () => {
 
                 const result = await petsService.create(TEST_USER_ID, createPetDto);
 
-                expect(result).toEqual(mockPet);
+                expect(result).toEqual({ ...mockPet, weight: 5.85 });
                 expect(existsByUserIdSpy).toHaveBeenCalledWith(TEST_USER_ID);
                 expect(existsByUserIdSpy).toHaveBeenCalledTimes(1);
                 expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createPetDto, PET_DETAIL_SELECT);
@@ -254,7 +257,7 @@ describe("PetsService", () => {
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
 
-                expect(result).toEqual(mockUpdatePet);
+                expect(result).toEqual({ ...mockUpdatePet, weight: 5.85 });
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, updatePetDto, PET_DETAIL_SELECT);
@@ -275,7 +278,7 @@ describe("PetsService", () => {
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
 
-                expect(result).toEqual(mockUpdatePet);
+                expect(result).toEqual({ ...mockUpdatePet, weight: 10.8 });
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, updatePetDto, PET_DETAIL_SELECT);
@@ -299,7 +302,7 @@ describe("PetsService", () => {
 
                 const result = await petsService.update(TEST_PET_ID, TEST_USER_ID, updatePetDto);
 
-                expect(result).toEqual(mockUpdatePet);
+                expect(result).toEqual({ ...mockUpdatePet, weight: 10.8 });
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_PET_ID, TEST_USER_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
                 expect(updateSpy).toHaveBeenCalledWith(TEST_PET_ID, updatePetDto, PET_DETAIL_SELECT);
@@ -328,7 +331,7 @@ describe("PetsService", () => {
             findByIdSpy.mockResolvedValue({ id: TEST_PET_ID });
             deleteSpy.mockResolvedValue({
                 id: TEST_PET_ID,
-                userID: TEST_USER_ID,
+                userId: TEST_USER_ID,
                 name: "호두",
                 type: PetType.DOG,
                 gender: PetGender.MALE,

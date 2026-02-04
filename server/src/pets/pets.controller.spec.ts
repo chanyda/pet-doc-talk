@@ -62,6 +62,9 @@ describe("PetsController", () => {
                 gender: PetGender.MALE,
                 breed: "믹스",
                 imageUrl: null,
+                weight: null,
+                birthDate: null,
+                isNeutered: null,
             }));
 
             findManySpy.mockResolvedValue(mockPets);
