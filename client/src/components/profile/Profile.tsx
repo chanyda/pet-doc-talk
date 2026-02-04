@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 
 import * as api from "@/lib/api";
 
+import { ProfileEditModal } from "../modals/ProfileEditModal";
 import { ProfileAvatar } from "../ui/ProfileAvatar";
 import { MyPets } from "./MyPets";
 
 export function Profile() {
     const [user, setUser] = useState<User | null>(null);
+    const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -24,6 +26,11 @@ export function Profile() {
         fetchUser();
     }, []);
 
+    const handleProfileUpdate = async (data: { nickname: string; image: File | null }) => {
+        // TODO: 프로필 업데이트 API 연결
+        console.log("Profile update:", data);
+    };
+
     if (!user) return null;
 
     return (
@@ -32,6 +39,7 @@ export function Profile() {
                 <div className="relative">
                     <ProfileAvatar profileImageUrl={user.profileImageUrl} nickname={user.nickname} size="xl" />
                     <div
+                        onClick={() => setIsProfileEditOpen(true)}
                         className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform border"
                         style={{ background: "#ffffff" }}>
                         <SettingIcon />
@@ -56,6 +64,13 @@ export function Profile() {
                 </div>
             </div>
             <MyPets />
+            <ProfileEditModal
+                isOpen={isProfileEditOpen}
+                onClose={() => setIsProfileEditOpen(false)}
+                onSubmit={handleProfileUpdate}
+                currentNickname={user.nickname}
+                currentImage={user.profileImageUrl}
+            />
         </div>
     );
 }
