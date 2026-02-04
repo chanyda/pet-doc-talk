@@ -4,12 +4,14 @@ import SettingIcon from "public/icons/setting-icon.svg";
 import { useEffect, useState } from "react";
 
 import * as api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 
 import { ProfileEditModal } from "../modals/ProfileEditModal";
 import { ProfileAvatar } from "../ui/ProfileAvatar";
 import { MyPets } from "./MyPets";
 
 export function Profile() {
+    const { setUser: setAuthUser } = useAuthStore();
     const [user, setUser] = useState<User | null>(null);
     const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
@@ -26,9 +28,12 @@ export function Profile() {
         fetchUser();
     }, []);
 
-    const handleProfileUpdate = async (data: { nickname: string; image: File | null }) => {
-        // TODO: 프로필 업데이트 API 연결
-        console.log("Profile update:", data);
+    const handleProfileUpdate = async (data: UpdateProfileBody) => {
+        // 해당 함수는 모달창에서 실행되고, API 오류에 대한 안내를 모달창에서 진행해야하므로 try~catch문으로 묶지않음
+        // 모달창에서 호출할 때 try~catch로 묶어 API 오류에 대한 안내를 보여주도록 함
+        const response = await api.updateProfile(data);
+        setUser(response.data);
+        setAuthUser(response.data);
     };
 
     if (!user) return null;

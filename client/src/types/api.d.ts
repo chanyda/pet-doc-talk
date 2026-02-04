@@ -8,6 +8,11 @@ interface FindPostListQuery extends PaginationQuery {
     orderBy?: OrderByType;
 }
 
+interface UpdateProfileBody {
+    nickname?: string;
+    profileImageUrl?: string;
+}
+
 interface PostListResponse {
     posts: PostSummary[];
     nextCursor: number | null;

@@ -7,16 +7,25 @@ import { useRef, useState } from "react";
 interface ProfileEditModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: { nickname: string; image: File | null }) => void;
+    onSubmit: (data: UpdateProfileBody) => Promise<void>;
     currentNickname: string;
     currentImage?: string | null;
 }
 
-export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, currentImage }: ProfileEditModalProps) {
+export function ProfileEditModal({
+    isOpen,
+    onClose,
+    onSubmit,
+    currentNickname,
+    currentImage = null,
+}: ProfileEditModalProps) {
     const [nickname, setNickname] = useState(currentNickname);
-    const [imagePreview, setImagePreview] = useState<string | null>(currentImage || null);
+    // TODO: 이미지 업로드 처리
+    const [imagePreview, setImagePreview] = useState<string | null>(currentImage);
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [nicknameErrorMessage, setNicknameErrorMessage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageSelect = (file: File) => {
@@ -56,25 +65,43 @@ export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, c
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!nickname.trim()) {
-            alert("닉네임을 입력해주세요.");
+            setNicknameErrorMessage("닉네임을 입력해주세요.");
             return;
         }
         if (nickname.trim().length < 2) {
-            alert("닉네임은 최소 2자 이상이어야 합니다.");
+            setNicknameErrorMessage("닉네임은 최소 2자 이상이어야 합니다.");
             return;
         }
 
-        onSubmit({ nickname: nickname.trim(), image: imageFile });
-        handleClose();
+        setIsLoading(true);
+        setNicknameErrorMessage(null);
+
+        try {
+            // TODO: 프로필 사진 업로드 처리
+            await onSubmit({ nickname: nickname.trim() });
+            handleClose();
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                // NOTE: 일단은 하드코딩 해두고 추후 error code를 넣는 형식으로 바꿔서 처리해주자.
+                if (err.message.includes("This nickname is already in use.")) {
+                    setNicknameErrorMessage("이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.");
+                } else {
+                    setNicknameErrorMessage("프로필 업데이트에 실패했습니다. 다시 시도해주세요.");
+                }
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleClose = () => {
         setNickname(currentNickname);
-        setImagePreview(currentImage || null);
+        setImagePreview(currentImage);
         setImageFile(null);
         setIsDragging(false);
+        setNicknameErrorMessage(null);
         onClose();
     };
 
@@ -85,7 +112,6 @@ export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, c
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                {/* Header - PetRegistrationModal과 동일한 디자인 */}
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-5 rounded-t-3xl z-1">
                     <div className="relative flex items-center justify-center">
                         <button
@@ -100,15 +126,11 @@ export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, c
                         </div>
                     </div>
                 </div>
-
-                {/* Content */}
                 <div className="p-8 space-y-8">
                     <div className="text-center mb-8">
                         <h3 className="text-xl font-bold text-gray-900 mb-3">프로필을 꾸며보세요</h3>
                         <p className="text-base text-gray-600">나를 표현할 수 있는 사진과 닉네임을 설정해주세요</p>
                     </div>
-
-                    {/* Profile Image Upload */}
                     <div className="flex flex-col items-center">
                         <div
                             onDragOver={handleDragOver}
@@ -147,8 +169,6 @@ export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, c
                             className="hidden"
                         />
                     </div>
-
-                    {/* Nickname */}
                     <div>
                         <label className="block text-base font-medium text-gray-700 mb-3">
                             닉네임 <span className="text-pink-600">*</span>
@@ -157,36 +177,48 @@ export function ProfileEditModal({ isOpen, onClose, onSubmit, currentNickname, c
                             <input
                                 type="text"
                                 value={nickname}
-                                onChange={(e) => setNickname(e.target.value)}
-                                placeholder="닉네임을 입력하세요"
+                                onChange={(e) => {
+                                    setNickname(e.target.value);
+                                    setNicknameErrorMessage(null);
+                                }}
+                                placeholder="닉네임을 입력하세요."
                                 maxLength={20}
-                                className="w-full px-5 py-4 pr-16 text-base border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
+                                className={`w-full px-5 py-4 pr-16 text-base border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                                    nicknameErrorMessage
+                                        ? "border-red-400 focus:ring-red-200"
+                                        : "border-gray-200 focus:ring-pink-200"
+                                }`}
                             />
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">
                                 {nickname.length}/20
                             </span>
                         </div>
-                        {nickname.trim().length > 0 && nickname.trim().length < 2 && (
-                            <p className="text-xs text-red-500 mt-2">닉네임은 최소 2자 이상이어야 합니다</p>
-                        )}
+                        <p className="text-xs text-red-500 mt-2 min-h-5">
+                            {nicknameErrorMessage
+                                ? nicknameErrorMessage
+                                : nickname.trim().length > 0 && nickname.trim().length < 2
+                                  ? "닉네임은 최소 2자 이상이어야 합니다."
+                                  : "\u00A0"}
+                        </p>
                     </div>
-
-                    {/* Action Buttons */}
                     <div className="flex gap-3 pt-4">
                         <button
                             onClick={handleClose}
-                            className="flex-1 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base">
+                            disabled={isLoading}
+                            className="flex-1 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-base disabled:opacity-50">
                             취소
                         </button>
                         <button
                             onClick={handleSubmit}
-                            disabled={!isValid}
-                            className={`flex-1 px-6 py-4 text-white rounded-xl transition-all font-medium text-base ${
-                                isValid
-                                    ? "bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500"
-                                    : "bg-gray-300 cursor-not-allowed"
-                            }`}>
-                            저장
+                            disabled={!isValid || isLoading}
+                            className="flex-1 px-6 py-4 text-white rounded-xl transition-all font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110"
+                            style={{
+                                background:
+                                    isValid && !isLoading
+                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                        : "#d1d5db",
+                            }}>
+                            {isLoading ? "저장 중..." : "저장"}
                         </button>
                     </div>
                 </div>

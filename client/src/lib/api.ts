@@ -166,3 +166,7 @@ export async function getMyPosts(params: PaginationQuery): Promise<AxiosResponse
 export async function getMyComments(params: PaginationQuery): Promise<AxiosResponse<MyCommentListResponse>> {
     return apiClient.get<MyCommentListResponse>("/comments/me", { params });
 }
+
+export async function updateProfile(body: UpdateProfileBody): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>("/users/me", body);
+}
