@@ -1,12 +1,12 @@
 "use client";
 
-import SendIcon from "public/icons/send-icon.svg";
 import { useEffect, useRef } from "react";
 
 interface MessageInputProps {
     value: string;
     onChange: (value: string) => void;
     onSubmit: () => void;
+    onCancel?: () => void;
     placeholder?: string;
     disabled?: boolean;
     maxLength?: number;
@@ -16,6 +16,7 @@ export function MessageInput({
     value,
     onChange,
     onSubmit,
+    onCancel,
     placeholder = "댓글을 입력하세요...",
     disabled = false,
     maxLength,
@@ -65,36 +66,46 @@ export function MessageInput({
     };
 
     return (
-        <div className={"flex flex-col gap-1 flex-1"}>
-            <div className="flex gap-2 items-center">
-                <textarea
-                    ref={textareaRef}
-                    disabled={disabled}
-                    value={value}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    className={`flex-1 px-4 border rounded-xl resize-none focus:outline-none focus:ring-2 transition-all overflow-hidden py-2.5 ${
-                        isOverLimit ? "border-red-400 focus:ring-red-200" : "border-gray-200 focus:ring-pink-200"
-                    }`}
-                    rows={1}
-                    style={{ minHeight: "42px", maxHeight: "120px" }}
-                    onKeyDown={handleKeyDown}
-                />
-                <button
-                    onClick={onSubmit}
-                    disabled={!value.trim() || disabled || isOverLimit}
-                    className={
-                        "text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2.5 flex-shrink-0"
-                    }
-                    style={{ backgroundColor: "#FF6B9D", minHeight: "42px" }}>
-                    <SendIcon />
-                </button>
+        <div
+            className={`flex-1 border rounded-lg  transition-all overflow-hidden ${
+                isOverLimit
+                    ? "border-red-400 focus-within:ring-2 focus-within:ring-red-200"
+                    : "border-gray-200 focus-within:ring-2 focus-within:ring-pink-200"
+            }`}>
+            <textarea
+                ref={textareaRef}
+                disabled={disabled}
+                value={value}
+                onChange={handleChange}
+                placeholder={placeholder}
+                className="w-full resize-none focus:outline-none overflow-hidden px-4 pt-3 pb-1 text-sm leading-relaxed bg-transparent"
+                rows={3}
+                style={{ minHeight: "60px", maxHeight: "200px" }}
+                onKeyDown={handleKeyDown}
+            />
+            <div className="flex items-end justify-end px-3 py-2 gap-1">
+                {onCancel && (
+                    <button
+                        onClick={onCancel}
+                        className="text-xs text-gray-500 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-colors px-4 py-2.5">
+                        취소
+                    </button>
+                )}
+                <div className="flex flex-col items-end gap-1.5">
+                    {maxLength !== undefined && value.length > 0 && (
+                        <span className={`text-xs ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
+                            {value.length}/{maxLength}
+                        </span>
+                    )}
+                    <button
+                        onClick={onSubmit}
+                        disabled={!value.trim() || disabled || isOverLimit}
+                        className="text-xs text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5"
+                        style={{ backgroundColor: "#FF6B9D" }}>
+                        등록
+                    </button>
+                </div>
             </div>
-            {maxLength !== undefined && value.length > 0 && (
-                <span className={`text-xs text-right ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
-                    {value.length}/{maxLength}
-                </span>
-            )}
         </div>
     );
 }
