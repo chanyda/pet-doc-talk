@@ -155,6 +155,10 @@ export async function updatePet(petId: number, body: PetRegistrationFormData): P
     return apiClient.patch<Pet>(`/pets/${petId}`, body);
 }
 
+export async function deletePet(petId: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete<void>(`/pets/${petId}`);
+}
+
 export async function getMyPosts(params: PaginationQuery): Promise<AxiosResponse<PostListResponse>> {
     return apiClient.get<PostListResponse>("/posts/me", { params });
 }

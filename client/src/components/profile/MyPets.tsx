@@ -81,6 +81,20 @@ export function MyPets() {
         setEditingPet(pet);
     };
 
+    const handleDeletePet = async () => {
+        if (!editingPet) return;
+
+        try {
+            await api.deletePet(editingPet.id);
+
+            setPets((prev) => prev.filter((p) => p.id !== editingPet.id));
+            setIsModalOpen(false);
+            setEditingPet(null);
+        } catch (error) {
+            console.error("반려동물 삭제 실패:", error);
+        }
+    };
+
     const handlePetSubmit = async (petData: PetRegistrationFormData) => {
         try {
             // 몸무게의 경우 소수점 두자리까지만 저장해줘야하므로, 두자리를 초과한 경우 두자리까지 잘라준다.
@@ -192,6 +206,7 @@ export function MyPets() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSubmit={handlePetSubmit}
+                onDelete={handleDeletePet}
                 isEditMode={!!editingPet}
                 initialFormData={editingPet ? editingPet : undefined}
             />

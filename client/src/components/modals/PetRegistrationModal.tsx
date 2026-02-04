@@ -17,6 +17,7 @@ interface PetRegistrationModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (petData: PetRegistrationFormData) => void;
+    onDelete: () => void;
     initialFormData?: Partial<PetRegistrationFormData>;
     isEditMode?: boolean;
 }
@@ -30,6 +31,7 @@ export function PetRegistrationModal({
     isOpen,
     onClose,
     onSubmit,
+    onDelete,
     initialFormData = defaultFormData,
     isEditMode = false,
 }: PetRegistrationModalProps) {
@@ -364,6 +366,20 @@ export function PetRegistrationModal({
                             </button>
                         )}
                     </div>
+                    {isEditMode && (
+                        <div className="mt-6 text-center">
+                            <button
+                                onClick={() => {
+                                    if (window.confirm("정말 삭제하시겠습니까?")) {
+                                        onDelete();
+                                        handleClose();
+                                    }
+                                }}
+                                className="text-sm text-gray-400 hover:text-red-500 underline transition-colors">
+                                이 아이 삭제하기
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
