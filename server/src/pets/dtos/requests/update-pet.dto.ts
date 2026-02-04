@@ -35,15 +35,20 @@ export class UpdatePetDto {
     @MaxLength(100)
     breed?: string;
 
-    @ApiPropertyOptional({ description: "The weight of pet in kg.", minimum: 0, example: 5.85 })
+    @ApiPropertyOptional({ description: "The weight of pet in kg.", minimum: 0, example: 5.85, nullable: true })
     @IsOptional()
     @IsNumber({ maxDecimalPlaces: 2 })
     @Min(0)
-    weight?: Decimal;
+    weight?: Decimal | null;
 
     @ApiPropertyOptional({ description: "The birth date of pet.", example: "2025-01-01T00:00:00Z" })
     @IsOptional()
-    @Transform(({ value }: { value: string }) => (value === "" ? null : value))
+    @Transform(({ value }: { value: string }) => {
+        if (!value || value === "") return null;
+        // "2025-01-15" 같은 date-only 형식이면 시간을 붙여준다
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00.000Z`;
+        return value;
+    })
     @IsDateString()
     birthDate?: string | null;
 
