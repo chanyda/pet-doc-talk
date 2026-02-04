@@ -92,8 +92,8 @@ export function MessageInput({
                     </button>
                 )}
                 <div className="flex flex-col items-end gap-1.5">
-                    {maxLength !== undefined && value.length > 0 && (
-                        <span className={`text-xs ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
+                    {maxLength !== undefined && (
+                        <span className={`text-xs ${value.length > 0 ? "" : "invisible"} ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
                             {value.length}/{maxLength}
                         </span>
                     )}
