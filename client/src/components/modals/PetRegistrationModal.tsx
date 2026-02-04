@@ -343,7 +343,7 @@ export function PetRegistrationModal({
                             <button
                                 onClick={handleNext}
                                 disabled={!isStepOneValid}
-                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
                                     background: isStepOneValid
                                         ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
@@ -356,7 +356,7 @@ export function PetRegistrationModal({
                             <button
                                 onClick={handleSubmit}
                                 disabled={!isStepTwoValid}
-                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
+                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
                                     background: isStepTwoValid
                                         ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
