@@ -8,6 +8,9 @@ export class CommentReplyListResponseDto {
     })
     replies: CommentReplyItemDto[];
 
+    @ApiProperty({ description: "Total number of reply comments." })
+    totalReplyCount: number;
+
     @ApiPropertyOptional({
         description: "The cursor for the next page.",
         nullable: true,

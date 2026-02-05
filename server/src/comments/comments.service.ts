@@ -63,7 +63,7 @@ export class CommentsService {
             throw new NotFoundException("Parent comment not exists.");
         }
 
-        const replies = await this.commentsRepository.findMany({
+        const { comments: replies, totalCount: totalReplyCount } = await this.commentsRepository.findManyAndCount({
             take: query.limit,
             skip: query.cursor ? 1 : undefined,
             cursor: query.cursor ? { id: query.cursor } : undefined,
@@ -79,6 +79,7 @@ export class CommentsService {
                 ...reply,
                 content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
             })),
+            totalReplyCount,
             nextCursor,
         };
     }

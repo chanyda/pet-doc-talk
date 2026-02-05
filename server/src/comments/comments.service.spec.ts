@@ -239,18 +239,19 @@ describe("CommentsService", () => {
                         ...reply,
                         content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
                     })),
+                    totalReplyCount: 20,
                     nextCursor: mockReplies[mockReplies.length - 1].id,
                 };
 
                 findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
-                findManySpy.mockResolvedValue(mockReplies);
+                findManyAndCountSpy.mockResolvedValue({ comments: mockReplies, totalCount: 20 });
 
                 const result = await commentsService.findReplies(TEST_COMMENT_ID, requiredQuery);
 
                 expect(result).toEqual(repliesResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
@@ -258,7 +259,7 @@ describe("CommentsService", () => {
                     select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
 
             it("답글 목록을 조회하여 다음 페이지가 없을 때 nextCursor를 null로 반환한다. (cursor 전달)", async () => {
@@ -279,18 +280,19 @@ describe("CommentsService", () => {
                         ...reply,
                         content: reply.deletedAt ? "삭제된 댓글입니다." : reply.content,
                     })),
+                    totalReplyCount: 9,
                     nextCursor: null,
                 };
 
                 findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
-                findManySpy.mockResolvedValue(mockReplies);
+                findManyAndCountSpy.mockResolvedValue({ comments: mockReplies, totalCount: 9 });
 
                 const result = await commentsService.findReplies(TEST_COMMENT_ID, query);
 
                 expect(result).toEqual(repliesResponse);
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: query.limit,
                     skip: 1,
                     cursor: { id: query.cursor },
@@ -298,19 +300,19 @@ describe("CommentsService", () => {
                     select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
 
             it("답글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
                 findByIdSpy.mockResolvedValue({ id: TEST_COMMENT_ID });
-                findManySpy.mockResolvedValue([]);
+                findManyAndCountSpy.mockResolvedValue({ comments: [], totalCount: 0 });
 
                 const result = await commentsService.findReplies(TEST_COMMENT_ID, requiredQuery);
 
-                expect(result).toEqual({ replies: [], nextCursor: null });
+                expect(result).toEqual({ replies: [], totalReplyCount: 0, nextCursor: null });
                 expect(findByIdSpy).toHaveBeenCalledWith(TEST_COMMENT_ID, { id: true });
                 expect(findByIdSpy).toHaveBeenCalledTimes(1);
-                expect(findManySpy).toHaveBeenCalledWith({
+                expect(findManyAndCountSpy).toHaveBeenCalledWith({
                     take: requiredQuery.limit,
                     skip: undefined,
                     cursor: undefined,
@@ -318,7 +320,7 @@ describe("CommentsService", () => {
                     select: COMMENT_BASE_SELECT,
                     orderBy: { createdAt: "asc" },
                 });
-                expect(findManySpy).toHaveBeenCalledTimes(1);
+                expect(findManyAndCountSpy).toHaveBeenCalledTimes(1);
             });
         });
 

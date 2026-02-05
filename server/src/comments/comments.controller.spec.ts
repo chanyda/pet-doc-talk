@@ -162,7 +162,11 @@ describe("CommentsController", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const repliesResponse = { replies: mockReplies, nextCursor: mockReplies[mockReplies.length - 1].id };
+                const repliesResponse = {
+                    replies: mockReplies,
+                    totalReplyCount: 20,
+                    nextCursor: mockReplies[mockReplies.length - 1].id,
+                };
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
@@ -184,7 +188,7 @@ describe("CommentsController", () => {
                     updatedAt: new Date(),
                     deletedAt: null,
                 }));
-                const repliesResponse = { replies: mockReplies, nextCursor: null };
+                const repliesResponse = { replies: mockReplies, totalReplyCount: 9, nextCursor: null };
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
@@ -196,7 +200,7 @@ describe("CommentsController", () => {
             });
 
             it("답글 목록이 없을 때 빈 배열과 nextCursor를 null로 반환한다.", async () => {
-                const repliesResponse = { replies: [], nextCursor: null };
+                const repliesResponse = { replies: [], totalReplyCount: 0, nextCursor: null };
 
                 findRepliesSpy.mockResolvedValue(repliesResponse);
 
