@@ -139,6 +139,13 @@ export async function deleteComment(commentId: number): Promise<AxiosResponse<vo
     return apiClient.delete<void>(`/comments/${commentId}`);
 }
 
+export async function getReplies(
+    commentId: number,
+    params: PaginationQuery,
+): Promise<AxiosResponse<ReplyListResponse>> {
+    return apiClient.get<ReplyListResponse>(`/comments/${commentId}/replies`, { params });
+}
+
 export async function createPost(body: CreatePostBody): Promise<AxiosResponse<PostDetail>> {
     return apiClient.post<PostDetail>("/posts", body);
 }

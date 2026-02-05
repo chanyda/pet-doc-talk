@@ -1,58 +1,149 @@
 "use client";
 
-import ArrowDownIcon from "public/icons/arrow-down-icon.svg";
-import ArrowUpIcon from "public/icons/arrow-up-icon.svg";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
-import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
+import { COMMENT_CONTENT_LIMIT, COMMENT_REPLY_PAGE_LIMIT } from "@/constants/post";
+import { useCommentAction } from "@/contexts/CommentActionContext";
 import { useOutsideClick } from "@/hooks/useClickOutside";
 import * as api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 import { formatLocalDateTime } from "@/utils/date";
 
 import { CommentActionMenu } from "./CommentActionMenu";
+import { ReplyItem } from "./ReplyItem";
 
 interface CommentProps {
     comment: PostComment;
-    currentUserId: number | null;
+    postId: number;
     onEdit: (updatedComment: Comment) => void;
     onDelete: (commentId: number) => void;
-    isEditing: boolean;
-    onStartEdit: () => void;
-    onCancelEdit: () => void;
+    onAddReplyCount: (commentId: number) => void;
 }
 
-// TODO: 댓글 삭제, 답글 관련 처리 필요
-export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditing, onStartEdit, onCancelEdit }: CommentProps) {
-    const [showReplyInput, setShowReplyInput] = useState<boolean>(false);
-    const [showReplies, setShowReplies] = useState<boolean>(false);
-    const [replyContent, setReplyContent] = useState<string>("");
+export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount }: CommentProps) {
+    const { activeAction, setActiveAction, cancelAction } = useCommentAction();
+    const { user: currentUser } = useAuthStore();
+
     const [isActionMenuOpen, setIsActionMenuOpen] = useState<boolean>(false);
     const [editContent, setEditContent] = useState<string>(comment.content);
+    const [replies, setReplies] = useState<CommentReply[]>([]);
+    const [totalReplyCount, setTotalReplyCount] = useState<number>(0);
+    const [repliesNextCursor, setRepliesNextCursor] = useState<number | null>(null);
+    const [showReplies, setShowReplies] = useState<boolean>(false);
+    const [replyContent, setReplyContent] = useState<string>("");
+    const [isRepliesLoading, setIsRepliesLoading] = useState<boolean>(false);
+    const [replyTarget, setReplyTarget] = useState<CommentReplyTarget | null>(null);
     const actionMenuRef = useOutsideClick(() => setIsActionMenuOpen(false));
 
-    const isAuthor = comment.user.id === currentUserId;
+    const isEditing = activeAction?.type === "editing" && activeAction.targetId === comment.id;
+    const isReplying = activeAction?.type === "replying" && activeAction.targetId === comment.id;
+    const isAuthor = !!currentUser && comment.user.id === currentUser.id;
     const isDeleted = !!comment.deletedAt;
 
-    const handleSubmitReply = () => {
-        if (!replyContent.trim()) return;
+    const fetchReplies = async (cursor?: number) => {
+        try {
+            setIsRepliesLoading(true);
 
-        // TODO: 답글 관련 처리
+            const params: PaginationQuery = {
+                limit: COMMENT_REPLY_PAGE_LIMIT,
+            };
+
+            if (cursor !== undefined) {
+                params.cursor = cursor;
+            }
+
+            const { data } = await api.getReplies(comment.id, params);
+
+            setReplies((prev) => (cursor !== undefined ? [...prev, ...data.replies] : data.replies));
+            setTotalReplyCount(data.totalReplyCount);
+            setRepliesNextCursor(data.nextCursor);
+        } catch (error) {
+            console.error("Failed to fetch replies:", error);
+            setReplies([]);
+            setRepliesNextCursor(null);
+        } finally {
+            setIsRepliesLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (showReplies && replies.length === 0) {
+            fetchReplies();
+        }
+    }, [showReplies]);
+
+    const handleSubmitReply = async () => {
+        if (!replyContent.trim() || !currentUser) return;
+
+        try {
+            const { data } = await api.createComment(postId, {
+                content: replyContent,
+                parentId: comment.id,
+                mentionUserId: replyTarget?.mentionUser.id ?? null,
+            });
+
+            const newReply: CommentReply = {
+                id: data.id,
+                content: data.content,
+                parentId: data.parentId,
+                user: {
+                    id: currentUser.id,
+                    nickname: currentUser.nickname,
+                    profileImageUrl: currentUser.profileImageUrl,
+                },
+                mentionUser: replyTarget?.mentionUser ?? null,
+                createdAt: data.createdAt,
+                updatedAt: data.updatedAt,
+                deletedAt: data.deletedAt,
+            };
+
+            setReplies((prev) => [...prev, newReply]);
+            setReplyContent("");
+            setReplyTarget(null);
+            cancelAction();
+            setShowReplies(true);
+            onAddReplyCount(comment.id);
+        } catch (error) {
+            console.error("Failed to create reply:", error);
+            alert("답글 작성에 실패했습니다. 다시 시도해주세요.");
+        }
+    };
+
+    const handleReplyToReply = (targetUser: MentionUser, replyId: number) => {
+        setReplyTarget({ replyId, mentionUser: targetUser });
+        setReplyContent("");
+        setActiveAction({ type: "replying", targetId: comment.id });
+    };
+
+    const handleCancelReply = () => {
+        cancelAction();
+        setReplyContent("");
+        setReplyTarget(null);
+    };
+
+    const handleEditReply = (updatedReply: CommentReply) => {
+        setReplies((prev) => prev.map((r) => (r.id === updatedReply.id ? updatedReply : r)));
+    };
+
+    const handleDeleteReply = (replyId: number) => {
+        setReplies((prev) => prev.map((r) => (r.id === replyId ? { ...r, deletedAt: new Date().toISOString() } : r)));
     };
 
     const handleSubmitEdit = async () => {
         if (!editContent.trim()) return;
 
         if (editContent === comment.content) {
-            onCancelEdit();
+            cancelAction();
             return;
         }
 
         try {
             const { data } = await api.updateComment(comment.id, { content: editContent });
             onEdit(data);
-            onCancelEdit();
+            cancelAction();
         } catch (error) {
             console.error("Failed to update comment:", error);
             alert("댓글 수정에 실패했습니다. 다시 시도해주세요.");
@@ -60,7 +151,7 @@ export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditin
     };
 
     const handleCancelEdit = () => {
-        onCancelEdit();
+        cancelAction();
         setEditContent(comment.content);
     };
 
@@ -79,10 +170,16 @@ export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditin
     const handleActionMenuClick = (action: CommentActionMenuClickType) => {
         switch (action) {
             case "reply":
-                setShowReplyInput(!showReplyInput);
+                if (!isReplying) {
+                    setActiveAction({ type: "replying", targetId: comment.id });
+                }
+
+                setReplyTarget(null);
+                setReplyContent("");
+                setIsActionMenuOpen(false);
                 break;
             case "edit":
-                onStartEdit();
+                setActiveAction({ type: "editing", targetId: comment.id });
                 setEditContent(comment.content);
                 setIsActionMenuOpen(false);
                 break;
@@ -116,7 +213,13 @@ export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditin
             <>
                 <p className="text-gray-800 mb-3 leading-relaxed break-words">{comment.content}</p>
                 <button
-                    onClick={() => setShowReplyInput(!showReplyInput)}
+                    onClick={() => {
+                        setReplyTarget(null);
+                        setReplyContent("");
+                        if (!isReplying) {
+                            setActiveAction({ type: "replying", targetId: comment.id });
+                        }
+                    }}
                     className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3">
                     답글 달기
                 </button>
@@ -153,12 +256,13 @@ export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditin
                         )}
                     </div>
                     {renderComment()}
-                    {showReplyInput && !isDeleted && (
+                    {isReplying && !isDeleted && !replyTarget && (
                         <div className="mt-4">
                             <MessageInput
                                 value={replyContent}
                                 onChange={setReplyContent}
                                 onSubmit={handleSubmitReply}
+                                onCancel={handleCancelReply}
                                 placeholder="답글을 입력하세요..."
                                 maxLength={COMMENT_CONTENT_LIMIT}
                             />
@@ -167,28 +271,59 @@ export function CommentItem({ comment, currentUserId, onEdit, onDelete, isEditin
                     {comment.replyCount > 0 && (
                         <button
                             onClick={() => setShowReplies(!showReplies)}
-                            className="flex items-center gap-2 mt-4 text-sm text-pink-600 hover:text-pink-700 transition-colors">
-                            {showReplies ? (
+                            className="flex items-center gap-2 mt-0.5 text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                            {!showReplies && (
                                 <>
-                                    <ArrowUpIcon fill={"#e60076"} />
-                                    <span>답글 숨기기</span>
-                                </>
-                            ) : (
-                                <>
-                                    <ArrowDownIcon fill={"#e60076"} />
-                                    <span>답글 {comment.replyCount}개 보기</span>
+                                    <span>답글 {comment.replyCount}개 더보기</span>
                                 </>
                             )}
                         </button>
                     )}
-                    {/* Replies */}
-                    {/* {showReplies && hasReplies && (
+                    {showReplies && (
                         <div className="mt-4 space-y-4 pl-4 border-l-2 border-pink-100">
                             {replies.map((reply) => (
-                                <Reply key={reply.id} reply={reply} currentUserId={currentUserId} />
+                                <Fragment key={reply.id}>
+                                    <ReplyItem
+                                        reply={reply}
+                                        onReplyToReply={handleReplyToReply}
+                                        onEdit={handleEditReply}
+                                        onDelete={handleDeleteReply}
+                                    />
+                                    {isReplying && replyTarget?.replyId === reply.id && (
+                                        <div className="mt-2">
+                                            <MessageInput
+                                                value={replyContent}
+                                                onChange={setReplyContent}
+                                                onSubmit={handleSubmitReply}
+                                                onCancel={handleCancelReply}
+                                                placeholder={
+                                                    replyTarget
+                                                        ? `@${replyTarget.mentionUser.nickname} 에게 답글 입력...`
+                                                        : "답글을 입력하세요..."
+                                                }
+                                                maxLength={COMMENT_CONTENT_LIMIT}
+                                            />
+                                        </div>
+                                    )}
+                                </Fragment>
                             ))}
+                            {isRepliesLoading && <LoadingSpinner />}
+                            {!isRepliesLoading &&
+                                (repliesNextCursor && replies.length < totalReplyCount ? (
+                                    <button
+                                        onClick={() => fetchReplies(repliesNextCursor)}
+                                        className="text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                                        답글 더보기
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setShowReplies(false)}
+                                        className="flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                                        <span>답글 숨기기</span>
+                                    </button>
+                                ))}
                         </div>
-                    )} */}
+                    )}
                 </div>
             </div>
         </div>

@@ -44,6 +44,7 @@ interface MyCommentListResponse {
 
 interface ReplyListResponse {
     replies: CommentReply[];
+    totalReplyCount: number;
     nextCursor: number | null;
 }
 

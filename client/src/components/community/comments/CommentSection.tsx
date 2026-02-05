@@ -10,15 +10,18 @@ import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
 import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
 import * as api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 
+import { CommentActionProvider } from "../../../contexts/CommentActionContext";
 import { CommentItem } from "./CommentItem";
 
 interface CommentSectionProps {
     postId: number;
-    currentUser: User | null;
 }
 
-export function CommentSection({ postId, currentUser }: CommentSectionProps) {
+export function CommentSection({ postId }: CommentSectionProps) {
+    const { user: currentUser } = useAuthStore();
+
     const [comments, setComments] = useState<PostComment[]>([]);
     const [totalParentCommentCount, setTotalParentCommentCount] = useState<number>(0);
     const [totalCommentCount, setTotalCommentCount] = useState<number>(0);
@@ -27,7 +30,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
     const [newCommentId, setNewCommentId] = useState<number | null>(null);
-    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+    const [activeAction, setActiveAction] = useState<CommentActiveAction | null>(null);
 
     const newCommentRef = useRef<HTMLDivElement>(null);
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -173,7 +176,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
         await fetchComments(nextCursor);
     };
 
-    const handleReply = (commentId: number) => {
+    const handleAddReplyCount = (commentId: number) => {
         setComments(
             comments.map((c) =>
                 c.id === commentId
@@ -184,6 +187,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                     : c,
             ),
         );
+        setTotalCommentCount((prev) => prev + 1);
     };
 
     const handleEdit = (updatedComment: Comment) => {
@@ -235,12 +239,10 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                         }`}>
                         <CommentItem
                             comment={comment}
-                            currentUserId={currentUser?.id ?? null}
+                            postId={postId}
                             onEdit={handleEdit}
                             onDelete={handleDelete}
-                            isEditing={editingCommentId === comment.id}
-                            onStartEdit={() => setEditingCommentId(comment.id)}
-                            onCancelEdit={() => setEditingCommentId(null)}
+                            onAddReplyCount={handleAddReplyCount}
                         />
                     </div>
                 ))}
@@ -249,35 +251,37 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     };
 
     return (
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center gap-2 mb-6">
-                <h2 className="text-xl">
-                    댓글 <span style={{ color: "#FF6B9D" }}>{totalCommentCount}</span>
-                </h2>
-            </div>
-            {renderCommentList()}
-            {nextCursor && comments.length < totalParentCommentCount && (
-                <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
-            )}
-            {
-                <div className="border-t border-gray-100 pt-6 mt-8">
-                    <div className="flex gap-3 items-start">
-                        <ProfileAvatar
-                            nickname={currentUser?.nickname ?? "U"}
-                            profileImageUrl={currentUser?.profileImageUrl}
-                            size="md"
-                        />
-                        <MessageInput
-                            value={newContent}
-                            onChange={setNewContent}
-                            onSubmit={handleSubmitComment}
-                            placeholder={currentUser ? "댓글을 입력하세요..." : "로그인 후 이용해주세요."}
-                            disabled={!currentUser}
-                            maxLength={COMMENT_CONTENT_LIMIT}
-                        />
-                    </div>
+        <CommentActionProvider activeAction={activeAction} setActiveAction={setActiveAction}>
+            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center gap-2 mb-6">
+                    <h2 className="text-xl">
+                        댓글 <span style={{ color: "#FF6B9D" }}>{totalCommentCount}</span>
+                    </h2>
                 </div>
-            }
-        </section>
+                {renderCommentList()}
+                {nextCursor && comments.length < totalParentCommentCount && (
+                    <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
+                )}
+                {
+                    <div className="border-t border-gray-100 pt-6 mt-8">
+                        <div className="flex gap-3 items-start">
+                            <ProfileAvatar
+                                nickname={currentUser?.nickname ?? "U"}
+                                profileImageUrl={currentUser?.profileImageUrl}
+                                size="md"
+                            />
+                            <MessageInput
+                                value={newContent}
+                                onChange={setNewContent}
+                                onSubmit={handleSubmitComment}
+                                placeholder={currentUser ? "댓글을 입력하세요..." : "로그인 후 이용해주세요."}
+                                disabled={!currentUser}
+                                maxLength={COMMENT_CONTENT_LIMIT}
+                            />
+                        </div>
+                    </div>
+                }
+            </section>
+        </CommentActionProvider>
     );
 }

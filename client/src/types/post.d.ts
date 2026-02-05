@@ -62,7 +62,7 @@ interface CommentReply {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
-    mentionUser: MentionUser;
+    mentionUser: MentionUser | null;
 }
 
 interface Comment {
@@ -94,3 +94,13 @@ interface MyComment {
 type CommentActionMenuClickType = "reply" | "edit" | "delete";
 
 type PostMode = "create" | "edit";
+
+interface CommentActiveAction {
+    type: "editing" | "replying" | "editingReply";
+    targetId: number;
+}
+
+interface CommentReplyTarget {
+    replyId: number;
+    mentionUser: MentionUser;
+}
