@@ -17,6 +17,7 @@ import { CategoriesModule } from "./categories/categories.module";
 import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
 import { AuthKakaoModule } from "./auth-kakao/auth-kakao.module";
+import { ConsultationsModule } from "./consultations/consultations.module";
 
 @Module({
     imports: [
@@ -45,6 +46,7 @@ import { AuthKakaoModule } from "./auth-kakao/auth-kakao.module";
         CategoriesModule,
         PostsModule,
         CommentsModule,
+        ConsultationsModule,
     ],
     providers: [AuthService],
 })
