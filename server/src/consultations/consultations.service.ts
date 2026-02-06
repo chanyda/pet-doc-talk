@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { ConsultationsRepository } from "./consultations.repository";
 import { CreateConsultationDto } from "./dtos/requests/create-consultation.dto";
 import { ConsultationDto } from "./dtos/responses/consultation.dto";
+import { MyConsultationListResponseDto } from "./dtos/responses/my-consultation-list-response.dto";
+import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { PetsService } from "src/pets/pets.service";
+import { getNextCursor } from "src/common/utils/pagination.util";
+import { CONSULTATION_SELECT } from "./constants";
 
 @Injectable()
 export class ConsultationsService {
@@ -10,6 +14,25 @@ export class ConsultationsService {
         private readonly consultationsRepository: ConsultationsRepository,
         private readonly petsService: PetsService,
     ) {}
+
+    async findMyConsultations(userId: number, query: PaginationQueryDto): Promise<MyConsultationListResponseDto> {
+        const { consultations, totalCount } = await this.consultationsRepository.findManyAndCount({
+            take: query.limit,
+            skip: query.cursor ? 1 : undefined,
+            cursor: query.cursor ? { id: query.cursor } : undefined,
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+            select: CONSULTATION_SELECT,
+        });
+
+        const nextCursor = getNextCursor(consultations, query.limit);
+
+        return {
+            consultations,
+            totalConsultationCount: totalCount,
+            nextCursor,
+        };
+    }
 
     async create(userId: number, createConsultationDto: CreateConsultationDto): Promise<ConsultationDto> {
         // findById 함수에서 사용자의 펫이 아닌 경우, 오류를 뱉으므로 해당 레벨에서는 별도로 오류 처리를 하지 않음
