@@ -27,6 +27,7 @@ model User {
   posts             Post[]
   comments          Comment[] @relation("CommentAuthor")
   mentionedComments Comment[] @relation("CommentMention")
+  consultations     Consultation[]
 }
 
 model Pet {
@@ -42,7 +43,8 @@ model Pet {
   imageUrl    String?   @db.VarChar(500)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consultations Consultation[]
 
   @@index([userId])
 }
@@ -61,6 +63,11 @@ enum PetType {
 enum PetGender {
   MALE
   FEMALE
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
 }
 
 model Category {
@@ -110,4 +117,51 @@ model Comment {
   @@index([postId, createdAt])
   @@index([userId, createdAt])
   @@index([parentId, createdAt])
+}
+
+model Consultation {
+  id            Int                          @id @default(autoincrement()) @db.Integer
+  userId        Int                          @db.Integer
+  petId         Int                          @db.Integer
+  title         String?                      @db.VarChar(200)
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @updatedAt
+  user          User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pet           Pet                          @relation(fields: [petId], references: [id], onDelete: Cascade)
+  conversations ConsultationConversation[]
+  messages      ConsultationMessage[]
+
+  @@index([userId])
+  @@index([petId])
+  @@index([createdAt])
+}
+
+model ConsultationConversation {
+  id               Int                   @id @default(autoincrement()) @db.Integer
+  consultationId   Int                   @db.Integer
+  conversationId   String                @db.VarChar(255)
+  totalInputToken  Int                   @default(0)
+  totalOutputToken Int                   @default(0)
+  isActive         Boolean               @default(false)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  consultation     Consultation          @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([isActive])
+}
+
+model ConsultationMessage {
+  id                         Int                      @id @default(autoincrement()) @db.Integer
+  consultationId             Int                      @db.Integer
+  role                       MessageRole
+  content                    String                   @db.Text
+  inputToken                 Int                      @default(0)
+  outputToken                Int                      @default(0)
+  createdAt                  DateTime                 @default(now())
+  updatedAt                  DateTime                 @updatedAt
+  consultation               Consultation             @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([createdAt])
 }
