@@ -38,4 +38,7 @@ export class EnvironmentVariables {
 
     @IsString()
     KAKAO_CLIENT_SECRET: string;
+
+    @IsString()
+    OPENAI_API_KEY: string;
 }

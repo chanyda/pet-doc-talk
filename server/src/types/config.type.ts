@@ -19,8 +19,13 @@ export type AuthConfigType = {
     kakaoClientSecret: string;
 };
 
+export type OpenaiConfigType = {
+    apiKey: string;
+};
+
 export type ConfigType = {
     app: AppConfigType;
     prisma: PrismaConfigType;
     auth: AuthConfigType;
+    openai: OpenaiConfigType;
 };
