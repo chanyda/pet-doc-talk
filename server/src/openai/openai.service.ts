@@ -5,14 +5,19 @@ import { ConfigType } from "src/types/config.type";
 import { IStreamChunk, IStreamResponseParams } from "./interfaces/openai.interface";
 import { ResponseUsage } from "openai/resources/responses/responses";
 import { CONSULTATION_JSON_SCHEMA, CONSULTATION_PROMPT } from "./constants";
+import { ResponsesModel } from "openai/resources/shared";
 
 @Injectable()
 export class OpenAIService {
     private readonly openai: OpenAI;
+    private readonly model: ResponsesModel;
 
     constructor(private readonly configService: ConfigService<ConfigType, true>) {
         const apiKey = this.configService.get("openai.apiKey", { infer: true });
+        const model = this.configService.get("openai.model", { infer: true });
+
         this.openai = new OpenAI({ apiKey });
+        this.model = model;
     }
 
     /**
@@ -31,7 +36,7 @@ export class OpenAIService {
      */
     async *streamResponse(params: IStreamResponseParams): AsyncGenerator<IStreamChunk> {
         const stream = await this.openai.responses.create({
-            model: "gpt-5-mini-2025-08-07", // TODO: env로 빼기
+            model: this.model,
             conversation: params.conversationId,
             input: params.input,
             instructions: `${params.petContext}\n\n${CONSULTATION_PROMPT}`,

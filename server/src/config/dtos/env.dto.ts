@@ -41,4 +41,7 @@ export class EnvironmentVariables {
 
     @IsString()
     OPENAI_API_KEY: string;
+
+    @IsString()
+    OPENAI_MODEL: string;
 }

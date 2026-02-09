@@ -1,4 +1,5 @@
 import type { StringValue } from "ms";
+import { ResponsesModel } from "openai/resources/shared";
 
 export type AppConfigType = {
     nodeEnv: string;
@@ -21,6 +22,7 @@ export type AuthConfigType = {
 
 export type OpenaiConfigType = {
     apiKey: string;
+    model: ResponsesModel;
 };
 
 export type ConfigType = {
