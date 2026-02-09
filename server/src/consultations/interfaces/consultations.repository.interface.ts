@@ -16,6 +16,7 @@ export interface IConsultationsRepository {
         params: SelectSubset<T, ConsultationFindManyArgs>,
     ): Promise<FindManyAndCountResult<T>>;
     count(whereInput?: ConsultationWhereInput): Promise<number>;
+    findById(id: number, select?: ConsultationSelect): Promise<IConsultation | null>;
     create(
         userId: number,
         createConsultationDto: CreateConsultationDto,

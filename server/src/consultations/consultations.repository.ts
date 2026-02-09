@@ -33,6 +33,13 @@ export class ConsultationsRepository implements IConsultationsRepository {
         return this.txHost.tx.consultation.count({ where: whereInput });
     }
 
+    async findById(id: number, select?: ConsultationSelect): Promise<IConsultation | null> {
+        return this.txHost.tx.consultation.findUnique({
+            where: { id },
+            select,
+        });
+    }
+
     async create(
         userId: number,
         createConsultationDto: CreateConsultationDto,

@@ -1,4 +1,5 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject, forwardRef } from "@nestjs/common";
+import { Transactional } from "@nestjs-cls/transactional";
 import { ConsultationsRepository } from "./consultations.repository";
 import { CreateConsultationDto } from "./dtos/requests/create-consultation.dto";
 import { ConsultationDto } from "./dtos/responses/consultation.dto";
@@ -7,12 +8,17 @@ import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dt
 import { PetsService } from "src/pets/pets.service";
 import { getNextCursor } from "src/common/utils/pagination.util";
 import { CONSULTATION_SELECT } from "./constants";
+import { ConsultationMessagesService } from "src/consultation-messages/consultation-messages.service";
+import { IConsultation } from "./interfaces/consultations.interface";
+import { MessageRole } from "generated/prisma/enums";
 
 @Injectable()
 export class ConsultationsService {
     constructor(
         private readonly consultationsRepository: ConsultationsRepository,
         private readonly petsService: PetsService,
+        @Inject(forwardRef(() => ConsultationMessagesService))
+        private readonly messagesService: ConsultationMessagesService,
     ) {}
 
     async findMyConsultations(userId: number, query: PaginationQueryDto): Promise<MyConsultationListResponseDto> {
@@ -34,15 +40,25 @@ export class ConsultationsService {
         };
     }
 
+    async findById(consultationId: number): Promise<IConsultation | null> {
+        return this.consultationsRepository.findById(consultationId);
+    }
+
+    @Transactional()
     async create(userId: number, createConsultationDto: CreateConsultationDto): Promise<ConsultationDto> {
         // findById 함수에서 사용자의 펫이 아닌 경우, 오류를 뱉으므로 해당 레벨에서는 별도로 오류 처리를 하지 않음
         const pet = await this.petsService.findById(createConsultationDto.petId, userId);
-        console.log(pet);
 
-        return this.consultationsRepository.create(userId, createConsultationDto);
+        const consultation = await this.consultationsRepository.create(userId, createConsultationDto);
 
-        // TODO: 채팅방 생성하면 처음 인사 메세지를 생성해준다.
-        // (인사 메세지 예: 안녕하세요 AI 수의사입니다. ㅇㅇ이에 대해 궁금한 게 있으시면 물어보세요!)
-        // 따라서 petExists 함수가 아닌 findById로 펫 정보를 가져옴
+        const welcomeMessage = `안녕하세요, AI 수의사입니다!\n\n${pet.name}(이)에 대해 궁금하신 점이나 걱정되는 증상이 있으시면 편하게 물어보세요. 최선을 다해 도와드리겠습니다.`;
+        await this.messagesService.create(consultation.id, {
+            role: MessageRole.ASSISTANT,
+            content: welcomeMessage,
+            inputToken: 0,
+            outputToken: 0,
+        });
+
+        return consultation;
     }
 }
