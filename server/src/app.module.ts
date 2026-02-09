@@ -8,6 +8,7 @@ import { AuthService } from "./auth/auth.service";
 import { AuthModule } from "./auth/auth.module";
 import prismaConfig from "./config/prisma.config";
 import authConfig from "./config/auth.config";
+import openaiConfig from "./config/openai.config";
 import { ClsModule } from "nestjs-cls";
 import { ClsPluginTransactional } from "@nestjs-cls/transactional";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
@@ -18,12 +19,15 @@ import { PostsModule } from "./posts/posts.module";
 import { CommentsModule } from "./comments/comments.module";
 import { AuthKakaoModule } from "./auth-kakao/auth-kakao.module";
 import { ConsultationsModule } from "./consultations/consultations.module";
+import { OpenAIModule } from "./openai/openai.module";
+import { ConsultationConversationsModule } from "./consultation-conversations/consultation-conversations.module";
+import { ConsultationMessagesModule } from "./consultation-messages/consultation-messages.module";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [appConfig, prismaConfig, authConfig],
+            load: [appConfig, prismaConfig, authConfig, openaiConfig],
             envFilePath: ".env",
             validate,
         }),
@@ -47,6 +51,9 @@ import { ConsultationsModule } from "./consultations/consultations.module";
         PostsModule,
         CommentsModule,
         ConsultationsModule,
+        OpenAIModule,
+        ConsultationConversationsModule,
+        ConsultationMessagesModule,
     ],
     providers: [AuthService],
 })
