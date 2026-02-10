@@ -53,7 +53,7 @@ export class ConsultationsService {
 
         const welcomeMessage = `안녕하세요, AI 수의사입니다!\n\n${pet.name}(이)에 대해 궁금하신 점이나 걱정되는 증상이 있으시면 편하게 물어보세요. 최선을 다해 도와드리겠습니다.`;
         await this.messagesService.create(consultation.id, {
-            role: MessageRole.ASSISTANT,
+            role: MessageRole.assistant,
             content: welcomeMessage,
             inputToken: 0,
             outputToken: 0,

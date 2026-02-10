@@ -66,8 +66,8 @@ enum PetGender {
 }
 
 enum MessageRole {
-  USER
-  ASSISTANT
+  user
+  assistant
 }
 
 model Category {

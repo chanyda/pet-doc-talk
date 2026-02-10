@@ -8,7 +8,7 @@ export class MessageDto {
     @ApiProperty({ description: "Consultation ID", example: 1 })
     consultationId: number;
 
-    @ApiProperty({ description: "Message role", enum: MessageRole, example: MessageRole.USER })
+    @ApiProperty({ description: "Message role", enum: MessageRole, example: MessageRole.user })
     role: MessageRole;
 
     @ApiProperty({ description: "Message content", example: "강아지가 기침을 해요" })
