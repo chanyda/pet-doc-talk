@@ -6,6 +6,7 @@ import {
     FindManyAndCountResult,
     IConsultationMessagesRepository,
     ICreateMessageData,
+    IMessageContext,
 } from "./interfaces/consultation-messages.repository.interface";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ConsultationMessageFindManyArgs } from "generated/prisma/models";
@@ -43,6 +44,19 @@ export class ConsultationMessagesRepository implements IConsultationMessagesRepo
     async create(consultationId: number, data: ICreateMessageData): Promise<IConsultationMessage> {
         return this.txHost.tx.consultationMessage.create({
             data: { consultationId, ...data },
+        });
+    }
+
+    async findRecentForContext(consultationId: number, limit: number): Promise<Array<IMessageContext>> {
+        return this.txHost.tx.consultationMessage.findMany({
+            where: {
+                consultationId,
+                // welcome 메세지는 제외하도록 한다.
+                OR: [{ inputToken: { gt: 0 } }, { outputToken: { gt: 0 } }],
+            },
+            orderBy: { createdAt: "desc" },
+            take: limit,
+            select: { role: true, content: true },
         });
     }
 }

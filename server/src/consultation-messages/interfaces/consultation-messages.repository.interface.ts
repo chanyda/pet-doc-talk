@@ -14,6 +14,11 @@ export interface ICreateMessageData {
     outputToken: number;
 }
 
+export interface IMessageContext {
+    role: MessageRole;
+    content: string;
+}
+
 export type FindManyAndCountResult<T extends ConsultationMessageFindManyArgs> = {
     messages: ConsultationMessageGetPayload<T>[];
     totalCount: number;
@@ -28,4 +33,5 @@ export interface IConsultationMessagesRepository {
     ): Promise<FindManyAndCountResult<T>>;
     count(whereInput?: ConsultationMessageWhereInput): Promise<number>;
     create(consultationId: number, data: ICreateMessageData): Promise<IConsultationMessage>;
+    findRecentForContext(consultationId: number, limit: number): Promise<Array<IMessageContext>>;
 }
