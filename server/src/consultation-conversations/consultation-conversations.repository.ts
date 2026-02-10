@@ -42,4 +42,11 @@ export class ConsultationConversationsRepository implements IConsultationConvers
             },
         });
     }
+
+    async deactivate(id: number): Promise<void> {
+        await this.txHost.tx.consultationConversation.update({
+            where: { id },
+            data: { isActive: false },
+        });
+    }
 }
