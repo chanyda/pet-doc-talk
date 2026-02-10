@@ -1,16 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
+import { Tiktoken, get_encoding } from "tiktoken";
 import { ConfigType } from "src/types/config.type";
 import { IStreamChunk, IStreamResponseParams } from "./interfaces/openai.interface";
-import { ResponseUsage } from "openai/resources/responses/responses";
-import { CONSULTATION_JSON_SCHEMA, CONSULTATION_PROMPT } from "./constants";
+import { EasyInputMessage, ResponseUsage } from "openai/resources/responses/responses";
+import { CONSULTATION_JSON_SCHEMA } from "./constants";
 import { ResponsesModel } from "openai/resources/shared";
 
 @Injectable()
 export class OpenAIService {
     private readonly openai: OpenAI;
     private readonly model: ResponsesModel;
+    private readonly tiktoken: Tiktoken;
 
     constructor(private readonly configService: ConfigService<ConfigType, true>) {
         const apiKey = this.configService.get("openai.apiKey", { infer: true });
@@ -18,15 +20,27 @@ export class OpenAIService {
 
         this.openai = new OpenAI({ apiKey });
         this.model = model;
+        // GPT-5-nano uses o200k_base encoding
+        this.tiktoken = get_encoding("o200k_base");
     }
 
-    /**
-     * Creates a new conversation using OpenAI Conversations API
-     * @returns The conversation ID
-     */
     async createConversation(): Promise<string> {
         const conversation = await this.openai.conversations.create();
         return conversation.id;
+    }
+
+    countMessagesTokens(messages: Array<EasyInputMessage>, serializedSchema: string): number {
+        let totalTokens = 0;
+
+        for (const message of messages) {
+            totalTokens += 3; // Message overhead
+            totalTokens += this.tiktoken.encode(message.role).length;
+            totalTokens += this.tiktoken.encode(message.content as string).length;
+        }
+
+        totalTokens += this.tiktoken.encode(serializedSchema).length;
+
+        return totalTokens;
     }
 
     /**
@@ -39,7 +53,7 @@ export class OpenAIService {
             model: this.model,
             conversation: params.conversationId,
             input: params.input,
-            instructions: `${params.petContext}\n\n${CONSULTATION_PROMPT}`,
+            instructions: params.instruction,
             text: {
                 format: {
                     name: CONSULTATION_JSON_SCHEMA.name,
@@ -48,6 +62,7 @@ export class OpenAIService {
                 },
             },
             stream: true,
+            reasoning: { effort: "low" },
         });
 
         let fullContent = "";
@@ -56,17 +71,18 @@ export class OpenAIService {
         for await (const event of stream) {
             if (event.type === "response.output_text.delta") {
                 fullContent += event.delta;
-                yield { role: "ASSISTANT", content: event.delta, usage: null };
+                yield { type: "delta", role: "assistant", content: event.delta, usage: null };
             }
 
             if (event.type === "response.completed") {
                 usage = event.response.usage ?? null;
                 yield {
-                    role: "ASSISTANT",
+                    type: "completed",
+                    role: "assistant",
                     content: fullContent,
                     usage: {
-                        inputTokens: usage?.input_tokens ?? 0,
-                        outputTokens: usage?.output_tokens ?? 0,
+                        inputToken: usage?.input_tokens ?? 0,
+                        outputToken: usage?.output_tokens ?? 0,
                     },
                 };
             }
