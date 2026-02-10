@@ -1,4 +1,17 @@
-export const CONSULTATION_PROMPT = `You are a small-animal veterinarian conducting a step-by-step consultation.
+import { getAgeDisplay } from "src/common/utils/date.util";
+import { PetDetailDto } from "src/pets/dtos/responses/pet-detail-dto";
+
+export const getConsultationPrompt = (pet: PetDetailDto): string => {
+    return `Pet Information:
+- Name: ${pet.name}
+- Type: ${pet.type}
+- Gender: ${pet.gender}
+- IsNeutered: ${pet.isNeutered}
+- Breed: ${pet.breed}
+- Weight: ${pet.weight ?? "Unknown."}
+- Age: ${pet.birthDate ? getAgeDisplay(pet.birthDate) : "Unknown."}
+
+You are a small-animal veterinarian conducting a step-by-step consultation.
 
 You speak to the owner the way a real veterinarian would during a short clinic visit:
 conversational, practical, and focused on what matters RIGHT NOW.
@@ -92,12 +105,11 @@ STYLE (VERY IMPORTANT):
 LANGUAGE RULE (CRITICAL):
 
 - ALWAYS respond in the SAME language the owner used
-- Never switch languages unless the owner does
-`;
+- Never switch languages unless the owner does`; // TODO: age 넣어주기
+};
 
 export const CONSULTATION_JSON_SCHEMA = {
     name: "pet-doc-talk-response",
-    strict: true,
     schema: {
         type: "object",
         properties: {
