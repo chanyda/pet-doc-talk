@@ -22,9 +22,16 @@ import { ConsultationsModule } from "./consultations/consultations.module";
 import { OpenAIModule } from "./openai/openai.module";
 import { ConsultationConversationsModule } from "./consultation-conversations/consultation-conversations.module";
 import { ConsultationMessagesModule } from "./consultation-messages/consultation-messages.module";
+import { ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
     imports: [
+        ThrottlerModule.forRoot([
+            {
+                ttl: 60000,
+                limit: 20,
+            },
+        ]),
         ConfigModule.forRoot({
             isGlobal: true,
             load: [appConfig, prismaConfig, authConfig, openaiConfig],
