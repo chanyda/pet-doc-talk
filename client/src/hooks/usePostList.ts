@@ -1,12 +1,13 @@
-import { useCursorPagination } from "./useCursorPagination";
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
 
-interface UseCursorPostListProps {
+import { useCursorPagination } from "./useCursorPagination";
+
+interface UsePostListProps {
     fetchFn: (params: FindPostListQuery) => Promise<{ data: PostListResponse }>;
     queryParams?: Partial<FindPostListQuery>;
 }
 
-export function useCursorPostList({ fetchFn, queryParams }: UseCursorPostListProps) {
+export function usePostList({ fetchFn, queryParams }: UsePostListProps) {
     const { items, nextCursor, isLoading, totalCount, handleLoadMore } = useCursorPagination<
         PostSummary,
         PostListResponse

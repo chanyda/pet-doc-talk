@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { CommunityEmptyState } from "@/components/ui/CommunityEmptyState";
 import { HasMoreButton } from "@/components/ui/HasMoreButton";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { useCursorPostList } from "@/hooks/useCursorPostList";
+import { usePostList } from "@/hooks/usePostList";
 import * as api from "@/lib/api";
 
 import { PostItem } from "./PostItem";
@@ -31,7 +31,7 @@ export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
         return params;
     }, [categoryId, orderBy, searchQuery]);
 
-    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = useCursorPostList({
+    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = usePostList({
         fetchFn: api.getPosts,
         queryParams,
     });

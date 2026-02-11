@@ -1,6 +1,6 @@
 "use client";
 
-import { useCursorPostList } from "@/hooks/useCursorPostList";
+import { usePostList } from "@/hooks/usePostList";
 import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
@@ -11,7 +11,7 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export function MyPosts() {
     const { user } = useAuthStore();
-    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = useCursorPostList({
+    const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = usePostList({
         fetchFn: api.getMyPosts,
     });
 
