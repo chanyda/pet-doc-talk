@@ -13,6 +13,7 @@ import { createConsultation } from "@/lib/api";
 import { formatLocalDateTime } from "@/utils/date";
 
 import { PetSelectionModal } from "../modals/PetSelectionModal";
+import { ConsultationEmptyState } from "../ui/ConsultationEmptyState";
 
 interface ConsultationListPageProps {
     onStartChat: (consultationId: number) => void;
@@ -63,11 +64,7 @@ export function ConsultationList({ onStartChat, onViewChat }: ConsultationListPa
             <div>
                 {consultations.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20">
-                        <div className="w-32 h-32 bg-gradient-to-br from-pink-100 to-orange-100 rounded-full flex items-center justify-center mb-6">
-                            <span className="text-6xl">🩺</span>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-3">아직 상담 내역이 없습니다.</h2>
-                        <p className="text-gray-600 mb-8 text-center">AI 수의사와 반려동물 건강에 대해 상담해보세요.</p>
+                        <ConsultationEmptyState />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full">
                             <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
                                 <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
