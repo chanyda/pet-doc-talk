@@ -233,7 +233,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
 
                                     accumulatedAnswer = content.answer;
                                     currentCheckList = content.checkList;
-                                    console.log(currentCheckList);
+
                                     setStreamingContent({
                                         answer: accumulatedAnswer,
                                         checkList: currentCheckList,

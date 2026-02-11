@@ -105,7 +105,7 @@ STYLE (VERY IMPORTANT):
 LANGUAGE RULE (CRITICAL):
 
 - ALWAYS respond in the SAME language the owner used
-- Never switch languages unless the owner does`; // TODO: age 넣어주기
+- Never switch languages unless the owner does`;
 };
 
 export const CONSULTATION_JSON_SCHEMA = {
