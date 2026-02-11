@@ -4,6 +4,7 @@ import Image from "next/image";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import ArrowRightIcon from "public/icons/arrow-right-icon.svg";
 import CatFaceIcon from "public/icons/cat-face-icon.svg";
+import CheckIcon from "public/icons/check-icon.svg";
 import DogFaceIcon from "public/icons/dog-face-icon.svg";
 import PlusIcon from "public/icons/plus-icon.svg";
 import { useEffect, useRef, useState } from "react";
@@ -11,7 +12,13 @@ import { useEffect, useRef, useState } from "react";
 import { PetRegistrationModal } from "@/components/modals/PetRegistrationModal";
 import * as api from "@/lib/api";
 
-export function MyPets() {
+interface MyPetsProps {
+    mode?: "edit" | "select";
+    selectedPetId?: number | null;
+    onSelectPet?: (pet: Pet) => void;
+}
+
+export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProps) {
     const [pets, setPets] = useState<Pet[]>([]);
     const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
     const [canScrollRight, setCanScrollRight] = useState<boolean>(false);
@@ -79,6 +86,14 @@ export function MyPets() {
     const handleEditPet = (pet: Pet) => {
         setIsModalOpen(true);
         setEditingPet(pet);
+    };
+
+    const handlePetClick = (pet: Pet) => {
+        if (mode === "select" && onSelectPet) {
+            onSelectPet(pet);
+        } else {
+            handleEditPet(pet);
+        }
     };
 
     const handleDeletePet = async () => {
@@ -158,45 +173,66 @@ export function MyPets() {
                         onScroll={handleScroll}
                         className="flex gap-4 overflow-x-auto"
                         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                        {pets.map((pet) => (
-                            <button
-                                key={pet.id}
-                                onClick={() => handleEditPet(pet)}
-                                className="flex-shrink-0 w-64 p-4 rounded-2xl bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50 border-2 border-pink-200 hover:border-pink-300 hover:shadow-lg transition-all group">
-                                <div className="flex items-center gap-3 mb-3">
-                                    {pet.imageUrl ? (
-                                        <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md flex-shrink-0">
-                                            <Image src={pet.imageUrl} alt={pet.name} />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl border-3 border-white shadow-md flex-shrink-0"
-                                            style={{
-                                                background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
-                                            }}>
-                                            {pet.type === "CAT" ? (
-                                                <CatFaceIcon width="30px" height="30px" />
-                                            ) : (
-                                                <DogFaceIcon width="30px" height="30px" />
-                                            )}
+                        {pets.map((pet) => {
+                            const isSelected = mode === "select" && selectedPetId === pet.id;
+                            return (
+                                <button
+                                    key={pet.id}
+                                    onClick={() => handlePetClick(pet)}
+                                    className={`shrink-0 w-64 p-4 rounded-2xl bg-linear-to-br from-pink-50 via-purple-50 to-orange-50 border-2 transition-all group relative ${
+                                        isSelected
+                                            ? "border-pink-500 shadow-xl"
+                                            : "border-pink-200 hover:border-pink-300 hover:shadow-lg"
+                                    }`}>
+                                    {isSelected && (
+                                        <div className="absolute top-2 right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                                            <CheckIcon stroke="#ffffff" width="18px" height="18px" />
                                         </div>
                                     )}
-                                    <div className="flex-1 text-left">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="text-lg font-bold text-gray-900">{pet.name}</h4>
-                                            <span
-                                                className={`text-xs px-2 py-0.5 rounded-full ${genderStyle(pet.gender)}`}>
-                                                {pet.gender === "FEMALE" ? "♀" : "♂"}
-                                            </span>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        {pet.imageUrl ? (
+                                            <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
+                                                <Image src={pet.imageUrl} alt={pet.name} />
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl border-3 border-white shadow-md shrink-0"
+                                                style={{
+                                                    background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
+                                                }}>
+                                                {pet.type === "CAT" ? (
+                                                    <CatFaceIcon width="30px" height="30px" />
+                                                ) : (
+                                                    <DogFaceIcon width="30px" height="30px" />
+                                                )}
+                                            </div>
+                                        )}
+                                        <div className="flex-1 text-left">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="text-lg font-bold text-gray-900">{pet.name}</h4>
+                                                <span
+                                                    className={`text-xs px-2 py-0.5 rounded-full ${genderStyle(pet.gender)}`}>
+                                                    {pet.gender === "FEMALE" ? "♀" : "♂"}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600">{pet.breed}</p>
                                         </div>
-                                        <p className="text-sm text-gray-600">{pet.breed}</p>
                                     </div>
-                                </div>
-                                <div className="mt-3 text-xs text-center text-gray-500 group-hover:text-pink-600 transition-colors">
-                                    클릭하여 수정
-                                </div>
-                            </button>
-                        ))}
+                                    <div
+                                        className={`mt-3 text-xs text-center transition-colors ${
+                                            isSelected
+                                                ? "text-pink-600 font-medium"
+                                                : "text-gray-500 group-hover:text-pink-600"
+                                        }`}>
+                                        {mode === "select"
+                                            ? isSelected
+                                                ? "선택됨"
+                                                : "클릭하여 선택"
+                                            : "클릭하여 수정"}
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}
