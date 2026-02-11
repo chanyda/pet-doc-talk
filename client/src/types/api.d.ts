@@ -59,3 +59,15 @@ interface UpdatePostBody {
     title?: string;
     content?: string;
 }
+
+interface ConsultationListResponse {
+    consultations: Array<ConsultationItem>;
+    totalConsultationCount: number;
+    nextCursor: number | null;
+}
+
+
+interface CreateConsultationBody {
+    petId: number;
+}
+

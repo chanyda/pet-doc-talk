@@ -185,3 +185,12 @@ export async function getMyComments(params: PaginationQuery): Promise<AxiosRespo
 export async function updateProfile(body: UpdateProfileBody): Promise<AxiosResponse<User>> {
     return apiClient.patch<User>("/users/me", body);
 }
+
+export async function getConsultations(params: PaginationQuery): Promise<AxiosResponse<ConsultationListResponse>> {
+    return apiClient.get<ConsultationListResponse>("/consultations", { params });
+}
+
+export async function createConsultation(body: CreateConsultationBody): Promise<AxiosResponse<Consultation>> {
+    return apiClient.post<Consultation>("/consultations", body);
+}
+
