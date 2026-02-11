@@ -23,6 +23,7 @@ import {
     RECENT_MESSAGE_COUNT,
     TOKEN_INPUT_LIMIT,
 } from "src/openai/constants";
+import { jsonrepair, JSONRepairError } from "jsonrepair";
 
 @Injectable()
 export class ConsultationMessagesService {
@@ -126,16 +127,25 @@ export class ConsultationMessagesService {
             });
 
             for await (const chunk of stream) {
-                if (chunk.type === "delta") {
-                    aiAnswer += chunk.content;
+                try {
+                    if (chunk.type === "delta") {
+                        aiAnswer += chunk.content;
 
-                    subscriber.next({
-                        data: { type: "delta", message: { role: MessageRole.assistant, content: chunk.content } },
-                    });
-                } else if (chunk.type === "completed") {
-                    aiAnswer = chunk.content;
-                    inputToken = chunk.usage?.inputToken || 0;
-                    outputToken = chunk.usage?.outputToken || 0;
+                        subscriber.next({
+                            data: {
+                                type: "delta",
+                                message: { role: MessageRole.assistant, content: jsonrepair(aiAnswer) },
+                            },
+                        });
+                    } else if (chunk.type === "completed") {
+                        aiAnswer = chunk.content;
+                        inputToken = chunk.usage?.inputToken || 0;
+                        outputToken = chunk.usage?.outputToken || 0;
+                    }
+                } catch (err) {
+                    if (err instanceof JSONRepairError) {
+                        console.error(err);
+                    }
                 }
             }
         } catch (error) {
