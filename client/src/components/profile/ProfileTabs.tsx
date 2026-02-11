@@ -10,7 +10,7 @@ export function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps) {
         { id: "consultation" as const, label: "내 상담 내역" },
         { id: "posts" as const, label: "내 게시글" },
         { id: "comments" as const, label: "내 댓글" },
-        { id: "likes" as const, label: "내 공감 목록" },
+        // { id: "likes" as const, label: "내 공감 목록" },
     ];
 
     return (

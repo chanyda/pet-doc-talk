@@ -58,6 +58,10 @@ export function Profile() {
                     </div>
                     <div className="flex items-center justify-center md:justify-start gap-6 mb-6">
                         <div className="flex gap-2 text-center">
+                            <div className="text-sm text-gray-600">상담</div>
+                            <div className="text-sm font-bold">{user.consultationCount}</div>
+                        </div>
+                        <div className="flex gap-2 text-center">
                             <div className="text-sm text-gray-600">게시글</div>
                             <div className="text-sm font-bold">{user.postCount}</div>
                         </div>

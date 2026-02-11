@@ -6,6 +6,7 @@ interface User {
     profileImageUrl: string | null;
     postCount: number;
     commentCount: number;
+    consultationCount: number;
 }
 
 type ProfileTab = "consultation" | "posts" | "comments" | "likes";
