@@ -21,6 +21,7 @@ describe("UsersController", () => {
         profileImageUrl: null,
         postCount: 10,
         commentCount: 35,
+        consultationCount: 10,
     };
 
     beforeEach(async () => {

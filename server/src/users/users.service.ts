@@ -93,6 +93,7 @@ export class UsersService {
             profileImageUrl: user.profileImageUrl,
             postCount: user._count.posts,
             commentCount: user._count.comments,
+            consultationCount: user._count.consultations,
         };
     }
 }

@@ -21,4 +21,7 @@ export class FindProfileResponseDto {
 
     @ApiProperty()
     commentCount: number;
+
+    @ApiProperty()
+    consultationCount: number;
 }
