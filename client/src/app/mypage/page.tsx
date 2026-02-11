@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { TopNavigation } from "@/components/layout/TopNavigation";
 import { MyComments } from "@/components/profile/MyComments";
-import { MyConsultationHistory } from "@/components/profile/MyConsultationHistory";
+import { MyConsultations } from "@/components/profile/MyConsultations";
 import { MyPosts } from "@/components/profile/MyPosts";
 import { Profile } from "@/components/profile/Profile";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
@@ -15,7 +15,7 @@ export default function ProfilePage() {
     const renderTabContent = () => {
         switch (activeTab) {
             case "consultation":
-                return <MyConsultationHistory />;
+                return <MyConsultations />;
             case "posts":
                 return <MyPosts />;
             case "comments":

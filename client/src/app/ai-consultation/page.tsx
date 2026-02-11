@@ -1,34 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Chat } from "@/components/ai-consultation/Chat";
 import { ConsultationList } from "@/components/ai-consultation/ConsultationList";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 
-type ViewType = "list" | "chat";
-
 export default function AIConsultationPage() {
-    const [view, setView] = useState<ViewType>("list");
-    const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const consultationIdFromUrl = searchParams.get("consultationId");
 
     const handleStartChat = (consultationId: number) => {
-        setSelectedConsultationId(consultationId);
-        setView("chat");
+        router.push(`/ai-consultation?consultationId=${consultationId}`);
     };
 
     const handleViewChat = (consultationId: number) => {
-        setSelectedConsultationId(consultationId);
-        setView("chat");
+        router.push(`/ai-consultation?consultationId=${consultationId}`);
     };
 
     const handleBackToList = () => {
-        setView("list");
-        setSelectedConsultationId(null);
+        router.push("/ai-consultation");
     };
 
-    if (view === "chat" && selectedConsultationId) {
-        return <Chat consultationId={selectedConsultationId} onBack={handleBackToList} />;
+    if (consultationIdFromUrl) {
+        const consultationId = parseInt(consultationIdFromUrl, 10);
+        if (!isNaN(consultationId)) {
+            return <Chat consultationId={consultationId} onBack={handleBackToList} />;
+        }
     }
 
     return (
