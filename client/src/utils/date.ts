@@ -33,3 +33,17 @@ export const formatLocalDateTime = (dateString: string): string => {
 
     return `${year}.${month}.${day} ${hours}:${minutes}`;
 };
+
+/**
+ * UTC 시간을 로컬 시간으로 변환하여 "HH:mm" 형식으로 반환
+ * @param dateString
+ * @returns
+ */
+export function formatTo24HourTime(dateString: string): string {
+    const date = new Date(dateString);
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${hours}:${minutes}`;
+}

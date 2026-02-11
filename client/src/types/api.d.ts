@@ -66,8 +66,16 @@ interface ConsultationListResponse {
     nextCursor: number | null;
 }
 
+interface MessageListResponse {
+    messages: Message[];
+    totalMessageCount: number;
+    nextCursor: number | null;
+}
 
 interface CreateConsultationBody {
     petId: number;
 }
 
+interface SendMessageBody {
+    content: string;
+}

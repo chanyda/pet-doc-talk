@@ -1,0 +1,46 @@
+/**
+ * AI 메시지의 content를 파싱하여 AIMessageContent로 반환
+ * - user 메시지는 null 반환
+ * - JSON 파싱 실패 시 null 반환 (welcome message 등 plain text)
+ * - AIMessageContent 구조가 아니면 null 반환
+ */
+export function parseAIMessageContent(message: Message): AIMessageContent | null {
+    if (message.role !== "assistant") {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(message.content);
+
+        // AIMessageContent 구조인지 확인한다.
+        if (
+            typeof parsed === "object" &&
+            parsed !== null &&
+            "answer" in parsed &&
+            "checkList" in parsed &&
+            typeof parsed.answer === "string" &&
+            Array.isArray(parsed.checkList)
+        ) {
+            return parsed as AIMessageContent;
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 메시지 표시용 텍스트 반환
+ * - user 메시지: content 그대로
+ * - AI 메시지 (JSON): answer 필드
+ * - AI 메시지 (plain text): content 그대로
+ */
+export function getMessageDisplayText(message: Message): string {
+    if (message.role === "user") {
+        return message.content;
+    }
+
+    const aiContent = parseAIMessageContent(message);
+    return aiContent ? aiContent.answer : message.content;
+}

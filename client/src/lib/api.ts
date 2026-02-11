@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, isAxio
 
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -194,3 +194,9 @@ export async function createConsultation(body: CreateConsultationBody): Promise<
     return apiClient.post<Consultation>("/consultations", body);
 }
 
+export async function getMessages(
+    consultationId: number,
+    params: PaginationQuery,
+): Promise<AxiosResponse<MessageListResponse>> {
+    return apiClient.get<MessageListResponse>(`/consultations/${consultationId}/messages`, { params });
+}
