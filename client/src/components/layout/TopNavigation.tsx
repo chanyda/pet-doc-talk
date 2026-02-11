@@ -30,7 +30,7 @@ export function TopNavigation() {
     const tabs: Tab[] = [
         { id: "home", label: "홈", href: "/" },
         { id: "community", label: "커뮤니티", href: "/community" },
-        { id: "ai", label: "AI 상담", href: "/ai" },
+        { id: "ai", label: "AI 상담", href: "/ai-consultation" },
     ];
 
     const handleLogout = async () => {
