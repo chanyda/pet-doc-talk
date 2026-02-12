@@ -5,7 +5,7 @@ import SendIcon from "public/icons/send-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
-import { API_BASE_URL, getMessages } from "@/lib/api";
+import { API_BASE_URL, getMessages, getMyPoints } from "@/lib/api";
 import { formatTo24HourTime } from "@/utils/date";
 import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
@@ -25,6 +25,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
     const [totalMessageCount, setTotalMessageCount] = useState<number>(0);
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
     const [checkListAnswers, setCheckListAnswers] = useState<Record<number, Record<number, string>>>({});
+    const [points, setPoints] = useState<number>(0);
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -69,14 +70,24 @@ export function Chat({ consultationId, onBack }: ChatProps) {
         isInitialLoadRef.current = true;
         shouldAutoScrollRef.current = false;
 
+        const fetchPoints = async () => {
+            try {
+                const response = await getMyPoints();
+                setPoints(response.data.amount);
+            } catch (error) {
+                console.error("Failed to fetch points:", error);
+            }
+        };
+
         fetchMessages();
+        fetchPoints();
 
         return () => {
             setMessages([]);
             setStreamingContent(null);
             setCheckListAnswers({});
         };
-    }, [consultationId]);
+    }, [consultationId, fetchMessages]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -175,6 +186,11 @@ export function Chat({ consultationId, onBack }: ChatProps) {
 
         if (!messageContent || isStreaming) return;
 
+        if (points <= 0) {
+            alert("포인트가 부족합니다.");
+            return;
+        }
+
         const userMessage: Message = {
             id: Date.now(), // 임시 ID
             consultationId,
@@ -245,6 +261,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                             } else if (event.type === "done") {
                                 setMessages((prev) => [...prev, event.message]);
                                 setStreamingContent(null);
+                                setPoints((prev) => Math.max(0, prev - 1));
 
                                 shouldAutoScrollRef.current = true;
                             } else if (event.type === "error") {
@@ -277,6 +294,10 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                 <div className="flex-1">
                     <h1 className="font-bold text-lg text-gray-900 flex items-center gap-2">AI 상담</h1>
                     <p className="text-sm text-gray-600">AI 수의사와 상담중</p>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-50 to-orange-50 rounded-full border border-pink-200">
+                    <span className="text-sm text-gray-600">포인트</span>
+                    <span className="text-lg font-bold text-pink-500">{points}</span>
                 </div>
             </div>
             <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
@@ -435,11 +456,11 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                     />
                     <button
                         onClick={() => handleSend()}
-                        disabled={!inputValue.trim() || isStreaming}
+                        disabled={!inputValue.trim() || isStreaming || points <= 0}
                         className="px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                         style={{
                             background:
-                                inputValue.trim() && !isStreaming
+                                inputValue.trim() && !isStreaming && points > 0
                                     ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
                                     : "#d1d5db",
                         }}>

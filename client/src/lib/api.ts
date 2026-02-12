@@ -200,3 +200,7 @@ export async function getMessages(
 ): Promise<AxiosResponse<MessageListResponse>> {
     return apiClient.get<MessageListResponse>(`/consultations/${consultationId}/messages`, { params });
 }
+
+export async function getMyPoints(): Promise<AxiosResponse<PointResponse>> {
+    return apiClient.get<PointResponse>("/points/me");
+}

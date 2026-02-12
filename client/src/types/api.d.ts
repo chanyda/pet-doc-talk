@@ -79,3 +79,7 @@ interface CreateConsultationBody {
 interface SendMessageBody {
     content: string;
 }
+
+interface PointResponse {
+    amount: number;
+}
