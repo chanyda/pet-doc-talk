@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PostForm } from "@/components/community/posts/PostForm";
 import { PostFormHeader } from "@/components/community/posts/PostFormHeader";
 import { PostErrorState } from "@/components/community/posts/state/PostErrorState";
@@ -49,22 +50,32 @@ export default function EditPostPage() {
     }, [postId, user, router]);
 
     if (isLoading) {
-        return <PostLoadingState />;
+        return (
+            <ProtectedRoute>
+                <PostLoadingState />
+            </ProtectedRoute>
+        );
     }
 
     if (error || !post) {
-        return <PostErrorState message={error || undefined} />;
+        return (
+            <ProtectedRoute>
+                <PostErrorState message={error || undefined} />
+            </ProtectedRoute>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <TopNavigation />
-            <main className="max-w-4xl mx-auto px-6 py-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                    <PostFormHeader mode="edit" />
-                    <PostForm mode="edit" initialData={post} />
-                </div>
-            </main>
-        </div>
+        <ProtectedRoute>
+            <div className="min-h-screen bg-gray-50">
+                <TopNavigation />
+                <main className="max-w-4xl mx-auto px-6 py-8">
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                        <PostFormHeader mode="edit" />
+                        <PostForm mode="edit" initialData={post} />
+                    </div>
+                </main>
+            </div>
+        </ProtectedRoute>
     );
 }
