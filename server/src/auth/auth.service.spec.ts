@@ -4,7 +4,9 @@ import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "./auth.service";
 import { BadRequestException, UnauthorizedException } from "@nestjs/common";
-import { LoginFrom } from "generated/prisma/enums";
+import { LoginFrom, PointSource } from "generated/prisma/enums";
+import { PointsService } from "src/points/points.service";
+import { POINT_POLICY } from "src/points/constants";
 
 // @Transactional() 데코레이터 모킹 (원래 함수를 그대로 반환하도록 함)
 jest.mock("@nestjs-cls/transactional", () => ({
@@ -26,12 +28,15 @@ describe("AuthService", () => {
 
     let jwtService: JwtService;
 
+    let pointsService: PointsService;
+
     let userFindByEmailSpy: jest.SpyInstance;
     let userExistsByNicknameSpy: jest.SpyInstance;
     let userCreateSpy: jest.SpyInstance;
     let userUpdateByIdSpy: jest.SpyInstance;
     let userUpdateRefreshTokenSpy: jest.SpyInstance;
     let jwtVerifySpy: jest.SpyInstance;
+    let pointApplyPointSpy: jest.SpyInstance;
 
     beforeEach(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -69,6 +74,12 @@ describe("AuthService", () => {
                         }),
                     },
                 },
+                {
+                    provide: PointsService,
+                    useValue: {
+                        applyPoint: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
@@ -77,6 +88,7 @@ describe("AuthService", () => {
         authService = moduleRef.get(AuthService);
         userService = moduleRef.get(UsersService);
         jwtService = moduleRef.get(JwtService);
+        pointsService = moduleRef.get(PointsService);
 
         userFindByEmailSpy = jest.spyOn(userService, "findByEmail");
         userExistsByNicknameSpy = jest.spyOn(userService, "existsByNickname");
@@ -84,6 +96,7 @@ describe("AuthService", () => {
         userUpdateByIdSpy = jest.spyOn(userService, "updateById");
         userUpdateRefreshTokenSpy = jest.spyOn(userService, "updateRefreshToken");
         jwtVerifySpy = jest.spyOn(jwtService, "verify");
+        pointApplyPointSpy = jest.spyOn(pointsService, "applyPoint");
     });
 
     afterEach(() => {
@@ -152,6 +165,7 @@ describe("AuthService", () => {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 });
+                pointApplyPointSpy.mockResolvedValue(POINT_POLICY.SIGN_UP.amount);
                 userUpdateByIdSpy.mockResolvedValue({
                     id: 1,
                     email: loginDto.email,
@@ -173,6 +187,8 @@ describe("AuthService", () => {
                     refreshToken: "",
                     nickname: "user_exampleNickname",
                 });
+                expect(pointApplyPointSpy).toHaveBeenCalledWith(TEST_USER_ID, PointSource.SIGN_UP);
+                expect(pointApplyPointSpy).toHaveBeenCalledTimes(1);
                 expect(userUpdateByIdSpy).toHaveBeenCalledWith(1, { refreshToken });
             });
         });

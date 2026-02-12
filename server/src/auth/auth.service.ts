@@ -3,16 +3,19 @@ import { LoginDto } from "./dtos/requests/login.dto";
 import { UsersService } from "src/users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
+import { PointsService } from "src/points/points.service";
 import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/login-response.dto";
 import { ConfigType } from "src/types/config.type";
 import { nanoid } from "nanoid";
 import { Transactional } from "@nestjs-cls/transactional";
 import { JwtPayload } from "src/types/auth.type";
+import { PointSource } from "generated/prisma/enums";
 
 @Injectable()
 export class AuthService {
     constructor(
         private usersService: UsersService,
+        private pointsService: PointsService,
         private jwtService: JwtService,
         private configService: ConfigService<ConfigType, true>,
     ) {}
@@ -28,6 +31,8 @@ export class AuthService {
 
             user = await this.usersService.create({ ...loginDto, refreshToken: "", nickname: temporaryNickname });
             isNewUser = true;
+
+            await this.pointsService.applyPoint(user.id, PointSource.SIGN_UP);
         } else {
             // 기존 회원인 경우, 현재 로그인하려는 provider와 기존에 로그인한 provider가 동일한지 체크한다.
             if (loginDto.loginFrom.toString() !== user.loginFrom) {
