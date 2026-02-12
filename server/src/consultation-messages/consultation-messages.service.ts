@@ -16,7 +16,8 @@ import { ConsultationConversationsService } from "src/consultation-conversations
 import { IConsultationConversation } from "src/consultation-conversations/interfaces/consultation-conversations.interface";
 import { OpenAIService } from "src/openai/openai.service";
 import { PetsService } from "src/pets/pets.service";
-import { MessageRole } from "generated/prisma/enums";
+import { PointsService } from "src/points/points.service";
+import { MessageRole, PointSource } from "generated/prisma/enums";
 import {
     CONSULTATION_JSON_SCHEMA,
     getConsultationPrompt,
@@ -34,6 +35,7 @@ export class ConsultationMessagesService {
         private readonly conversationsService: ConsultationConversationsService,
         private readonly openaiService: OpenAIService,
         private readonly petsService: PetsService,
+        private readonly pointsService: PointsService,
     ) {}
 
     async findMany(userId: number, consultationId: number, query: PaginationQueryDto): Promise<MessageListResponseDto> {
@@ -69,12 +71,13 @@ export class ConsultationMessagesService {
         return this.consultationMessagesRepository.create(consultationId, data);
     }
 
+    @Transactional()
     async sendMessageStream(
         userId: number,
         consultationId: number,
         sendMessageDto: SendMessageDto,
     ): Promise<Observable<MessageEvent>> {
-        // consultation 조회 및 권환을 확인한다.
+        // consultation 조회 및 권한을 확인한다.
         const consultation = await this.consultationsService.findById(consultationId);
         if (!consultation) {
             throw new NotFoundException("Consultation not exists.");
@@ -82,6 +85,13 @@ export class ConsultationMessagesService {
         if (consultation.userId !== userId) {
             throw new ForbiddenException("Access denied to this consultation.");
         }
+
+        const point = await this.pointsService.findMyPoints(userId);
+        if (point.amount < 1) {
+            throw new ForbiddenException("You do not have enough consultation points.");
+        }
+
+        await this.pointsService.applyPoint(userId, PointSource.CONSULTATION);
 
         // 상담하려는 반려동물의 정보를 AI 수의사에게 넘겨줘야하기 때문에 Pet을 조회한다.
         const pet = await this.petsService.findById(consultation.petId, userId);
@@ -103,7 +113,16 @@ export class ConsultationMessagesService {
                 subscriber,
             )
                 .then(() => subscriber.complete())
-                .catch((error) => subscriber.error(error));
+                .catch(async (error) => {
+                    try {
+                        // OpenAI 스트리밍 실패 시 포인트 환불
+                        await this.pointsService.refundPoint(userId);
+                        console.log("Refund point.");
+                        subscriber.error(error);
+                    } catch (err) {
+                        console.error("Failed to refund point.", err);
+                    }
+                });
         });
     }
 
@@ -198,7 +217,7 @@ export class ConsultationMessagesService {
             outputToken: 0,
         });
 
-        // AI 답변을 저장한다.
+        // AI 답변 저장
         const answerMessage = await this.create(consultationId, {
             role: MessageRole.assistant,
             content: aiMessage,
