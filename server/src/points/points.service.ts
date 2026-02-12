@@ -3,7 +3,7 @@ import { Transactional } from "@nestjs-cls/transactional";
 
 import { PointAction, PointSource } from "generated/prisma/enums";
 import { PointsRepository } from "./points.repository";
-import { POINT_POLICY } from "./constants";
+import { FixedPointSource, POINT_POLICY } from "./constants";
 import { MyPointItemDto } from "./dtos/responses/my-point-item.dto";
 
 @Injectable()
@@ -21,10 +21,10 @@ export class PointsService {
     }
 
     @Transactional()
-    async applyPoint(userId: number, source: PointSource): Promise<number> {
+    async applyPoint(userId: number, source: FixedPointSource): Promise<number> {
         const point = await this.findMyPoints(userId);
 
-        const amount = POINT_POLICY[source];
+        const { amount, action } = POINT_POLICY[source];
         const newAmount = point.amount + amount;
 
         if (newAmount < 0) {
@@ -32,17 +32,18 @@ export class PointsService {
         }
 
         await this.pointsRepository.updateAmount(userId, newAmount);
-        await this.pointsRepository.createHistory(userId, PointAction.EARN, source, amount, newAmount);
+        await this.pointsRepository.createHistory(userId, action, source, amount, newAmount);
 
         return newAmount;
     }
 
     @Transactional()
-    async refundPoint(userId: number, originalSource: PointSource): Promise<number> {
+    async refundPoint(userId: number): Promise<number> {
         const point = await this.findMyPoints(userId);
 
         // 차감했던 금액의 절댓값을 다시 더해줌 (CONSULTATION: -1 → 환불: +1)
-        const refundAmount = Math.abs(POINT_POLICY[originalSource]);
+        // NOTE: 우선은 환불은 상담 메세지에 대해서만 진행해줌. 추후 또 필요한 상황이 있다면 변경
+        const refundAmount = Math.abs(POINT_POLICY.CONSULTATION.amount);
         const newAmount = point.amount + refundAmount;
 
         await this.pointsRepository.updateAmount(userId, newAmount);
