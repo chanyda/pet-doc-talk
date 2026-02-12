@@ -23,6 +23,7 @@ import { OpenAIModule } from "./openai/openai.module";
 import { ConsultationConversationsModule } from "./consultation-conversations/consultation-conversations.module";
 import { ConsultationMessagesModule } from "./consultation-messages/consultation-messages.module";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { PointsModule } from "./points/points.module";
 
 @Module({
     imports: [
@@ -61,6 +62,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
         OpenAIModule,
         ConsultationConversationsModule,
         ConsultationMessagesModule,
+        PointsModule,
     ],
     providers: [AuthService],
 })
