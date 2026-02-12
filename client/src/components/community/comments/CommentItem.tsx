@@ -1,13 +1,16 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { COMMENT_CONTENT_LIMIT, COMMENT_REPLY_PAGE_LIMIT } from "@/constants/post";
 import { useCommentAction } from "@/contexts/CommentActionContext";
 import { useOutsideClick } from "@/hooks/useClickOutside";
+import { useConfirm } from "@/hooks/useConfirm";
 import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { formatLocalDateTime } from "@/utils/date";
@@ -26,6 +29,7 @@ interface CommentProps {
 export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount }: CommentProps) {
     const { activeAction, setActiveAction, cancelAction } = useCommentAction();
     const { user: currentUser } = useAuthStore();
+    const { confirmState, confirm } = useConfirm();
 
     const [isActionMenuOpen, setIsActionMenuOpen] = useState<boolean>(false);
     const [editContent, setEditContent] = useState<string>(comment.content);
@@ -106,9 +110,10 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
             cancelAction();
             setShowReplies(true);
             onAddReplyCount(comment.id);
+            toast.success("답글이 등록되었습니다.");
         } catch (error) {
             console.error("Failed to create reply:", error);
-            alert("답글 작성에 실패했습니다. 다시 시도해주세요.");
+            toast.error("답글 작성에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -144,9 +149,10 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
             const { data } = await api.updateComment(comment.id, { content: editContent });
             onEdit(data);
             cancelAction();
+            toast.success("댓글이 수정되었습니다.");
         } catch (error) {
             console.error("Failed to update comment:", error);
-            alert("댓글 수정에 실패했습니다. 다시 시도해주세요.");
+            toast.error("댓글 수정에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -156,14 +162,21 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
     };
 
     const handleDelete = async () => {
-        if (!confirm("댓글을 삭제하시겠습니까?")) return;
+        const confirmed = await confirm({
+            title: "댓글 삭제",
+            message: "댓글을 삭제하시겠습니까?",
+            variant: "danger",
+        });
+
+        if (!confirmed) return;
 
         try {
             await api.deleteComment(comment.id);
             onDelete(comment.id);
+            toast.success("댓글이 삭제되었습니다.");
         } catch (error) {
             console.error("Failed to delete comment:", error);
-            alert("댓글 삭제에 실패했습니다. 다시 시도해주세요.");
+            toast.error("댓글 삭제에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -326,6 +339,18 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                     )}
                 </div>
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </div>
     );
 }

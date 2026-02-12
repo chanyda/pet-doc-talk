@@ -6,6 +6,7 @@ import CatFaceIcon from "public/icons/cat-face-icon.svg";
 import DogFaceIcon from "public/icons/dog-face-icon.svg";
 import PlusIcon from "public/icons/plus-icon.svg";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { HasMoreButton } from "@/components/ui/HasMoreButton";
 import { useConsultationList } from "@/hooks/useConsultationList";
@@ -35,7 +36,7 @@ export function ConsultationList({ onStartChat, onViewChat }: ConsultationListPa
             onStartChat(response.data.id);
         } catch (error) {
             console.error("Failed to create consultation:", error);
-            alert("상담 생성에 실패했습니다.");
+            toast.error("상담 생성에 실패했습니다.");
         }
     };
 

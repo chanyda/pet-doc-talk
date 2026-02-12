@@ -2,9 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Tiptap } from "@/components/editor/Tiptap";
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { POST_CONTENT_LIMIT, POST_TITLE_LIMIT } from "@/constants/post";
+import { useConfirm } from "@/hooks/useConfirm";
 import * as api from "@/lib/api";
 
 import { CategorySelect } from "./CategorySelect";
@@ -16,6 +19,7 @@ interface PostFormProps {
 
 export function PostForm({ mode, initialData }: PostFormProps) {
     const router = useRouter();
+    const { confirmState, confirm } = useConfirm();
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialData?.category.id ?? null);
     const [title, setTitle] = useState<string>(initialData?.title ?? "");
     const [content, setContent] = useState<string>(initialData?.content ?? "");
@@ -28,23 +32,23 @@ export function PostForm({ mode, initialData }: PostFormProps) {
 
     const handleSubmit = async () => {
         if (!selectedCategoryId) {
-            alert("카테고리를 선택해 주세요.");
+            toast.error("카테고리를 선택해 주세요.");
             return;
         }
         if (!title.trim()) {
-            alert("제목을 입력해 주세요.");
+            toast.error("제목을 입력해 주세요.");
             return;
         }
         if (isTitleOver) {
-            alert(`제목은 최대 ${POST_TITLE_LIMIT}자까지 입력 가능합니다.`);
+            toast.error(`제목은 최대 ${POST_TITLE_LIMIT}자까지 입력 가능합니다.`);
             return;
         }
         if (!content.trim()) {
-            alert("본문을 입력해 주세요.");
+            toast.error("본문을 입력해 주세요.");
             return;
         }
         if (isContentOver) {
-            alert(`본문은 최대 ${POST_CONTENT_LIMIT}자까지 입력 가능합니다.`);
+            toast.error(`본문은 최대 ${POST_CONTENT_LIMIT}자까지 입력 가능합니다.`);
             return;
         }
 
@@ -72,22 +76,33 @@ export function PostForm({ mode, initialData }: PostFormProps) {
                     break;
             }
 
+            toast.success(`게시글이 ${isEdit ? "수정" : "등록"}되었습니다.`);
             router.push(`/community/${postId}`);
         } catch (error) {
             console.error(`Failed to ${mode} post:`, error);
-            alert(`게시글 ${isEdit ? "수정" : "등록"}에 실패했습니다. 다시 시도해주세요.`);
+            toast.error(`게시글 ${isEdit ? "수정" : "등록"}에 실패했습니다. 다시 시도해주세요.`);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleCancel = () => {
+    const handleCancel = async () => {
         const hasUnsavedChanges = Boolean(title || content);
         const exitPath = isEdit && initialData ? `/community/${initialData.id}` : "/community";
 
-        if (!hasUnsavedChanges || window.confirm("작성 중인 내용이 있습니다. 정말 나가시겠습니까?")) {
+        if (!hasUnsavedChanges) {
             router.push(exitPath);
             return;
+        }
+
+        const confirmed = await confirm({
+            title: "작성 취소",
+            message: "작성 중인 내용이 있습니다. 정말 나가시겠습니까?",
+            variant: "warning",
+        });
+
+        if (confirmed) {
+            router.push(exitPath);
         }
     };
 
@@ -137,6 +152,18 @@ export function PostForm({ mode, initialData }: PostFormProps) {
                     {isEdit ? "게시글 수정" : "게시글 등록"}
                 </button>
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </div>
     );
 }

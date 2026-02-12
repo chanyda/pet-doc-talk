@@ -2,6 +2,7 @@
 
 import CancelIcon from "public/icons/cancel-icon.svg";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { MyPets } from "../profile/MyPets";
 
@@ -22,7 +23,7 @@ export function PetSelectionModal({ isOpen, onClose, onSelectPet }: PetSelection
         if (selectedPetId) {
             onSelectPet(selectedPetId);
         } else {
-            alert("상담할 반려동물을 선택해주세요.");
+            toast.warning("상담할 반려동물을 선택해주세요.");
         }
     };
 

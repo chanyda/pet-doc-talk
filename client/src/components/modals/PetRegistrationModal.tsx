@@ -9,9 +9,13 @@ import CatFaceIcon from "public/icons/cat-face-icon.svg";
 import DogFaceIcon from "public/icons/dog-face-icon.svg";
 import UploadIcon from "public/icons/upload-icon.svg";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { catBreeds, dogBreeds } from "@/constants/pet";
 import { useOutsideClick } from "@/hooks/useClickOutside";
+import { useConfirm } from "@/hooks/useConfirm";
+
+import ConfirmModal from "./ConfirmModal";
 
 interface PetRegistrationModalProps {
     isOpen: boolean;
@@ -40,6 +44,7 @@ export function PetRegistrationModal({
     const [isBreedSelectOpen, setIsBreedSelectOpen] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const breedDropdownRef = useOutsideClick(() => setIsBreedSelectOpen(false));
+    const { confirmState, confirm } = useConfirm();
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         // TODO: 사진 처리하는 거 추가하기
@@ -57,7 +62,7 @@ export function PetRegistrationModal({
 
     const handleNext = () => {
         if (!formData.name || !formData.type || !formData.gender) {
-            alert("필수 항목을 모두 입력해 주세요.");
+            toast.warning("필수 항목을 모두 입력해 주세요.");
             return;
         }
         setStep(2);
@@ -65,11 +70,24 @@ export function PetRegistrationModal({
 
     const handleSubmit = () => {
         if (!formData.breed) {
-            alert("품종을 입력해 주세요.");
+            toast.warning("품종을 입력해 주세요.");
             return;
         }
         onSubmit(formData as PetRegistrationFormData);
         handleClose();
+    };
+
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: "반려동물 삭제",
+            message: "정말 삭제하시겠습니까?",
+            variant: "danger",
+        });
+
+        if (confirmed) {
+            onDelete();
+            handleClose();
+        }
     };
 
     const handleClose = () => {
@@ -369,12 +387,7 @@ export function PetRegistrationModal({
                     {isEditMode && (
                         <div className="mt-6 text-center">
                             <button
-                                onClick={() => {
-                                    if (window.confirm("정말 삭제하시겠습니까?")) {
-                                        onDelete();
-                                        handleClose();
-                                    }
-                                }}
+                                onClick={handleDelete}
                                 className="text-sm text-gray-400 hover:text-red-500 underline transition-colors">
                                 이 아이 삭제하기
                             </button>
@@ -382,6 +395,18 @@ export function PetRegistrationModal({
                     )}
                 </div>
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </div>
     );
 }

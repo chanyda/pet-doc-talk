@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { CommunityEmptyState } from "@/components/ui/CommunityEmptyState";
 import { HasMoreButton } from "@/components/ui/HasMoreButton";
@@ -164,9 +165,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
             setNewCommentId(newComment.id);
 
             handleNewCommentEffect();
+            toast.success("댓글이 등록되었습니다.");
         } catch (error) {
             console.error("Failed to create comment:", error);
-            alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
+            toast.error("댓글 작성에 실패했습니다. 다시 시도해주세요.");
         }
     };
 

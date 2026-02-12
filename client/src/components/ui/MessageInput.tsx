@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 interface MessageInputProps {
     value: string;
@@ -58,7 +59,7 @@ export function MessageInput({
         e.preventDefault();
 
         if (isOverLimit) {
-            alert(`최대 ${maxLength}자까지 작성할 수 있어요.`);
+            toast.warning(`최대 ${maxLength}자까지 작성할 수 있어요.`);
             return;
         }
 

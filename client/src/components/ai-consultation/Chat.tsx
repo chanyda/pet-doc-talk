@@ -3,6 +3,7 @@
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
 import { API_BASE_URL, getMessages, getMyPoints } from "@/lib/api";
@@ -151,7 +152,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
         const answers = checkListAnswers[messageId];
 
         if (!answers || Object.keys(answers).length === 0) {
-            alert("최소 1개 이상의 질문에 답변해주세요.");
+            toast.warning("최소 1개 이상의 질문에 답변해주세요.");
             return;
         }
 
@@ -167,7 +168,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
             .join("\n");
 
         if (!formattedAnswers) {
-            alert("최소 1개 이상의 질문에 답변해주세요.");
+            toast.warning("최소 1개 이상의 질문에 답변해주세요.");
             return;
         }
 
@@ -187,7 +188,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
         if (!messageContent || isStreaming) return;
 
         if (points <= 0) {
-            alert("포인트가 부족합니다.");
+            toast.error("포인트가 부족합니다.");
             return;
         }
 
@@ -266,7 +267,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                                 shouldAutoScrollRef.current = true;
                             } else if (event.type === "error") {
                                 console.error("❌ SSE error:", event.message);
-                                alert("메시지 전송 중 오류가 발생했습니다.");
+                                toast.error("메시지 전송 중 오류가 발생했습니다.");
                             }
                         } catch (parseError) {
                             console.error("❌ Failed to parse SSE data:", data, parseError);
@@ -276,7 +277,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
             }
         } catch (error) {
             console.error("Message send error:", error);
-            alert("메시지 전송에 실패했습니다.");
+            toast.error("메시지 전송에 실패했습니다. 다시 시도해주세요.");
         } finally {
             setIsStreaming(false);
             setStreamingContent(null);

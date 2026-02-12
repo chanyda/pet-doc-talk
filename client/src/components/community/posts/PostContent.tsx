@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import DeleteIcon from "public/icons/delete-icon.svg";
 import EditIcon from "public/icons/edit-icon.svg";
+import { toast } from "sonner";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
+import { useConfirm } from "@/hooks/useConfirm";
 import * as api from "@/lib/api";
 import { formatLocalDateTime } from "@/utils/date";
 
@@ -20,6 +23,7 @@ interface PostContentProps {
 
 export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
     const router = useRouter();
+    const { confirmState, confirm } = useConfirm();
     const isAuthor = currentUserId && post.user.id === currentUserId;
 
     const handleEdit = () => {
@@ -27,14 +31,21 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+        const confirmed = await confirm({
+            title: "게시글 삭제",
+            message: "정말 삭제하시겠습니까?",
+            variant: "danger",
+        });
+
+        if (!confirmed) return;
 
         try {
             await api.deletePost(post.id);
+            toast.success("게시글이 삭제되었습니다.");
             router.push("/community");
         } catch (error) {
             console.error("Failed to delete post:", error);
-            alert("게시글 삭제에 실패했습니다.");
+            toast.error("게시글 삭제에 실패했습니다.");
         }
     };
 
@@ -126,6 +137,18 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                     </button>
                 </div> */}
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </article>
     );
 }

@@ -1,6 +1,8 @@
 "use client";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
+import { useConfirm } from "@/hooks/useConfirm";
 import { formatLocalDateTime } from "@/utils/date";
 
 interface ReplyProps {
@@ -11,6 +13,7 @@ interface ReplyProps {
 }
 
 export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
+    const { confirmState, confirm } = useConfirm();
     const isAuthor = reply.user.id === currentUserId;
     const isDeleted = !!reply.deletedAt;
 
@@ -23,8 +26,16 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
         }
     };
 
-    const handleDelete = () => {
-        if (onDelete && window.confirm("답글을 삭제하시겠습니까?")) {
+    const handleDelete = async () => {
+        if (!onDelete) return;
+
+        const confirmed = await confirm({
+            title: "답글 삭제",
+            message: "답글을 삭제하시겠습니까?",
+            variant: "danger",
+        });
+
+        if (confirmed) {
             onDelete(reply.id);
         }
     };
@@ -83,6 +94,18 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
                     </div>
                 )}
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </div>
     );
 }

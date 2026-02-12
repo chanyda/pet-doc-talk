@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { MessageInput } from "@/components/ui/MessageInput";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { COMMENT_CONTENT_LIMIT } from "@/constants/post";
 import { useCommentAction } from "@/contexts/CommentActionContext";
 import { useOutsideClick } from "@/hooks/useClickOutside";
+import { useConfirm } from "@/hooks/useConfirm";
 import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { formatLocalDateTime } from "@/utils/date";
@@ -23,6 +26,7 @@ interface ReplyItemProps {
 export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItemProps) {
     const { activeAction, setActiveAction, cancelAction } = useCommentAction();
     const { user: currentUser } = useAuthStore();
+    const { confirmState, confirm } = useConfirm();
 
     const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
     const [editContent, setEditContent] = useState(reply.content);
@@ -49,9 +53,10 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
                 updatedAt: data.updatedAt,
             });
             cancelAction();
+            toast.success("답글이 수정되었습니다.");
         } catch (error) {
             console.error("Failed to update reply:", error);
-            alert("답글 수정에 실패했습니다. 다시 시도해주세요.");
+            toast.error("답글 수정에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -61,14 +66,21 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
     };
 
     const handleDelete = async () => {
-        if (!confirm("답글을 삭제하시겠습니까?")) return;
+        const confirmed = await confirm({
+            title: "답글 삭제",
+            message: "답글을 삭제하시겠습니까?",
+            variant: "danger",
+        });
+
+        if (!confirmed) return;
 
         try {
             await api.deleteComment(reply.id);
             onDelete(reply.id);
+            toast.success("답글이 삭제되었습니다.");
         } catch (error) {
             console.error("Failed to delete reply:", error);
-            alert("답글 삭제에 실패했습니다. 다시 시도해주세요.");
+            toast.error("답글 삭제에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -151,6 +163,18 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
                 </div>
                 {renderContent()}
             </div>
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
         </div>
     );
 }
