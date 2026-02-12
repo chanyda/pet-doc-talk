@@ -1,11 +1,11 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { CommentSection } from "@/components/community/comments/CommentSection";
 import { PostContent } from "@/components/community/posts/PostContent";
-import { PostErrorState } from "@/components/community/posts/state/PostErrorState";
 import { PostLoadingState } from "@/components/community/posts/state/PostLoadingState";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 import * as api from "@/lib/api";
@@ -17,20 +17,18 @@ export default function PostDetailPage() {
     const postId = Number(params.id);
     const [post, setPost] = useState<PostDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const { user } = useAuthStore();
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 setIsLoading(true);
-                setError(null);
 
                 const response = await api.getPost(postId);
                 setPost(response.data);
             } catch (error) {
                 console.error("Failed to fetch post:", error);
-                setError("게시글을 불러오는데 실패했습니다.");
+                toast.error("게시글을 불러오는데 실패했습니다.");
             } finally {
                 setIsLoading(false);
             }
@@ -47,8 +45,8 @@ export default function PostDetailPage() {
         return <PostLoadingState />;
     }
 
-    if (error || !post) {
-        return <PostErrorState message={error || undefined} />;
+    if (isNaN(postId) || !post) {
+        return notFound();
     }
 
     return (

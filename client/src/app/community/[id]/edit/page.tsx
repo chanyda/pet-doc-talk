@@ -1,12 +1,12 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { PostForm } from "@/components/community/posts/PostForm";
 import { PostFormHeader } from "@/components/community/posts/PostFormHeader";
-import { PostErrorState } from "@/components/community/posts/state/PostErrorState";
 import { PostLoadingState } from "@/components/community/posts/state/PostLoadingState";
 import { TopNavigation } from "@/components/layout/TopNavigation";
 import * as api from "@/lib/api";
@@ -20,7 +20,6 @@ export default function EditPostPage() {
 
     const [post, setPost] = useState<PostDetail | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -32,7 +31,7 @@ export default function EditPostPage() {
                 const { data } = await api.getPost(postId);
 
                 if (data.user.id !== user.id) {
-                    alert("수정 권한이 없습니다.");
+                    toast.error("수정 권한이 없습니다.");
                     router.push(`/community/${postId}`);
                     return;
                 }
@@ -40,7 +39,7 @@ export default function EditPostPage() {
                 setPost(data);
             } catch (error) {
                 console.error("Failed to fetch post:", error);
-                setError("게시글을 불러오는데 실패했습니다.");
+                toast.error("게시글을 불러오는데 실패했습니다.");
             } finally {
                 setIsLoading(false);
             }
@@ -57,12 +56,8 @@ export default function EditPostPage() {
         );
     }
 
-    if (error || !post) {
-        return (
-            <ProtectedRoute>
-                <PostErrorState message={error || undefined} />
-            </ProtectedRoute>
-        );
+    if (!post || isNaN(postId)) {
+        return notFound();
     }
 
     return (
