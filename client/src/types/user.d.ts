@@ -7,6 +7,7 @@ interface User {
     postCount: number;
     commentCount: number;
     consultationCount: number;
+    points: number;
 }
 
 type ProfileTab = "consultation" | "posts" | "comments" | "likes";
