@@ -14,20 +14,22 @@ datasource db {
 }
 
 model User {
-  id                Int       @id @default(autoincrement()) @db.Integer
-  email             String    @unique @db.VarChar(255)
-  name              String    @db.VarChar(100)
-  nickname          String    @unique @db.VarChar(20)
+  id                Int            @id @default(autoincrement()) @db.Integer
+  email             String         @unique @db.VarChar(255)
+  name              String         @db.VarChar(100)
+  nickname          String         @unique @db.VarChar(20)
   loginFrom         LoginFrom
-  profileImageUrl   String?   @db.VarChar(500)
-  refreshToken      String    @db.VarChar(500)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  profileImageUrl   String?        @db.VarChar(500)
+  refreshToken      String         @db.VarChar(500)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   pets              Pet[]
   posts             Post[]
-  comments          Comment[] @relation("CommentAuthor")
-  mentionedComments Comment[] @relation("CommentMention")
+  comments          Comment[]      @relation("CommentAuthor")
+  mentionedComments Comment[]      @relation("CommentMention")
   consultations     Consultation[]
+  point             Point?
+  pointHistories    PointHistory[]
 }
 
 model Pet {
@@ -164,4 +166,41 @@ model ConsultationMessage {
 
   @@index([consultationId])
   @@index([createdAt])
+}
+
+model Point {
+  id        Int      @id @default(autoincrement()) @db.Integer
+  userId    Int      @unique @db.Integer
+  amount    Int      @default(0) @db.Integer
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PointHistory {
+  id              Int         @id @default(autoincrement()) @db.Integer
+  userId          Int         @db.Integer
+  action          PointAction
+  source          PointSource
+  value           Int         @db.Integer
+  remainingPoints Int         @db.Integer
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+enum PointAction {
+  USE
+  EARN
+}
+
+enum PointSource {
+  SIGN_UP
+  AD_WATCH
+  CONSULTATION
+  REFUND
 }
