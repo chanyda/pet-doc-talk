@@ -4,6 +4,11 @@ export const USER_PROFILE_SELECT = {
     name: true,
     nickname: true,
     profileImageUrl: true,
+    point: {
+        select: {
+            amount: true,
+        },
+    },
     _count: {
         select: {
             posts: true,

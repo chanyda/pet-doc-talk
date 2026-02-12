@@ -94,6 +94,7 @@ export class UsersService {
             postCount: user._count.posts,
             commentCount: user._count.comments,
             consultationCount: user._count.consultations,
+            points: user.point?.amount ?? 0,
         };
     }
 }

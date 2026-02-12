@@ -24,4 +24,7 @@ export class FindProfileResponseDto {
 
     @ApiProperty()
     consultationCount: number;
+
+    @ApiProperty({ description: "The points of user.", example: 3 })
+    points: number;
 }

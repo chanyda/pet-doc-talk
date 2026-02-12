@@ -155,6 +155,7 @@ describe("UsersService", () => {
                     comments: 30,
                     consultations: 10,
                 },
+                point: { amount: 3 },
             };
             const profileResponse = toProfileResponse(mockUserProfile);
 
@@ -193,6 +194,7 @@ describe("UsersService", () => {
                         comments: 30,
                         consultations: 10,
                     },
+                    point: { amount: 3 },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
 
@@ -226,6 +228,7 @@ describe("UsersService", () => {
                         comments: 30,
                         consultations: 10,
                     },
+                    point: { amount: 3 },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
 
@@ -255,6 +258,7 @@ describe("UsersService", () => {
                         comments: 30,
                         consultations: 10,
                     },
+                    point: { amount: 3 },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
 
@@ -288,6 +292,7 @@ describe("UsersService", () => {
                         comments: 30,
                         consultations: 10,
                     },
+                    point: { amount: 3 },
                 };
                 const profileResponse = toProfileResponse(updateMockUserProfile);
 
@@ -393,5 +398,6 @@ function toProfileResponse(user: UserGetPayload<{ select: UserProfileSelect }>):
         postCount: user._count.posts,
         commentCount: user._count.comments,
         consultationCount: user._count.consultations,
+        points: user.point?.amount ?? 0,
     };
 }
