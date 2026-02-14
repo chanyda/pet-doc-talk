@@ -18,7 +18,7 @@ interface Props {
 export default function PostDetailPage({ postId }: Props) {
     const router = useRouter();
     const [post, setPost] = useState<PostDetail | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const { user } = useAuthStore();
 
     useEffect(() => {

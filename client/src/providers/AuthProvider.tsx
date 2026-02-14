@@ -7,7 +7,7 @@ import { getUser } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const { setUser, setIsLoading } = useAuthStore();
+    const { setUser } = useAuthStore();
 
     useEffect(() => {
         async function initAuth() {
@@ -24,13 +24,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (error) {
                 console.error("Failed to fetch user info:", error);
                 setUser(null);
-            } finally {
-                setIsLoading(false);
             }
         }
 
         initAuth();
-    }, [setUser, setIsLoading]);
+    }, [setUser]);
 
     return <>{children}</>;
 }

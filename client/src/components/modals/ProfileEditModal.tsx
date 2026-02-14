@@ -19,7 +19,7 @@ export function ProfileEditModal({
     currentNickname,
     currentImage = null,
 }: ProfileEditModalProps) {
-    const [nickname, setNickname] = useState(currentNickname);
+    const [nickname, setNickname] = useState<string>(currentNickname);
     // TODO: 이미지 업로드 처리
     const [imagePreview, setImagePreview] = useState<string | null>(currentImage);
     const [imageFile, setImageFile] = useState<File | null>(null);

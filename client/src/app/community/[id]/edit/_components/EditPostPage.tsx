@@ -20,7 +20,7 @@ export default function EditPostPage({ postId }: Props) {
     const { user } = useAuthStore();
 
     const [post, setPost] = useState<PostDetail | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchPost = async () => {

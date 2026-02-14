@@ -10,7 +10,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ value, onChange }: SearchBarProps) {
-    const [inputValue, setInputValue] = useState(value);
+    const [inputValue, setInputValue] = useState<string>(value);
 
     const handleSearch = () => {
         onChange(inputValue);

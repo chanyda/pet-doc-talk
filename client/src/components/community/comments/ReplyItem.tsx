@@ -28,8 +28,8 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
     const { user: currentUser } = useAuthStore();
     const { confirmState, confirm } = useConfirm();
 
-    const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-    const [editContent, setEditContent] = useState(reply.content);
+    const [isActionMenuOpen, setIsActionMenuOpen] = useState<boolean>(false);
+    const [editContent, setEditContent] = useState<string>(reply.content);
 
     const actionMenuRef = useOutsideClick(() => setIsActionMenuOpen(false));
 

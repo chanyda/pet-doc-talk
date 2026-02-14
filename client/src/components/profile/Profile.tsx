@@ -13,7 +13,7 @@ import { MyPets } from "./MyPets";
 export function Profile() {
     const { setUser: setAuthUser } = useAuthStore();
     const [user, setUser] = useState<User | null>(null);
-    const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+    const [isProfileEditOpen, setIsProfileEditOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUser = async () => {

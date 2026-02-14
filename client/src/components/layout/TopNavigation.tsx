@@ -24,7 +24,7 @@ export function TopNavigation() {
     const pathname = usePathname();
     const router = useRouter();
     const { user, isAuthenticated } = useAuthStore();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const menuRef = useOutsideClick(() => setIsMenuOpen(false));
 
     const tabs: Tab[] = [
