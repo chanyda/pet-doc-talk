@@ -18,10 +18,9 @@ import { ConsultationEmptyState } from "../ui/ConsultationEmptyState";
 
 interface ConsultationListPageProps {
     onStartChat: (consultationId: number) => void;
-    onViewChat: (consultationId: number) => void;
 }
 
-export function ConsultationList({ onStartChat, onViewChat }: ConsultationListPageProps) {
+export function ConsultationList({ onStartChat }: ConsultationListPageProps) {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { consultations, nextCursor, isLoading, totalConsultationCount, handleLoadMore } = useConsultationList();
 
@@ -101,7 +100,7 @@ export function ConsultationList({ onStartChat, onViewChat }: ConsultationListPa
                         {consultations.map((consultation) => (
                             <div
                                 key={consultation.id}
-                                onClick={() => onViewChat(consultation.id)}
+                                onClick={() => onStartChat(consultation.id)}
                                 className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-pink-300 hover:shadow-md transition-all cursor-pointer group">
                                 <div className="flex items-start gap-4">
                                     <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-pink-100 to-orange-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">

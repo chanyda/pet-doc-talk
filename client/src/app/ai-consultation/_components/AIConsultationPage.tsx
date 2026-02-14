@@ -12,15 +12,11 @@ export default function AIConsultationPage() {
         router.push(`/ai-consultation/${consultationId}`);
     };
 
-    const handleViewChat = (consultationId: number) => {
-        router.push(`/ai-consultation/${consultationId}`);
-    };
-
     return (
         <div className="min-h-screen bg-gray-50">
             <TopNavigation />
             <main className="max-w-6xl mx-auto px-6 py-8">
-                <ConsultationList onStartChat={handleStartChat} onViewChat={handleViewChat} />
+                <ConsultationList onStartChat={handleStartChat} />
             </main>
         </div>
     );
