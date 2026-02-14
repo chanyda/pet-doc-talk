@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { TopNavigation } from "@/components/layout/TopNavigation";
 import { MyComments } from "@/components/profile/MyComments";
@@ -10,7 +10,10 @@ import { Profile } from "@/components/profile/Profile";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 
 export default function MypagePage() {
-    const [activeTab, setActiveTab] = useState<ProfileTab>("consultation");
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    const activeTab = (searchParams.get("tab") as ProfileTab) ?? "consultation";
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -28,7 +31,7 @@ export default function MypagePage() {
             <TopNavigation />
             <main className="max-w-6xl mx-auto px-6 py-8 space-y-6">
                 <Profile />
-                <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ProfileTabs activeTab={activeTab} onTabChange={(tab) => router.replace(`?tab=${tab}`)} />
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">{renderTabContent()}</div>
             </main>
         </div>
