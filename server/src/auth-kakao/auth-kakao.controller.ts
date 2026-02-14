@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Query, Res } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpException, HttpStatus, Query, Res } from "@nestjs/common";
 import {
     ApiBadRequestResponse,
     ApiInternalServerErrorResponse,
@@ -39,12 +39,23 @@ export class AuthKakaoController {
         description: "Failed to authenticate with Kakao OAuth service or retrieve user information from Kakao.",
     })
     async kakaoLogin(@Query() query: KakaoLoginQueryDto, @Res() res: Response): Promise<void> {
-        const { email, name } = await this.authKakaoService.authenticate(query.code);
-        const { accessToken, refreshToken } = await this.authService.login({ email, name, loginFrom: LoginFrom.KAKAO });
+        try {
+            const { email, name } = await this.authKakaoService.authenticate(query.code);
+            const { accessToken, refreshToken } = await this.authService.login({
+                email,
+                name,
+                loginFrom: LoginFrom.KAKAO,
+            });
 
-        res.cookie("accessToken", accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
-        res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+            res.cookie("accessToken", accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+            res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        return res.redirect(`${this.origin}`);
+            return res.redirect(`${this.origin}`);
+        } catch (err: unknown) {
+            console.error(err);
+
+            const errorMessage = err instanceof HttpException ? err.message : "An error occurred during login.";
+            return res.redirect(`${this.origin}/auth/error?message=${encodeURIComponent(errorMessage)}`);
+        }
     }
 }
