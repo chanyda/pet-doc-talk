@@ -1,12 +1,13 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
-import { API_BASE_URL, getMessages, getMyPoints } from "@/lib/api";
+import * as api from "@/lib/api";
 import { formatTo24HourTime } from "@/utils/date";
 import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
@@ -27,6 +28,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
     const [checkListAnswers, setCheckListAnswers] = useState<Record<number, Record<number, string>>>({});
     const [points, setPoints] = useState<number>(0);
+    const [isNotFoundError, setNotFoundError] = useState<boolean>(false);
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +47,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                     query.cursor = cursor;
                 }
 
-                const { data } = await getMessages(consultationId, query);
+                const { data } = await api.getMessages(consultationId, query);
 
                 setMessages((prev) => {
                     const newMessages = [...data.messages].reverse();
@@ -58,8 +60,13 @@ export function Chat({ consultationId, onBack }: ChatProps) {
                 if (cursor === undefined && data.messages.length > 0) {
                     shouldAutoScrollRef.current = true;
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error("Failed to load more messages:", error);
+                toast.error("메시지를 불러오는데 실패했습니다.");
+
+                if (typeof error === "object" && error && "status" in error && error.status === 404) {
+                    setNotFoundError(true);
+                }
             } finally {
                 setIsLoadingMessages(false);
             }
@@ -73,7 +80,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
 
         const fetchPoints = async () => {
             try {
-                const response = await getMyPoints();
+                const response = await api.getMyPoints();
                 setPoints(response.data.amount);
             } catch (error) {
                 console.error("Failed to fetch points:", error);
@@ -208,7 +215,7 @@ export function Chat({ consultationId, onBack }: ChatProps) {
         shouldAutoScrollRef.current = true;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/consultations/${consultationId}/messages`, {
+            const response = await fetch(`${api.API_BASE_URL}/consultations/${consultationId}/messages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -283,6 +290,10 @@ export function Chat({ consultationId, onBack }: ChatProps) {
             setStreamingContent(null);
         }
     };
+
+    if (isNotFoundError) {
+        return notFound();
+    }
 
     return (
         <div className="flex flex-col h-screen bg-gray-50">
