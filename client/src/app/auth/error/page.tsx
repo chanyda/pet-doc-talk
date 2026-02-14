@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function AuthErrorPage() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const errorMessage = searchParams.get("message") || "로그인 중 오류가 발생했습니다.";
 
@@ -32,11 +31,11 @@ export default function AuthErrorPage() {
                         className="block w-full bg-pink-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-pink-600 transition-colors">
                         다시 로그인하기
                     </Link>
-                    <button
-                        onClick={() => router.push("/")}
+                    <Link
+                        href="/"
                         className="block w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
                         메인으로 돌아가기
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
