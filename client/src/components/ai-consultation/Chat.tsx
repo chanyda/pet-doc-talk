@@ -1,6 +1,6 @@
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,10 +15,11 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 interface ChatProps {
     consultationId: number;
-    onBack: () => void;
 }
 
-export function Chat({ consultationId, onBack }: ChatProps) {
+export function Chat({ consultationId }: ChatProps) {
+    const router = useRouter();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
     const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -292,14 +293,14 @@ export function Chat({ consultationId, onBack }: ChatProps) {
     };
 
     if (isNotFoundError) {
-        return notFound();
+        notFound();
     }
 
     return (
         <div className="flex flex-col h-screen bg-gray-50">
             <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center gap-3">
                 <button
-                    onClick={onBack}
+                    onClick={() => router.push("/ai-consultation")}
                     className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
                     <ArrowLeftIcon width="30px" height="30px" />
                 </button>
