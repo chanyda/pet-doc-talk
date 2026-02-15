@@ -3,7 +3,6 @@
 import { notFound, useRouter } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
-import SparklesIcon from "public/icons/sparkles-icon.svg";
 import StopIcon from "public/icons/stop-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ import { usePointStore } from "@/store/pointStore";
 import { formatTo24HourTime } from "@/utils/date";
 import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
+import { AIAvatar } from "../ui/AIAvatar";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { StyledButton } from "../ui/StyledButton";
 
@@ -359,14 +359,7 @@ export function Chat({ consultationId }: ChatProps) {
                             key={message.id}
                             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                             <div className={`max-w-[80%]`}>
-                                {message.role === "assistant" && (
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-orange-400">
-                                            <SparklesIcon stroke="#ffffff" />
-                                        </div>
-                                        <span className="text-sm font-medium">AI 수의사</span>
-                                    </div>
-                                )}
+                                {message.role === "assistant" && <AIAvatar />}
                                 <div
                                     className={`rounded-2xl px-4 py-3 ${
                                         message.role === "user"
@@ -444,10 +437,7 @@ export function Chat({ consultationId }: ChatProps) {
                 {isStreaming && streamingContent && (
                     <div className="flex justify-start">
                         <div className="max-w-[80%]">
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-orange-400"></div>
-                                <span className="text-sm font-medium">AI 수의사</span>
-                            </div>
+                            <AIAvatar />
                             <div className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3">
                                 <p className="whitespace-pre-wrap">{streamingContent.answer}</p>
                             </div>
@@ -457,10 +447,7 @@ export function Chat({ consultationId }: ChatProps) {
                 {isStreaming && !streamingContent && (
                     <div className="flex justify-start">
                         <div className="max-w-[80%]">
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-orange-400"></div>
-                                <span className="text-sm font-medium">AI 수의사</span>
-                            </div>
+                            <AIAvatar />
                             <div className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3">
                                 <div className="flex gap-1">
                                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
