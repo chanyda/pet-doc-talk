@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { CommunityHeader } from "@/components/community/comments/CommunityHeader";
 import { CommunityFilter } from "@/components/community/filters/CommunityFilter";
@@ -9,9 +9,24 @@ import { TopNavigation } from "@/components/layout/TopNavigation";
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
 
 export default function CommunityPage() {
-    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-    const [orderBy, setOrderBy] = useState<OrderByType>("createdAt");
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const selectedCategoryId = searchParams.get("categoryId") ? Number(searchParams.get("categoryId")) : null;
+    const orderBy = (searchParams.get("orderBy") as OrderByType) ?? "createdAt";
+    const searchQuery = searchParams.get("search") ?? "";
+
+    const setParam = (key: string, value: string | null) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (value) {
+            params.set(key, value);
+        } else {
+            params.delete(key);
+        }
+
+        router.replace(`/community?${params.toString()}`);
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -20,11 +35,11 @@ export default function CommunityPage() {
                 <CommunityHeader />
                 <CommunityFilter
                     selectedCategoryId={selectedCategoryId}
-                    onCategoryChange={setSelectedCategoryId}
+                    onCategoryChange={(id) => setParam("categoryId", id ? String(id) : null)}
                     orderBy={orderBy}
-                    onOrderByChange={setOrderBy}
+                    onOrderByChange={(order) => setParam("orderBy", order === "createdAt" ? null : order)}
                     searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
+                    onSearchChange={(query) => setParam("search", query)}
                 />
                 <PostList
                     categoryId={selectedCategoryId}
