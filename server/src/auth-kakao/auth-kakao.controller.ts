@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpException, HttpStatus, Query, Res } from "@nestjs/common";
+import { Controller, Get, HttpCode, HttpException, HttpStatus, Logger, Query, Res } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
     ApiBadRequestResponse,
@@ -22,6 +22,7 @@ import { KakaoLoginQueryDto } from "./dtos/requests/kakao-login-query.dto";
 @ApiTags("auth/kakao")
 @Controller("auth/kakao")
 export class AuthKakaoController {
+    private readonly logger = new Logger(AuthKakaoController.name);
     private readonly origin: string;
 
     constructor(
@@ -55,7 +56,7 @@ export class AuthKakaoController {
 
             return res.redirect(`${this.origin}`);
         } catch (err: unknown) {
-            console.error(err);
+            this.logger.error("Kakao login failed.", err);
 
             const errorMessage = err instanceof HttpException ? err.message : "An error occurred during login.";
             return res.redirect(`${this.origin}/auth/error?message=${encodeURIComponent(errorMessage)}`);

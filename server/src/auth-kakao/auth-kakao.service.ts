@@ -3,6 +3,7 @@ import {
     BadRequestException,
     Injectable,
     InternalServerErrorException,
+    Logger,
     NotFoundException,
     UnauthorizedException,
 } from "@nestjs/common";
@@ -18,6 +19,7 @@ import { AuthenticateResponseDto } from "./dtos/responses/authenticate-response.
 
 @Injectable()
 export class AuthKakaoService {
+    private readonly logger = new Logger(AuthKakaoService.name);
     private readonly kakaoClientId: string;
     private readonly kakaoRedirectUri: string;
     private readonly kakaoClientSecret: string;
@@ -103,7 +105,7 @@ export class AuthKakaoService {
     }
 
     private handleError(err: unknown): never {
-        console.error(err);
+        this.logger.error("Kakao API error.", err);
 
         if (isAxiosError(err)) {
             const status = err.response?.status;

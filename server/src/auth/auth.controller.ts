@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Controller, HttpCode, HttpStatus, Logger, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { Response } from "express";
 
@@ -12,6 +12,8 @@ import { LogoutGuard } from "./guards/logout.guard";
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
+    private readonly logger = new Logger(AuthController.name);
+
     constructor(private readonly authService: AuthService) {}
 
     @Post("refresh")
@@ -43,7 +45,7 @@ export class AuthController {
                 await this.authService.clearRefreshToken(req.user.userId);
             }
         } catch (err) {
-            console.error(err);
+            this.logger.error("Failed to clear refresh token during logout.", err);
         } finally {
             // 무조건 cookie는 삭제해준다.
             res.clearCookie("accessToken", ACCESS_TOKEN_COOKIE_OPTIONS);

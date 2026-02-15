@@ -1,4 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { MessageEvent } from "@nestjs/common";
 import { Transactional } from "@nestjs-cls/transactional";
 import { Response } from "express";
@@ -33,6 +33,8 @@ import { ICreateMessageData, IMessageContext } from "./interfaces/consultation-m
 
 @Injectable()
 export class ConsultationMessagesService {
+    private readonly logger = new Logger(ConsultationMessagesService.name);
+
     constructor(
         private readonly consultationMessagesRepository: ConsultationMessagesRepository,
         @Inject(forwardRef(() => ConsultationsService))
@@ -112,7 +114,7 @@ export class ConsultationMessagesService {
 
         const onClose = () => abortController.abort();
         res.on("close", () => {
-            console.log("Client Abort.");
+            this.logger.log("Client aborted the SSE connection.");
             onClose();
         });
 
@@ -128,16 +130,16 @@ export class ConsultationMessagesService {
             )
                 .then(() => subscriber.complete())
                 .catch(async (error) => {
-                    console.error(error);
+                    this.logger.error("Streaming message processing failed.", error);
 
                     if (error instanceof OpenAIError) {
                         try {
                             // OpenAI 스트리밍 실패 시 포인트 환불
                             await this.pointsService.refundPoint(userId);
-                            console.log("Refund point.");
+                            this.logger.log(`Point refunded for userId=${userId} due to OpenAI error.`);
                             subscriber.error(error);
                         } catch (err) {
-                            console.error("Failed to refund point.", err);
+                            this.logger.error("Failed to refund point.", err);
                         }
                     }
                 });
@@ -192,19 +194,19 @@ export class ConsultationMessagesService {
                     }
                 } catch (err) {
                     if (err instanceof JSONRepairError) {
-                        console.error(err);
+                        this.logger.warn("JSON repair failed for AI response chunk.", err);
                     }
                 }
             }
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            this.logger.error("OpenAI stream error.", err);
             subscriber.next({
                 data: {
                     type: "error",
                     message: "AI 서비스에 일시적인 문제가 발생했습니다.",
                 },
             });
-            throw error;
+            throw err;
         }
 
         const { answerMessage } = await this.saveMessagesWithTokens(
@@ -340,7 +342,7 @@ export class ConsultationMessagesService {
                     JSON.stringify(CONSULTATION_JSON_SCHEMA),
                 );
             } catch (err) {
-                console.error(err);
+                this.logger.error("Failed to count tokens during conversation rotation.", err);
             }
         }
 

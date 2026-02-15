@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Transactional } from "@nestjs-cls/transactional";
@@ -16,6 +16,8 @@ import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/log
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private usersService: UsersService,
         private pointsService: PointsService,
@@ -68,7 +70,7 @@ export class AuthService {
                 secret: secretKey,
             });
         } catch (err) {
-            console.error(err);
+            this.logger.error("Token verification failed.", err);
             throw new UnauthorizedException("Invalid token.");
         }
 
@@ -77,12 +79,12 @@ export class AuthService {
         const user = await this.usersService.findByEmail(refreshTokenPayload.email);
 
         if (!user) {
-            console.error("User not exists.");
+            this.logger.error("User not exists.");
             throw new UnauthorizedException("Invalid token.");
         }
 
         if (user.refreshToken !== refreshToken) {
-            console.error("Refresh token mismatch.");
+            this.logger.error("Refresh token mismatch.");
             throw new UnauthorizedException("Invalid token.");
         }
 
@@ -127,7 +129,7 @@ export class AuthService {
                 const nicknameExists = await this.usersService.existsByNickname(temporaryNickname);
                 exists = nicknameExists;
             } catch (err) {
-                console.error(err);
+                this.logger.error("Failed to generate temporary nickname.", err);
             }
         } while (exists);
 
@@ -155,7 +157,7 @@ export class AuthService {
                 throw new Error("Token payload mismatch.");
             }
         } catch (err) {
-            console.error(err);
+            this.logger.error("Token payload verification failed.", err);
             throw new UnauthorizedException("Invalid token.");
         }
     }

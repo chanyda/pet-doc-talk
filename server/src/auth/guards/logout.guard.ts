@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
@@ -9,6 +9,7 @@ import { AuthRequest } from "@/types/request.type";
 
 @Injectable()
 export class LogoutGuard implements CanActivate {
+    private readonly logger = new Logger(LogoutGuard.name);
     private readonly secretKey: string;
 
     constructor(
@@ -35,7 +36,7 @@ export class LogoutGuard implements CanActivate {
 
             request.user = jwtPayload;
         } catch (err) {
-            console.error(err);
+            this.logger.error("JWT verification failed during logout. Proceeding without user context.", err);
         }
 
         return true;
