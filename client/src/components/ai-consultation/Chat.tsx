@@ -3,6 +3,7 @@
 import { notFound, useRouter } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
+import StopIcon from "public/icons/stop-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -36,6 +37,7 @@ export function Chat({ consultationId }: ChatProps) {
     const observerTarget = useRef<HTMLDivElement | null>(null);
     const isInitialLoadRef = useRef<boolean>(true);
     const shouldAutoScrollRef = useRef<boolean>(false);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchMessages = useCallback(
         async (cursor?: number) => {
@@ -215,12 +217,16 @@ export function Chat({ consultationId }: ChatProps) {
 
         shouldAutoScrollRef.current = true;
 
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
+
         try {
             const response = await fetch(`${api.API_BASE_URL}/consultations/${consultationId}/messages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({ content: messageContent }),
+                signal: abortController.signal,
             });
 
             if (!response.ok) {
@@ -284,11 +290,35 @@ export function Chat({ consultationId }: ChatProps) {
                 }
             }
         } catch (error) {
+            if (error instanceof DOMException && error.name === "AbortError") {
+                // 사용자가 직접 중단 — 에러 처리 불필요
+                return;
+            }
             console.error("Message send error:", error);
             toast.error("메시지 전송에 실패했습니다. 다시 시도해주세요.");
         } finally {
+            abortControllerRef.current = null;
             setIsStreaming(false);
             setStreamingContent(null);
+        }
+    };
+
+    const handleAbort = () => {
+        if (!abortControllerRef.current) return;
+        abortControllerRef.current.abort();
+
+        // done 이벤트는 도달하지 않으므로 현재 streamingContent를 직접 메시지로 표시
+        if (streamingContent) {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now(),
+                    consultationId,
+                    role: "assistant",
+                    content: JSON.stringify(streamingContent),
+                    createdAt: new Date().toISOString(),
+                },
+            ]);
         }
     };
 
@@ -318,6 +348,11 @@ export function Chat({ consultationId }: ChatProps) {
                 {isLoadingMessages && <LoadingSpinner />}
                 {messages.map((message, index) => {
                     const aiContent = parseAIMessageContent(message);
+
+                    // assistant 메시지인데 표시할 내용이 없으면 렌더링하지 않음
+                    if (message.role === "assistant" && !aiContent) {
+                        return null;
+                    }
 
                     // 다음 메시지가 있는지 확인 (체크리스트 표시 및 interactive 여부 판단)
                     const nextMessage = messages[index + 1];
@@ -467,18 +502,27 @@ export function Chat({ consultationId }: ChatProps) {
                         className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-300 resize-none disabled:bg-gray-100"
                         style={{ minHeight: "48px", maxHeight: "120px" }}
                     />
-                    <button
-                        onClick={() => handleSend()}
-                        disabled={!inputValue.trim() || isStreaming || points <= 0}
-                        className="px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-                        style={{
-                            background:
-                                inputValue.trim() && !isStreaming && points > 0
-                                    ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
-                                    : "#d1d5db",
-                        }}>
-                        <SendIcon />
-                    </button>
+                    {isStreaming ? (
+                        <button
+                            onClick={handleAbort}
+                            className="px-6 py-3 text-white rounded-xl transition-all hover:scale-105"
+                            style={{ background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)" }}>
+                            <StopIcon />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => handleSend()}
+                            disabled={!inputValue.trim() || points <= 0}
+                            className="px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                            style={{
+                                background:
+                                    inputValue.trim() && points > 0
+                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                        : "#d1d5db",
+                            }}>
+                            <SendIcon />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

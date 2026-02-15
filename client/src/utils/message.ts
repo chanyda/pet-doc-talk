@@ -12,19 +12,19 @@ export function parseAIMessageContent(message: Message): AIMessageContent | null
     try {
         const parsed = JSON.parse(message.content);
 
-        // AIMessageContent 구조인지 확인한다.
-        if (
-            typeof parsed === "object" &&
-            parsed !== null &&
-            "answer" in parsed &&
-            "checkList" in parsed &&
-            typeof parsed.answer === "string" &&
-            Array.isArray(parsed.checkList)
-        ) {
-            return parsed as AIMessageContent;
+        if (typeof parsed !== "object" || parsed === null) {
+            return null;
         }
 
-        return null;
+        const answer = typeof parsed.answer === "string" ? parsed.answer : "";
+        const checkList = Array.isArray(parsed.checkList) ? parsed.checkList : [];
+
+        // answer도 checkList도 없으면 AI 메시지 형식이 아닌 것으로 간주
+        if (!answer && checkList.length === 0) {
+            return null;
+        }
+
+        return { answer, checkList };
     } catch {
         return null;
     }
@@ -36,11 +36,11 @@ export function parseAIMessageContent(message: Message): AIMessageContent | null
  * - AI 메시지 (JSON): answer 필드
  * - AI 메시지 (plain text): content 그대로
  */
-export function getMessageDisplayText(message: Message): string {
+export function getMessageDisplayText(message: Message): string | null {
     if (message.role === "user") {
         return message.content;
     }
 
     const aiContent = parseAIMessageContent(message);
-    return aiContent ? aiContent.answer : message.content;
+    return aiContent ? aiContent.answer : null;
 }
