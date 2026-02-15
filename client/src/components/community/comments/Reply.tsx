@@ -60,7 +60,7 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
                         {reply.mentionUser && (
                             <span className="text-sm text-pink-600 mr-1">@{reply.mentionUser.nickname}</span>
                         )}
-                        <p className="text-sm text-gray-800 mb-2 leading-relaxed inline">{reply.content}</p>
+                        <p className="text-sm text-gray-800 mb-2 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
                     </>
                 )}
 

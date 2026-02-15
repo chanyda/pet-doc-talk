@@ -123,7 +123,7 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
 
         return (
             <>
-                <p className="text-gray-800 mb-3 leading-relaxed break-words">
+                <p className="text-gray-800 mb-3 leading-relaxed break-words whitespace-pre-wrap">
                     {reply.mentionUser && reply.mentionUser.id !== 0 && (
                         <span className="text-pink-600 font-medium">@{reply.mentionUser.nickname} </span>
                     )}

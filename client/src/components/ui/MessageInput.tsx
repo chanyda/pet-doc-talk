@@ -49,23 +49,6 @@ export function MessageInput({
         onChange(e.target.value);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // 한글의 경우 keydown 이벤트가 두번씩 실행되는 오류가 있어서 해당 분기문이 필수로 필요
-        if (e.nativeEvent.isComposing) return;
-
-        const isSubmitKey = e.key === "Enter" && !e.shiftKey;
-        if (!isSubmitKey) return;
-
-        e.preventDefault();
-
-        if (isOverLimit) {
-            toast.warning(`최대 ${maxLength}자까지 작성할 수 있어요.`);
-            return;
-        }
-
-        onSubmit();
-    };
-
     return (
         <div
             className={`flex-1 border rounded-lg  transition-all overflow-hidden ${
@@ -82,7 +65,6 @@ export function MessageInput({
                 className="w-full resize-none focus:outline-none overflow-hidden px-4 pt-3 pb-1 text-sm leading-relaxed bg-transparent"
                 rows={3}
                 style={{ minHeight: "60px", maxHeight: "200px" }}
-                onKeyDown={handleKeyDown}
             />
             <div className="flex items-end justify-end px-3 py-2 gap-1">
                 {onCancel && (
@@ -94,7 +76,8 @@ export function MessageInput({
                 )}
                 <div className="flex flex-col items-end gap-1.5">
                     {maxLength !== undefined && (
-                        <span className={`text-xs ${value.length > 0 ? "" : "invisible"} ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
+                        <span
+                            className={`text-xs ${value.length > 0 ? "" : "invisible"} ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
                             {value.length}/{maxLength}
                         </span>
                     )}

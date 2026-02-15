@@ -224,7 +224,7 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
 
         return (
             <>
-                <p className="text-gray-800 mb-3 leading-relaxed break-words">{comment.content}</p>
+                <p className="text-gray-800 mb-3 leading-relaxed break-words whitespace-pre-wrap">{comment.content}</p>
                 <button
                     onClick={() => {
                         setReplyTarget(null);
