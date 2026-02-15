@@ -15,6 +15,7 @@ import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
 import { AIAvatar } from "../ui/AIAvatar";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { StreamingMessage } from "./StreamingMessage";
 import { StyledButton } from "../ui/StyledButton";
 
 interface ChatProps {
@@ -434,36 +435,7 @@ export function Chat({ consultationId }: ChatProps) {
                         </div>
                     );
                 })}
-                {isStreaming && streamingContent && (
-                    <div className="flex justify-start">
-                        <div className="max-w-[80%]">
-                            <AIAvatar />
-                            <div className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3">
-                                <p className="whitespace-pre-wrap">{streamingContent.answer}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {isStreaming && !streamingContent && (
-                    <div className="flex justify-start">
-                        <div className="max-w-[80%]">
-                            <AIAvatar />
-                            <div className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3">
-                                <div className="flex gap-1">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                    <div
-                                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                        style={{ animationDelay: "0.1s" }}
-                                    />
-                                    <div
-                                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                                        style={{ animationDelay: "0.2s" }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {isStreaming && <StreamingMessage content={streamingContent} />}
 
                 <div ref={messagesEndRef} />
             </div>
