@@ -69,7 +69,7 @@ export function MyComments() {
     return (
         <div>
             <div className="mb-6">
-                <h3 className="text-xl mb-1">내 댓글</h3>
+                <h3 className="text-xl font-semibold mb-1">내 댓글</h3>
             </div>
             {renderMyCommentList()}
             {nextCursor && comments.length < totalCommentCount && (

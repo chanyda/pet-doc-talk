@@ -38,7 +38,7 @@ export function MyConsultations() {
     return (
         <div>
             <div className="mb-6">
-                <h3 className="text-xl mb-1">내 상담 내역</h3>
+                <h3 className="text-xl font-semibold mb-1">내 상담 내역</h3>
             </div>
             {renderConsultationList()}
             {nextCursor && consultations.length < totalConsultationCount && (

@@ -38,7 +38,7 @@ export function MyPosts() {
     return (
         <div>
             <div className="mb-6">
-                <h3 className="text-xl mb-1">내 게시글</h3>
+                <h3 className="text-xl font-semibold mb-1">내 게시글</h3>
             </div>
             {renderMyPostList()}
             {nextCursor && posts.length < totalPostCount && (
