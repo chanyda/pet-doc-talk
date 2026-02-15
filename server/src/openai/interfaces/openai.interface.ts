@@ -17,4 +17,5 @@ export interface IStreamResponseParams {
     conversationId: string;
     input: string | Array<IMessageContext>;
     instruction: string;
+    signal: AbortSignal;
 }

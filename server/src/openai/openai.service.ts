@@ -49,21 +49,24 @@ export class OpenAIService {
      * @yields Stream chunks with content and usage information
      */
     async *streamResponse(params: IStreamResponseParams): AsyncGenerator<IStreamChunk> {
-        const stream = await this.openai.responses.create({
-            model: this.model,
-            conversation: params.conversationId,
-            input: params.input,
-            instructions: params.instruction,
-            text: {
-                format: {
-                    name: CONSULTATION_JSON_SCHEMA.name,
-                    type: "json_schema",
-                    schema: CONSULTATION_JSON_SCHEMA.schema,
+        const stream = await this.openai.responses.create(
+            {
+                model: this.model,
+                conversation: params.conversationId,
+                input: params.input,
+                instructions: params.instruction,
+                text: {
+                    format: {
+                        name: CONSULTATION_JSON_SCHEMA.name,
+                        type: "json_schema",
+                        schema: CONSULTATION_JSON_SCHEMA.schema,
+                    },
                 },
+                stream: true,
+                reasoning: { effort: "low" },
             },
-            stream: true,
-            reasoning: { effort: "low" },
-        });
+            { signal: params.signal },
+        );
 
         let fullContent = "";
         let usage: ResponseUsage | null = null;

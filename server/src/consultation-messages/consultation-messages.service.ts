@@ -2,6 +2,8 @@ import { Injectable, ForbiddenException, NotFoundException, forwardRef, Inject }
 import { Transactional } from "@nestjs-cls/transactional";
 import { Observable, Subscriber } from "rxjs";
 import { MessageEvent } from "@nestjs/common";
+import { Response } from "express";
+import { OpenAIError } from "openai";
 import { ConsultationMessagesRepository } from "./consultation-messages.repository";
 import { IConsultationMessage } from "./interfaces/consultation-messages.interface";
 import { ICreateMessageData, IMessageContext } from "./interfaces/consultation-messages.repository.interface";
@@ -76,6 +78,7 @@ export class ConsultationMessagesService {
         userId: number,
         consultationId: number,
         sendMessageDto: SendMessageDto,
+        res: Response,
     ): Promise<Observable<MessageEvent>> {
         // consultation 조회 및 권한을 확인한다.
         const consultation = await this.consultationsService.findById(consultationId);
@@ -103,6 +106,13 @@ export class ConsultationMessagesService {
             instruction,
         );
 
+        const abortController = new AbortController();
+
+        res.on("close", () => {
+            console.log("Client Abort.");
+            abortController.abort();
+        });
+
         return new Observable((subscriber: Subscriber<MessageEvent>) => {
             this.processStreamingMessage(
                 consultationId,
@@ -111,18 +121,25 @@ export class ConsultationMessagesService {
                 input,
                 instruction,
                 subscriber,
+                abortController.signal,
             )
                 .then(() => subscriber.complete())
                 .catch(async (error) => {
-                    try {
-                        // OpenAI 스트리밍 실패 시 포인트 환불
-                        await this.pointsService.refundPoint(userId);
-                        console.log("Refund point.");
-                        subscriber.error(error);
-                    } catch (err) {
-                        console.error("Failed to refund point.", err);
+                    console.error(error);
+
+                    if (error instanceof OpenAIError) {
+                        try {
+                            // OpenAI 스트리밍 실패 시 포인트 환불
+                            await this.pointsService.refundPoint(userId);
+                            console.log("Refund point.");
+                            subscriber.error(error);
+                        } catch (err) {
+                            console.error("Failed to refund point.", err);
+                        }
                     }
                 });
+
+            return () => abortController.abort();
         });
     }
 
@@ -133,8 +150,10 @@ export class ConsultationMessagesService {
         input: string | Array<IMessageContext>,
         instruction: string,
         subscriber: Subscriber<MessageEvent>,
+        signal: AbortSignal,
     ): Promise<void> {
-        let aiAnswer = "";
+        let aiAnswerRaw = "";
+        let aiAnswerRepair = "";
         let inputToken = 0;
         let outputToken = 0;
 
@@ -143,21 +162,25 @@ export class ConsultationMessagesService {
                 conversationId: conversation.conversationId,
                 input,
                 instruction,
+                signal,
             });
 
             for await (const chunk of stream) {
                 try {
                     if (chunk.type === "delta") {
-                        aiAnswer += chunk.content;
+                        aiAnswerRaw += chunk.content;
+                        aiAnswerRepair = jsonrepair(aiAnswerRaw);
 
                         subscriber.next({
                             data: {
                                 type: "delta",
-                                message: { role: MessageRole.assistant, content: jsonrepair(aiAnswer) },
+                                message: { role: MessageRole.assistant, content: aiAnswerRepair },
                             },
                         });
                     } else if (chunk.type === "completed") {
-                        aiAnswer = chunk.content;
+                        // completed인 경우, 완전한 json형태이기 때문에 별도의 jsonrepair처리는 하지 않음
+                        aiAnswerRepair = chunk.content;
+
                         inputToken = chunk.usage?.inputToken || 0;
                         outputToken = chunk.usage?.outputToken || 0;
                     }
@@ -182,7 +205,7 @@ export class ConsultationMessagesService {
             consultationId,
             conversation.id,
             userMessage,
-            aiAnswer,
+            aiAnswerRepair,
             inputToken,
             outputToken,
         );
