@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import CommentIcon from "public/icons/comment-icon.svg";
-import { useEffect, useState } from "react";
 
 import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
+import { useCursorPagination } from "@/hooks/useCursorPagination";
 import * as api from "@/lib/api";
 import { formatLocalDateTime } from "@/utils/date";
 
@@ -14,47 +14,19 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 export function MyComments() {
     const router = useRouter();
-    const [comments, setComments] = useState<MyComment[]>([]);
-    const [nextCursor, setNextCursor] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [totalCommentCount, setTotalCommentCount] = useState<number>(0);
-
-    const fetchMyComments = async (cursor?: number) => {
-        try {
-            setIsLoading(true);
-
-            const params: PaginationQuery = {
-                limit: DEFAULT_PAGE_LIMIT,
-            };
-
-            if (cursor !== undefined) {
-                params.cursor = cursor;
-            }
-
-            const response = await api.getMyComments(params);
-            const { comments: newComments, nextCursor: newNextCursor, totalCommentCount } = response.data;
-
-            setComments((prev) => (cursor !== undefined ? [...prev, ...newComments] : newComments));
-            setNextCursor(newNextCursor);
-            setTotalCommentCount(totalCommentCount);
-        } catch (error) {
-            setComments([]);
-            setNextCursor(null);
-            console.error("Failed to fetch comments:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchMyComments();
-    }, []);
-
-    const handleLoadMore = async () => {
-        if (!nextCursor || isLoading) return;
-
-        await fetchMyComments(nextCursor);
-    };
+    const {
+        items: comments,
+        nextCursor,
+        isLoading,
+        totalCount: totalCommentCount,
+        handleLoadMore,
+    } = useCursorPagination<MyComment, MyCommentListResponse>({
+        fetchFn: api.getMyComments,
+        extractItems: (res) => res.comments,
+        extractNextCursor: (res) => res.nextCursor,
+        extractTotalCount: (res) => res.totalCommentCount,
+        queryParams: { limit: DEFAULT_PAGE_LIMIT },
+    });
 
     const handleCommentClick = (postId: number, commentId: number) => {
         router.push(`/community/${postId}#comment-${commentId}`);
@@ -76,7 +48,7 @@ export function MyComments() {
                     <div
                         key={comment.id}
                         onClick={() => handleCommentClick(comment.post.id, comment.id)}
-                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 hover:border-pink-200 p-5">
+                        className="bg-white rounded-2xl p-5 border-2 border-gray-100 hover:border-pink-300 hover:shadow-md transition-all cursor-pointer">
                         <div className="flex flex-col flex-1 gap-2">
                             <p className="line-clamp-2">{comment.content}</p>
                             <div className="text-xs text-gray-500">{formatLocalDateTime(comment.createdAt)}</div>
