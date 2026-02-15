@@ -42,5 +42,5 @@ export function getMessageDisplayText(message: Message): string | null {
     }
 
     const aiContent = parseAIMessageContent(message);
-    return aiContent ? aiContent.answer : null;
+    return aiContent ? aiContent.answer : message.content;
 }

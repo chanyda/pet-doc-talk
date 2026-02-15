@@ -10,13 +10,11 @@ import { toast } from "sonner";
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
 import * as api from "@/lib/api";
 import { usePointStore } from "@/store/pointStore";
-import { formatTo24HourTime } from "@/utils/date";
-import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
-import { AIAvatar } from "../ui/AIAvatar";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
-import { StreamingMessage } from "./StreamingMessage";
 import { StyledButton } from "../ui/StyledButton";
+import { ChatMessage } from "./ChatMessage";
+import { StreamingMessage } from "./StreamingMessage";
 
 interface ChatProps {
     consultationId: number;
@@ -343,100 +341,18 @@ export function Chat({ consultationId }: ChatProps) {
             <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
                 <div ref={observerTarget} style={{ height: "1px" }} />
                 {isLoadingMessages && <LoadingSpinner />}
-                {messages.map((message, index) => {
-                    const aiContent = parseAIMessageContent(message);
-
-                    // assistant 메시지인데 표시할 내용이 없으면 렌더링하지 않음
-                    if (message.role === "assistant" && !aiContent) {
-                        return null;
-                    }
-
-                    // 다음 메시지가 있는지 확인 (체크리스트 표시 및 interactive 여부 판단)
-                    const nextMessage = messages[index + 1];
-                    const shouldShowCheckList = aiContent && aiContent.checkList && aiContent.checkList.length > 0;
-
-                    return (
-                        <div
-                            key={message.id}
-                            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                            <div className={`max-w-[80%]`}>
-                                {message.role === "assistant" && <AIAvatar />}
-                                <div
-                                    className={`rounded-2xl px-4 py-3 ${
-                                        message.role === "user"
-                                            ? "bg-gradient-to-r from-pink-500 to-orange-400 text-white"
-                                            : "bg-white border-2 border-gray-100"
-                                    }`}>
-                                    <p className="whitespace-pre-wrap">{getMessageDisplayText(message)}</p>
-                                    {shouldShowCheckList && (
-                                        <div className="mt-4 space-y-3">
-                                            {aiContent.checkList.map((item, idx) => {
-                                                const selectedAnswer = checkListAnswers[message.id]?.[idx];
-                                                const isInteractive = !nextMessage; // 마지막 메시지만 interactive
-
-                                                return (
-                                                    <div key={idx} className="p-3 bg-gray-50 rounded-xl">
-                                                        <p className="text-sm font-medium text-gray-900 mb-2">
-                                                            {item.question}
-                                                        </p>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {item.status.map((option, optIdx) => {
-                                                                const isSelected = selectedAnswer === option;
-
-                                                                return isInteractive ? (
-                                                                    <button
-                                                                        key={optIdx}
-                                                                        onClick={() =>
-                                                                            handleCheckListSelect(
-                                                                                message.id,
-                                                                                idx,
-                                                                                option,
-                                                                            )
-                                                                        }
-                                                                        className={`px-3 py-1.5 text-xs rounded-full transition-all ${
-                                                                            isSelected
-                                                                                ? "bg-gradient-to-r from-pink-500 to-orange-400 text-white border-2 border-pink-500"
-                                                                                : "bg-white border border-gray-200 text-gray-600 hover:border-pink-300 hover:bg-pink-50"
-                                                                        }`}>
-                                                                        {option}
-                                                                    </button>
-                                                                ) : (
-                                                                    <span
-                                                                        key={optIdx}
-                                                                        className="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-full text-gray-400 cursor-not-allowed">
-                                                                        {option}
-                                                                    </span>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            {!nextMessage && (
-                                                <StyledButton
-                                                    onClick={() =>
-                                                        handleCheckListSubmit(message.id, aiContent!.checkList)
-                                                    }
-                                                    disabled={isStreaming}
-                                                    className="w-full mt-2">
-                                                    답변 전송
-                                                </StyledButton>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                                <p
-                                    className={`text-xs text-gray-500 mt-1 ${
-                                        message.role === "user" ? "text-right" : "text-left"
-                                    }`}>
-                                    {formatTo24HourTime(message.createdAt)}
-                                </p>
-                            </div>
-                        </div>
-                    );
-                })}
+                {messages.map((message, index) => (
+                    <ChatMessage
+                        key={message.id}
+                        message={message}
+                        isLastMessage={index === messages.length - 1}
+                        isStreaming={isStreaming}
+                        checkListAnswers={checkListAnswers}
+                        onCheckListSelect={handleCheckListSelect}
+                        onCheckListSubmit={handleCheckListSubmit}
+                    />
+                ))}
                 {isStreaming && <StreamingMessage content={streamingContent} />}
-
                 <div ref={messagesEndRef} />
             </div>
             <div className="bg-white border-t border-gray-200 p-4">
