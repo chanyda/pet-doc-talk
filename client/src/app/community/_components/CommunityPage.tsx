@@ -6,6 +6,7 @@ import { CommunityHeader } from "@/components/community/comments/CommunityHeader
 import { CommunityFilter } from "@/components/community/filters/CommunityFilter";
 import { PostList } from "@/components/community/posts/PostList";
 import { TopNavigation } from "@/components/layout/TopNavigation";
+import { DEFAULT_PAGE_LIMIT } from "@/constants/common";
 
 export default function CommunityPage() {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
@@ -25,7 +26,12 @@ export default function CommunityPage() {
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                 />
-                <PostList categoryId={selectedCategoryId} orderBy={orderBy} searchQuery={searchQuery} />
+                <PostList
+                    categoryId={selectedCategoryId}
+                    orderBy={orderBy}
+                    searchQuery={searchQuery}
+                    limit={DEFAULT_PAGE_LIMIT}
+                />
             </main>
         </div>
     );

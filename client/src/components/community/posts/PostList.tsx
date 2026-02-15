@@ -11,12 +11,13 @@ import * as api from "@/lib/api";
 import { PostItem } from "./PostItem";
 
 interface PostListProps {
-    categoryId: number | null;
     orderBy: OrderByType;
-    searchQuery: string;
+    categoryId?: number | null;
+    searchQuery?: string;
+    limit: number;
 }
 
-export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
+export function PostList({ orderBy, categoryId, searchQuery, limit }: PostListProps) {
     const queryParams = useMemo(() => {
         const params: Partial<FindPostListQuery> = { orderBy };
 
@@ -28,8 +29,12 @@ export function PostList({ categoryId, orderBy, searchQuery }: PostListProps) {
             params.keyword = searchQuery;
         }
 
+        if (limit) {
+            params.limit = limit;
+        }
+
         return params;
-    }, [categoryId, orderBy, searchQuery]);
+    }, [categoryId, orderBy, searchQuery, limit]);
 
     const { posts, nextCursor, isLoading, totalPostCount, handleLoadMore } = usePostList({
         fetchFn: api.getPosts,
