@@ -24,7 +24,7 @@ export function CommunityEmptyState({ type }: CommunityEmptyStateProps) {
                     className="w-20 h-20 mx-auto mb-4 rounded-full hover:shadow-lg cursor-pointer flex items-center justify-center"
                     role="button"
                     aria-label="게시글 작성하기"
-                    style={{ backgroundColor: "#FF6B9D" }}
+                    style={{ backgroundColor: "var(--brand-pink)" }}
                     onClick={handleWriteClick}>
                     <WriteIcon stroke="#ffffff" width="35px" height="35px" />
                 </div>

@@ -7,7 +7,7 @@ export default function AIConsultationHero() {
             <div className="max-w-5xl mx-auto">
                 <div
                     className="relative overflow-hidden rounded-3xl shadow-2xl p-8 md:p-12"
-                    style={{ background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)" }}>
+                    style={{ background: "var(--brand-gradient)" }}>
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
                     <div className="relative z-10">
@@ -18,7 +18,7 @@ export default function AIConsultationHero() {
                             <div>
                                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">AI 수의사 상담</h1>
                                 <p className="text-white/90 text-sm md:text-base">
-                                    24시간 언제든지, 무료로 상담받으세요
+                                    24시간 언제든지, 무료로 상담 받으세요.
                                 </p>
                             </div>
                         </div>

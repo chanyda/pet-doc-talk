@@ -52,7 +52,7 @@ export function MyConsultations() {
                                     <div
                                         className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-white shadow-md"
                                         style={{
-                                            background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
+                                            background: "var(--brand-gradient)",
                                         }}>
                                         {consultation.pet.type === "CAT" ? (
                                             <CatFaceIcon width="28px" height="28px" />

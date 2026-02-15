@@ -222,7 +222,7 @@ export function PetRegistrationModal({
                         <div key="step2" className="space-y-8">
                             <div className="text-center mb-8">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                                    <span style={{ color: "#FF6B9D" }}>{`${formData.name ?? "아이"}`}</span>의 상세
+                                    <span style={{ color: "var(--brand-pink)" }}>{`${formData.name ?? "아이"}`}</span>의 상세
                                     정보를 알려주세요.
                                 </h3>
                                 <p className="text-base text-gray-600">더 자세한 정보를 입력해 주세요.</p>
@@ -246,7 +246,7 @@ export function PetRegistrationModal({
                                     <div
                                         className="absolute bottom-0 right-0 w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-3 border-white"
                                         style={{
-                                            background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
+                                            background: "var(--brand-gradient)",
                                         }}>
                                         <UploadIcon fill="#ffffff" />
                                     </div>
@@ -364,7 +364,7 @@ export function PetRegistrationModal({
                                 className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
                                     background: isStepOneValid
-                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                        ? "var(--brand-gradient)"
                                         : "#d1d5db",
                                 }}>
                                 <ArrowRightIcon width="30px" height="30px" stroke="#ffffff" />
@@ -377,7 +377,7 @@ export function PetRegistrationModal({
                                 className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
                                     background: isStepTwoValid
-                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                        ? "var(--brand-gradient)"
                                         : "#d1d5db",
                                 }}>
                                 <span>{isEditMode ? "수정 완료" : "등록 완료"}</span>

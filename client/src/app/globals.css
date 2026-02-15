@@ -5,6 +5,12 @@
 
 :root {
     --font-size: 16px;
+
+    /* Brand Colors */
+    --brand-pink: #FF6B9D;
+    --brand-orange: #FFA07A;
+    --brand-gradient: linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%);
+
     --background: #ffffff;
     --foreground: oklch(0.145 0 0);
     --card: #ffffff;

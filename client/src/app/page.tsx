@@ -18,7 +18,7 @@ export default function Page() {
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-linear-to-br from-pink-100 to-orange-100 rounded-xl flex items-center justify-center">
-                                    <TrendUpIcon fill="#FF6B9D" width="25px" height="25px" />
+                                    <TrendUpIcon fill="var(--brand-pink)" width="25px" height="25px" />
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-bold text-gray-900">인기 게시글</h2>

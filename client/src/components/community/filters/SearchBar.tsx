@@ -1,5 +1,6 @@
 "use client";
 
+import SearchIcon from "public/icons/search-icon.svg";
 import { useState } from "react";
 
 import { POST_SEARCH_KEYWORD_LIMIT } from "@/constants/post";
@@ -25,7 +26,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
     };
 
     return (
-        <div className="flex-1 relative">
+        <div className="flex-1 flex">
             <input
                 type="text"
                 placeholder="게시글 검색..."
@@ -33,13 +34,13 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
                 maxLength={POST_SEARCH_KEYWORD_LIMIT}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-5 pr-20 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
+                className="flex-1 pl-5 py-3 bg-white border border-gray-200 rounded-l-xl focus:outline-none focus:border-pink-300 transition-all"
             />
             <button
                 onClick={handleSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 text-sm rounded-lg text-white hover:opacity-90 transition-opacity shadow-md hover:shadow-lg cursor-pointer"
-                style={{ backgroundColor: "#FF6B9D" }}>
-                검색
+                className="px-3.5 flex items-center justify-center hover:opacity-90 transition-opacity rounded-r-xl"
+                style={{ background: "var(--brand-gradient)" }}>
+                <SearchIcon width="20px" height="20px" fill="#ffffff" />
             </button>
         </div>
     );

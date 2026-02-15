@@ -47,7 +47,7 @@ export function TopNavigation() {
             <div className="max-w-6xl mx-auto px-6">
                 <div className="flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center">
-                        <h1 className="text-xl" style={{ color: "#FF6B9D" }}>
+                        <h1 className="text-xl" style={{ color: "var(--brand-pink)" }}>
                             🐾 펫케어
                         </h1>
                     </Link>
@@ -59,7 +59,7 @@ export function TopNavigation() {
                                     key={tab.id}
                                     href={tab.href}
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:bg-gray-50"
-                                    style={{ color: isActive ? "#FF6B9D" : "#6B7280" }}>
+                                    style={{ color: isActive ? "var(--brand-pink)" : "#6B7280" }}>
                                     <span className="text-sm">{tab.label}</span>
                                 </Link>
                             );
@@ -109,7 +109,7 @@ export function TopNavigation() {
                                 href="/login"
                                 className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:bg-gray-50 ml-2"
                                 style={{
-                                    color: pathname === "/login" ? "#FF6B9D" : "#6B7280",
+                                    color: pathname === "/login" ? "var(--brand-pink)" : "#6B7280",
                                 }}>
                                 <span className="text-sm">로그인</span>
                             </Link>

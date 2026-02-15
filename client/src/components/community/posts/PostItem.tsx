@@ -22,7 +22,7 @@ export function PostItem({ post }: PostItemProps) {
     return (
         <article
             onClick={handleClick}
-            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100 hover:border-pink-200 p-5">
+            className="bg-white rounded-2xl p-5 border-2 border-gray-100 hover:border-pink-300 hover:shadow-md transition-all cursor-pointer">
             <div className="flex gap-4">
                 <div className="flex-1 min-w-0 flex flex-col">
                     <div className="flex items-center justify-between mb-2">
@@ -30,7 +30,7 @@ export function PostItem({ post }: PostItemProps) {
                             <CategoryTag category={post.category} />
                         </div>
                     </div>
-                    <h3 className="text-lg mb-3 line-clamp-1 hover:text-pink-600 transition-colors">{post.title}</h3>
+                    <h3 className="text-lg font-semibold mb-3 line-clamp-1">{post.title}</h3>
                     <div className="flex items-center justify-between mt-auto">
                         <div className="flex gap-4">
                             <div className="flex items-center gap-2">

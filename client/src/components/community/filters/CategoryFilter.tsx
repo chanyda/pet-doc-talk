@@ -26,20 +26,20 @@ export function CategoryFilter({ selectedCategoryId, onCategoryChange }: Categor
     }, []);
 
     const buttonClass = (isSelected: boolean) =>
-        `flex items-center gap-2 px-4 py-2.5 rounded-lg whitespace-nowrap transition-all cursor-pointer ${
-            isSelected ? "text-white shadow-md" : "text-gray-600 hover:bg-gray-50"
+        `flex items-center gap-2 px-6 py-3 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+            isSelected ? "text-white shadow-lg" : "text-gray-600 hover:bg-gray-50"
         }`;
 
     return (
-        <div className="bg-white rounded-xl p-2 shadow-sm">
+        <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
                 <button
                     onClick={() => onCategoryChange(null)}
                     className={buttonClass(selectedCategoryId === null)}
                     style={{
-                        backgroundColor: selectedCategoryId === null ? "#FF6B9D" : "transparent",
+                        background: selectedCategoryId === null ? "var(--brand-gradient)" : "transparent",
                     }}>
-                    <span className="text-sm">전체</span>
+                    <span className="text-sm font-medium">전체</span>
                 </button>
                 {categories.map((category) => (
                     <button
@@ -47,9 +47,9 @@ export function CategoryFilter({ selectedCategoryId, onCategoryChange }: Categor
                         onClick={() => onCategoryChange(category.id)}
                         className={buttonClass(selectedCategoryId === category.id)}
                         style={{
-                            backgroundColor: selectedCategoryId === category.id ? "#FF6B9D" : "transparent",
+                            background: selectedCategoryId === category.id ? "var(--brand-gradient)" : "transparent",
                         }}>
-                        <span className="text-sm">{category.name}</span>
+                        <span className="text-sm font-medium">{category.name}</span>
                     </button>
                 ))}
             </div>

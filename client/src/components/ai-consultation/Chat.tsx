@@ -14,6 +14,7 @@ import { formatTo24HourTime } from "@/utils/date";
 import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
 import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { StyledButton } from "../ui/StyledButton";
 
 interface ChatProps {
     consultationId: number;
@@ -337,7 +338,7 @@ export function Chat({ consultationId }: ChatProps) {
                     <ArrowLeftIcon width="30px" height="30px" />
                 </button>
                 <div className="flex-1">
-                    <h1 className="font-bold text-lg text-gray-900 flex items-center gap-2">AI 상담</h1>
+                    <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">AI 상담</h1>
                     <p className="text-sm text-gray-600">AI 수의사와 상담중</p>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-50 to-orange-50 rounded-full border border-pink-200">
@@ -425,17 +426,14 @@ export function Chat({ consultationId }: ChatProps) {
                                                 );
                                             })}
                                             {!nextMessage && (
-                                                <button
+                                                <StyledButton
                                                     onClick={() =>
                                                         handleCheckListSubmit(message.id, aiContent!.checkList)
                                                     }
                                                     disabled={isStreaming}
-                                                    className="w-full mt-2 px-4 py-2.5 text-white rounded-xl transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
-                                                    style={{
-                                                        background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
-                                                    }}>
-                                                    <span>답변 전송</span>
-                                                </button>
+                                                    className="w-full mt-2">
+                                                    답변 전송
+                                                </StyledButton>
                                             )}
                                         </div>
                                     )}
@@ -507,25 +505,13 @@ export function Chat({ consultationId }: ChatProps) {
                         style={{ minHeight: "48px", maxHeight: "120px" }}
                     />
                     {isStreaming ? (
-                        <button
-                            onClick={handleAbort}
-                            className="px-6 py-3 text-white rounded-xl transition-all hover:scale-105"
-                            style={{ background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)" }}>
+                        <StyledButton onClick={handleAbort}>
                             <StopIcon />
-                        </button>
+                        </StyledButton>
                     ) : (
-                        <button
-                            onClick={() => handleSend()}
-                            disabled={!inputValue.trim() || points <= 0}
-                            className="px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-                            style={{
-                                background:
-                                    inputValue.trim() && points > 0
-                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
-                                        : "#d1d5db",
-                            }}>
+                        <StyledButton onClick={() => handleSend()} disabled={!inputValue.trim() || points <= 0}>
                             <SendIcon />
-                        </button>
+                        </StyledButton>
                     )}
                 </div>
             </div>

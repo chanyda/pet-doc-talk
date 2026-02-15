@@ -146,7 +146,7 @@ export function PostForm({ mode, initialData }: PostFormProps) {
                     style={{
                         background:
                             isFormValid && !isSubmitting
-                                ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                ? "var(--brand-gradient)"
                                 : "#d1d5db",
                     }}>
                     {isEdit ? "게시글 수정" : "게시글 등록"}

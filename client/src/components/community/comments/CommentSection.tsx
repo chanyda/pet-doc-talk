@@ -256,8 +256,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <CommentActionProvider activeAction={activeAction} setActiveAction={setActiveAction}>
             <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-2 mb-6">
-                    <h2 className="text-xl">
-                        댓글 <span style={{ color: "#FF6B9D" }}>{totalCommentCount}</span>
+                    <h2 className="text-xl font-semibold">
+                        댓글 <span style={{ color: "var(--brand-pink)" }}>{totalCommentCount}</span>
                     </h2>
                 </div>
                 {renderCommentList()}

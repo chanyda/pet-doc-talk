@@ -29,9 +29,7 @@ export function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps) {
                                 isActive ? "text-white shadow-lg" : "text-gray-600 hover:bg-gray-50"
                             }`}
                             style={{
-                                background: isActive
-                                    ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
-                                    : "transparent",
+                                background: isActive ? "var(--brand-gradient)" : "transparent",
                             }}>
                             <span className="font-medium">{tab.label}</span>
                         </button>

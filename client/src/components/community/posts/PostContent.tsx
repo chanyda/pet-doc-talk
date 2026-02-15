@@ -61,7 +61,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                     </button>
                 )}
                 <CategoryTag category={post.category} />
-                <h1 className="text-3xl mb-4 mt-3">{post.title}</h1>
+                <h1 className="text-3xl font-bold mb-4 mt-3">{post.title}</h1>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                             isLiked ? "text-white shadow-lg" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                         style={{
-                            background: isLiked ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)" : undefined,
+                            background: isLiked ? "var(--brand-gradient)" : undefined,
                         }}>
                         <HeartIcon className={isLiked ? "fill-white" : ""} />
                         <span className="font-medium">좋아요 {likeCount}</span>

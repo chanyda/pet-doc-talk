@@ -153,7 +153,7 @@ export function ProfileEditModal({
                             <div
                                 className="absolute bottom-0 right-0 w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-3 border-white"
                                 style={{
-                                    background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
+                                    background: "var(--brand-gradient)",
                                 }}>
                                 <UploadIcon fill="#ffffff" />
                             </div>
@@ -215,7 +215,7 @@ export function ProfileEditModal({
                             style={{
                                 background:
                                     isValid && !isLoading
-                                        ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                        ? "var(--brand-gradient)"
                                         : "#d1d5db",
                             }}>
                             {isLoading ? "저장 중..." : "저장"}

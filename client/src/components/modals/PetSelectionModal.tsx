@@ -75,7 +75,7 @@ export function PetSelectionModal({ isOpen, onClose, onSelectPet }: PetSelection
                             className="flex-1 px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                             style={{
                                 background: selectedPetId
-                                    ? "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)"
+                                    ? "var(--brand-gradient)"
                                     : "#d1d5db",
                             }}>
                             상담 시작

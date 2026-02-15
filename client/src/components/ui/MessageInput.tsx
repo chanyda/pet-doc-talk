@@ -102,7 +102,7 @@ export function MessageInput({
                         onClick={onSubmit}
                         disabled={!value.trim() || disabled || isOverLimit}
                         className="text-xs text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5"
-                        style={{ backgroundColor: "#FF6B9D" }}>
+                        style={{ backgroundColor: "var(--brand-pink)" }}>
                         등록
                     </button>
                 </div>

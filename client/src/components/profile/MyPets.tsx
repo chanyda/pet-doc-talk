@@ -198,7 +198,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                                             <div
                                                 className="w-16 h-16 rounded-full flex items-center justify-center text-2xl border-3 border-white shadow-md shrink-0"
                                                 style={{
-                                                    background: "linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%)",
+                                                    background: "var(--brand-gradient)",
                                                 }}>
                                                 {pet.type === "CAT" ? (
                                                     <CatFaceIcon width="30px" height="30px" />

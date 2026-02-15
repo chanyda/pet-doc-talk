@@ -12,7 +12,7 @@ export default function LoginPage() {
             <TopNavigation />
             <main className="max-w-md mx-auto px-6 py-12">
                 <div className="bg-white rounded-2xl shadow-sm p-8">
-                    <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "#FF6B9D" }}>
+                    <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "var(--brand-pink)" }}>
                         로그인
                     </h1>
                     <p className="text-gray-600 text-center mb-8">펫케어에 오신 것을 환영합니다</p>
