@@ -6,7 +6,7 @@ interface StyledButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function StyledButton({ disabled, children, className = "", style, ...props }: StyledButtonProps) {
     const baseClasses =
-        "inline-flex items-center justify-center gap-2 font-medium px-6 py-3 text-base rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 shadow-lg active:scale-100";
+        "inline-flex items-center justify-center gap-2 font-medium px-6 py-3 text-base rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 shadow-lg active:scale-100";
 
     return (
         <button
