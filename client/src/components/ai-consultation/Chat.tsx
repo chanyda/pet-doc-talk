@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
 import * as api from "@/lib/api";
+import { usePointStore } from "@/store/pointStore";
 import { formatTo24HourTime } from "@/utils/date";
 import { getMessageDisplayText, parseAIMessageContent } from "@/utils/message";
 
@@ -23,6 +24,8 @@ interface ChatProps {
 export function Chat({ consultationId }: ChatProps) {
     const router = useRouter();
 
+    const { points, fetchPoints, decrement: decrementPoint } = usePointStore();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
     const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -31,7 +34,6 @@ export function Chat({ consultationId }: ChatProps) {
     const [totalMessageCount, setTotalMessageCount] = useState<number>(0);
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
     const [checkListAnswers, setCheckListAnswers] = useState<Record<number, Record<number, string>>>({});
-    const [points, setPoints] = useState<number>(0);
     const [isNotFoundError, setNotFoundError] = useState<boolean>(false);
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -82,15 +84,6 @@ export function Chat({ consultationId }: ChatProps) {
     useEffect(() => {
         isInitialLoadRef.current = true;
         shouldAutoScrollRef.current = false;
-
-        const fetchPoints = async () => {
-            try {
-                const response = await api.getMyPoints();
-                setPoints(response.data.amount);
-            } catch (error) {
-                console.error("Failed to fetch points:", error);
-            }
-        };
 
         fetchMessages();
         fetchPoints();
@@ -279,7 +272,7 @@ export function Chat({ consultationId }: ChatProps) {
                             } else if (event.type === "done") {
                                 setMessages((prev) => [...prev, event.message]);
                                 setStreamingContent(null);
-                                setPoints((prev) => Math.max(0, prev - 1));
+                                decrementPoint();
 
                                 shouldAutoScrollRef.current = true;
                             } else if (event.type === "error") {

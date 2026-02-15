@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import * as api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
+import { usePointStore } from "@/store/pointStore";
 
 import { ProfileEditModal } from "../modals/ProfileEditModal";
 import { ProfileAvatar } from "../ui/ProfileAvatar";
@@ -12,6 +13,7 @@ import { MyPets } from "./MyPets";
 
 export function Profile() {
     const { setUser: setAuthUser } = useAuthStore();
+    const { points, setPoints } = usePointStore();
     const [user, setUser] = useState<User | null>(null);
     const [isProfileEditOpen, setIsProfileEditOpen] = useState<boolean>(false);
 
@@ -20,6 +22,7 @@ export function Profile() {
             try {
                 const response = await api.getUser();
                 setUser(response.data);
+                setPoints(response.data.points);
             } catch (error) {
                 console.error("Failed to fetch user:", error);
             }
@@ -59,7 +62,7 @@ export function Profile() {
                     <div className="flex items-center justify-center md:justify-start gap-6 mb-6">
                         <div className="flex gap-2 text-center">
                             <div className="text-sm text-gray-600">포인트</div>
-                            <div className="text-sm font-bold text-pink-500">{user.points}</div>
+                            <div className="text-sm font-bold text-pink-500">{points}</div>
                         </div>
                         <div className="flex gap-2 text-center">
                             <div className="text-sm text-gray-600">상담</div>
