@@ -11,6 +11,7 @@ import { createConsultation } from "@/lib/api";
 
 import { PetSelectionModal } from "../modals/PetSelectionModal";
 import { ConsultationEmptyState } from "../ui/ConsultationEmptyState";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { StyledButton } from "../ui/StyledButton";
 import { ConsultationItem } from "./ConsultationItem";
 
@@ -34,6 +35,55 @@ export function ConsultationList() {
         }
     };
 
+    const renderConsultationList = () => {
+        if (consultations.length === 0 && isLoading) {
+            return <LoadingSpinner />;
+        }
+
+        if (consultations.length === 0) {
+            return (
+                <div className="flex flex-col items-center justify-center py-20">
+                    <ConsultationEmptyState />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full">
+                        <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
+                            <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                                <span className="text-2xl">⏰</span>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">24시간 상담</h3>
+                            <p className="text-sm text-gray-600">언제든지 AI 수의사에게 상담받으세요.</p>
+                        </div>
+                        <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
+                            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                                <span className="text-2xl">🎯</span>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">정확한 답변</h3>
+                            <p className="text-sm text-gray-600">반려동물 정보 기반 맞춤 상담</p>
+                        </div>
+                        <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
+                            <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                                <span className="text-2xl">📝</span>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">상담 기록</h3>
+                            <p className="text-sm text-gray-600">모든 상담 내역이 자동 저장됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-4">
+                {consultations.map((consultation) => (
+                    <ConsultationItem
+                        key={consultation.id}
+                        consultation={consultation}
+                        onClick={(id) => router.push(`/ai-consultation/${id}`)}
+                    />
+                ))}
+            </div>
+        );
+    };
+
     return (
         <>
             <PetSelectionModal
@@ -51,48 +101,14 @@ export function ConsultationList() {
                 </StyledButton>
             </div>
             <div>
-                {consultations.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <ConsultationEmptyState />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full">
-                            <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
-                                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
-                                    <span className="text-2xl">⏰</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">24시간 상담</h3>
-                                <p className="text-sm text-gray-600">언제든지 AI 수의사에게 상담받으세요.</p>
-                            </div>
-                            <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
-                                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                                    <span className="text-2xl">🎯</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">정확한 답변</h3>
-                                <p className="text-sm text-gray-600">반려동물 정보 기반 맞춤 상담</p>
-                            </div>
-                            <div className="bg-white rounded-2xl p-6 border-2 border-gray-100">
-                                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4">
-                                    <span className="text-2xl">📝</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">상담 기록</h3>
-                                <p className="text-sm text-gray-600">모든 상담 내역이 자동 저장됩니다.</p>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                상담 내역 <span className="text-pink-600">({totalConsultationCount})</span>
-                            </h2>
-                        </div>
-
-                        {consultations.map((consultation) => (
-                            <ConsultationItem key={consultation.id} consultation={consultation} onClick={(id) => router.push(`/ai-consultation/${id}`)} />
-                        ))}
-                        {nextCursor && consultations.length < totalConsultationCount && (
-                            <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
-                        )}
-                    </div>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                        상담 내역 <span className="text-pink-600">({totalConsultationCount})</span>
+                    </h2>
+                </div>
+                {renderConsultationList()}
+                {nextCursor && consultations.length < totalConsultationCount && (
+                    <HasMoreButton isLoading={isLoading} onClick={handleLoadMore} />
                 )}
             </div>
         </>
