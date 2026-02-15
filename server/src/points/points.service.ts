@@ -2,9 +2,10 @@ import { ForbiddenException, Injectable } from "@nestjs/common";
 import { Transactional } from "@nestjs-cls/transactional";
 
 import { PointAction, PointSource } from "generated/prisma/enums";
-import { PointsRepository } from "./points.repository";
+
 import { FixedPointSource, POINT_POLICY } from "./constants";
 import { MyPointItemDto } from "./dtos/responses/my-point-item.dto";
+import { PointsRepository } from "./points.repository";
 
 @Injectable()
 export class PointsService {

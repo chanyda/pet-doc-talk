@@ -1,12 +1,15 @@
-import { PetsService } from "src/pets/pets.service";
-import { ConsultationsService } from "./consultations.service";
-import { ConsultationsRepository } from "./consultations.repository";
-import { Test, TestingModule } from "@nestjs/testing";
-import { MessageRole, PetGender, PetType } from "generated/prisma/enums";
 import { NotFoundException } from "@nestjs/common";
-import { getNextCursor } from "src/common/utils/pagination.util";
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { MessageRole, PetGender, PetType } from "generated/prisma/enums";
+
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { ConsultationMessagesService } from "@/consultation-messages/consultation-messages.service";
+import { PetsService } from "@/pets/pets.service";
+
 import { CONSULTATION_SELECT } from "./constants";
-import { ConsultationMessagesService } from "src/consultation-messages/consultation-messages.service";
+import { ConsultationsRepository } from "./consultations.repository";
+import { ConsultationsService } from "./consultations.service";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {

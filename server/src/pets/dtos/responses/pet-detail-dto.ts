@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
 import { PetGender, PetType } from "generated/prisma/enums";
 
 export class PetDetailDto {

@@ -1,8 +1,10 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+
+import { Public } from "@/common/decorators/public.decorator";
+
 import { CategoriesService } from "./categories.service";
 import { CategoryListResponseDto } from "./dtos/responses/category-list-response.dto";
-import { Public } from "src/common/decorators/public.decorator";
 
 @ApiTags("categories")
 @Controller("categories")

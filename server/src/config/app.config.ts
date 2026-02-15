@@ -1,5 +1,6 @@
 import { registerAs } from "@nestjs/config";
-import { AppConfigType } from "src/types/config.type";
+
+import { AppConfigType } from "@/types/config.type";
 
 export default registerAs<AppConfigType>("app", () => ({
     nodeEnv: process.env.NODE_ENV || "development",

@@ -1,5 +1,6 @@
-import { ConsultationFindManyArgs, ConsultationGetPayload, ConsultationSelect } from "generated/prisma/models";
 import { ConsultationWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import { ConsultationFindManyArgs, ConsultationGetPayload, ConsultationSelect } from "generated/prisma/models";
+
 import { CreateConsultationDto } from "../dtos/requests/create-consultation.dto";
 import { IConsultation } from "./consultations.interface";
 

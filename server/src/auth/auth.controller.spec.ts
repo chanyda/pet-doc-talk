@@ -1,11 +1,13 @@
+import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { Response } from "express";
+
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "@/common/constants";
+import { AuthRequest } from "@/types/request.type";
+
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { Response } from "express";
-import { UnauthorizedException } from "@nestjs/common";
 import { LogoutGuard } from "./guards/logout.guard";
-import { AuthRequest } from "src/types/request.type";
-import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
 
 describe("AuthController", () => {
     let authController: AuthController;

@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
 import { CommentItemDto } from "./comment-item.dto";
 
 export class CommentListResponseDto {

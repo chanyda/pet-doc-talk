@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
-import { PrismaService } from "src/prisma/prisma.service";
-import { FindManyAndCountResult, ICommentsRepository } from "./interfaces/comments.repository.interface";
+import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
+import { CommentGetPayload, CommentWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
+import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
 import { IComment } from "./interfaces/comments.interface";
-import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
-import { CommentGetPayload, CommentWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
-import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
+import { FindManyAndCountResult, ICommentsRepository } from "./interfaces/comments.repository.interface";
 
 @Injectable()
 export class CommentsRepository implements ICommentsRepository {

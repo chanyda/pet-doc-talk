@@ -1,9 +1,11 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { PointsService } from "./points.service";
-import { PointsRepository } from "./points.repository";
-import { PointAction, PointSource } from "generated/prisma/enums";
-import { POINT_POLICY } from "./constants";
 import { ForbiddenException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { PointAction, PointSource } from "generated/prisma/enums";
+
+import { POINT_POLICY } from "./constants";
+import { PointsRepository } from "./points.repository";
+import { PointsService } from "./points.service";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {

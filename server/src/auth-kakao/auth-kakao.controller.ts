@@ -1,4 +1,5 @@
 import { Controller, Get, HttpCode, HttpException, HttpStatus, Query, Res } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import {
     ApiBadRequestResponse,
     ApiInternalServerErrorResponse,
@@ -7,14 +8,16 @@ import {
     ApiTags,
     ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
-import { AuthKakaoService } from "./auth-kakao.service";
-import { AuthService } from "src/auth/auth.service";
-import { LoginFrom } from "generated/prisma/enums";
-import { KakaoLoginQueryDto } from "./dtos/requests/kakao-login-query.dto";
 import { Response } from "express";
-import { ConfigType } from "src/types/config.type";
-import { ConfigService } from "@nestjs/config";
-import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
+
+import { LoginFrom } from "generated/prisma/enums";
+
+import { AuthService } from "@/auth/auth.service";
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "@/common/constants";
+import { ConfigType } from "@/types/config.type";
+
+import { AuthKakaoService } from "./auth-kakao.service";
+import { KakaoLoginQueryDto } from "./dtos/requests/kakao-login-query.dto";
 
 @ApiTags("auth/kakao")
 @Controller("auth/kakao")

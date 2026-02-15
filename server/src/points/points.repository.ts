@@ -2,11 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 
-import { IPointsRepository } from "./interfaces/points.repository.interface";
-import { IPoint, IPointHistory } from "./interfaces/point.interface";
-import { PrismaService } from "src/prisma/prisma.service";
 import { PointAction, PointSource } from "generated/prisma/enums";
 import { PointSelect } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
+import { IPoint, IPointHistory } from "./interfaces/point.interface";
+import { IPointsRepository } from "./interfaces/points.repository.interface";
 
 @Injectable()
 export class PointsRepository implements IPointsRepository {

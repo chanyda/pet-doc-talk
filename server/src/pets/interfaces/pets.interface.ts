@@ -1,4 +1,5 @@
 import { Decimal } from "@prisma/client/runtime/index-browser";
+
 import { PetGender, PetType } from "generated/prisma/enums";
 
 export interface IPet {

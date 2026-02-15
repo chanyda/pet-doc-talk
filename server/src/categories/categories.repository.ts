@@ -1,10 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
+import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
 import { CategorySelect } from "generated/prisma/models";
-import { ICategoriesRepository } from "./interfaces/categories.repository.interface";
-import { PrismaService } from "src/prisma/prisma.service";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
 import { ICategory } from "./interfaces/categories.interface";
+import { ICategoriesRepository } from "./interfaces/categories.repository.interface";
 
 @Injectable()
 export class CategoriesRepository implements ICategoriesRepository {

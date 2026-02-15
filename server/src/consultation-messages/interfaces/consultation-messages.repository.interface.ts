@@ -1,11 +1,12 @@
 import { MessageRole } from "generated/prisma/enums";
-import { IConsultationMessage } from "./consultation-messages.interface";
-import { ConsultationMessageFindManyArgs } from "generated/prisma/models";
 import {
     ConsultationMessageGetPayload,
     ConsultationMessageWhereInput,
     SelectSubset,
 } from "generated/prisma/internal/prismaNamespace";
+import { ConsultationMessageFindManyArgs } from "generated/prisma/models";
+
+import { IConsultationMessage } from "./consultation-messages.interface";
 
 export interface ICreateMessageData {
     role: MessageRole;

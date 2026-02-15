@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { UserPublicDto } from "./user-public.dto";
 import { IsUrl } from "class-validator";
+
+import { UserPublicDto } from "./user-public.dto";
 
 export class UserPublicWithProfileDto extends UserPublicDto {
     @ApiProperty({ type: String, nullable: true })

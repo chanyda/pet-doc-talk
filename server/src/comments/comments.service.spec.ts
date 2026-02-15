@@ -1,14 +1,17 @@
-import { UsersService } from "src/users/users.service";
+import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { CommentGetPayload } from "generated/prisma/models";
+
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { PostsService } from "@/posts/posts.service";
+import { UsersService } from "@/users/users.service";
+
 import { CommentsRepository } from "./comments.repository";
 import { CommentsService } from "./comments.service";
-import { PostsService } from "src/posts/posts.service";
-import { Test, TestingModule } from "@nestjs/testing";
-import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
-import { CommentGetPayload } from "generated/prisma/models";
 import { COMMENT_BASE_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
 import { CommentItemDto } from "./dtos/responses/comment-item.dto";
 import { MyCommentItemDto } from "./dtos/responses/my-comment-item.dto";
-import { getNextCursor } from "src/common/utils/pagination.util";
 
 describe("CommentsService", () => {
     let commentsService: CommentsService;

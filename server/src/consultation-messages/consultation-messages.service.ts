@@ -1,32 +1,35 @@
-import { Injectable, ForbiddenException, NotFoundException, forwardRef, Inject } from "@nestjs/common";
-import { Transactional } from "@nestjs-cls/transactional";
-import { Observable, Subscriber } from "rxjs";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { MessageEvent } from "@nestjs/common";
+import { Transactional } from "@nestjs-cls/transactional";
 import { Response } from "express";
+import { jsonrepair, JSONRepairError } from "jsonrepair";
 import { OpenAIError } from "openai";
-import { ConsultationMessagesRepository } from "./consultation-messages.repository";
-import { IConsultationMessage } from "./interfaces/consultation-messages.interface";
-import { ICreateMessageData, IMessageContext } from "./interfaces/consultation-messages.repository.interface";
-import { MessageListResponseDto } from "./dtos/responses/message-list-response.dto";
-import { MessageDto } from "./dtos/responses/message.dto";
-import { SendMessageDto } from "./dtos/requests/send-message.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { getNextCursor } from "src/common/utils/pagination.util";
-import { MESSAGE_SELECT } from "./constants";
-import { ConsultationsService } from "src/consultations/consultations.service";
-import { ConsultationConversationsService } from "src/consultation-conversations/consultation-conversations.service";
-import { IConsultationConversation } from "src/consultation-conversations/interfaces/consultation-conversations.interface";
-import { OpenAIService } from "src/openai/openai.service";
-import { PetsService } from "src/pets/pets.service";
-import { PointsService } from "src/points/points.service";
+import { Observable, Subscriber } from "rxjs";
+
 import { MessageRole, PointSource } from "generated/prisma/enums";
+
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { ConsultationConversationsService } from "@/consultation-conversations/consultation-conversations.service";
+import { IConsultationConversation } from "@/consultation-conversations/interfaces/consultation-conversations.interface";
+import { ConsultationsService } from "@/consultations/consultations.service";
 import {
     CONSULTATION_JSON_SCHEMA,
     getConsultationPrompt,
     RECENT_MESSAGE_COUNT,
     TOKEN_INPUT_LIMIT,
-} from "src/openai/constants";
-import { jsonrepair, JSONRepairError } from "jsonrepair";
+} from "@/openai/constants";
+import { OpenAIService } from "@/openai/openai.service";
+import { PetsService } from "@/pets/pets.service";
+import { PointsService } from "@/points/points.service";
+
+import { MESSAGE_SELECT } from "./constants";
+import { ConsultationMessagesRepository } from "./consultation-messages.repository";
+import { SendMessageDto } from "./dtos/requests/send-message.dto";
+import { MessageDto } from "./dtos/responses/message.dto";
+import { MessageListResponseDto } from "./dtos/responses/message-list-response.dto";
+import { IConsultationMessage } from "./interfaces/consultation-messages.interface";
+import { ICreateMessageData, IMessageContext } from "./interfaces/consultation-messages.repository.interface";
 
 @Injectable()
 export class ConsultationMessagesService {

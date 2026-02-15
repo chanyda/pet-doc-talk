@@ -1,11 +1,13 @@
 import { Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from "@nestjs/common";
-import { AuthService } from "./auth.service";
 import { ApiBearerAuth, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
-import { Cookies } from "src/common/decorators/cookie.decorator";
 import { Response } from "express";
-import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "src/common/constants";
+
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from "@/common/constants";
+import { Cookies } from "@/common/decorators/cookie.decorator";
+import { AuthRequest } from "@/types/request.type";
+
+import { AuthService } from "./auth.service";
 import { LogoutGuard } from "./guards/logout.guard";
-import { AuthRequest } from "src/types/request.type";
 
 @ApiTags("auth")
 @Controller("auth")

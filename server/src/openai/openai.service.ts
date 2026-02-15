@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
-import { Tiktoken, get_encoding } from "tiktoken";
-import { ConfigType } from "src/types/config.type";
-import { IStreamChunk, IStreamResponseParams } from "./interfaces/openai.interface";
 import { EasyInputMessage, ResponseUsage } from "openai/resources/responses/responses";
-import { CONSULTATION_JSON_SCHEMA } from "./constants";
 import { ResponsesModel } from "openai/resources/shared";
+import { get_encoding, Tiktoken } from "tiktoken";
+
+import { ConfigType } from "@/types/config.type";
+
+import { CONSULTATION_JSON_SCHEMA } from "./constants";
+import { IStreamChunk, IStreamResponseParams } from "./interfaces/openai.interface";
 
 @Injectable()
 export class OpenAIService {

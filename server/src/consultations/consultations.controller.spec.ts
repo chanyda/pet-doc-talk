@@ -1,10 +1,13 @@
+import { NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+
+import { PetType } from "generated/prisma/enums";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+import { getNextCursor } from "@/common/utils/pagination.util";
+
 import { ConsultationsController } from "./consultations.controller";
 import { ConsultationsService } from "./consultations.service";
-import { AuthGuard } from "src/auth/guards/auth.guard";
-import { NotFoundException } from "@nestjs/common";
-import { getNextCursor } from "src/common/utils/pagination.util";
-import { PetType } from "generated/prisma/enums";
 
 describe("ConsultationsController", () => {
     let consultationsController: ConsultationsController;

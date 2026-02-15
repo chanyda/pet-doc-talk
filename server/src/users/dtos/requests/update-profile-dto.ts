@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 import { Transform } from "class-transformer";
+import { IsOptional, IsString, IsUrl, MaxLength, MinLength } from "class-validator";
 
 export class UpdateProfileDto {
     @ApiPropertyOptional({ minLength: 1, maxLength: 20 })

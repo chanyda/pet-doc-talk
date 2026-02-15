@@ -1,16 +1,19 @@
-import { Injectable, Inject, forwardRef } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { Transactional } from "@nestjs-cls/transactional";
+
+import { MessageRole } from "generated/prisma/enums";
+
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { ConsultationMessagesService } from "@/consultation-messages/consultation-messages.service";
+import { PetsService } from "@/pets/pets.service";
+
+import { CONSULTATION_SELECT } from "./constants";
 import { ConsultationsRepository } from "./consultations.repository";
 import { CreateConsultationDto } from "./dtos/requests/create-consultation.dto";
 import { ConsultationDto } from "./dtos/responses/consultation.dto";
 import { MyConsultationListResponseDto } from "./dtos/responses/my-consultation-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { PetsService } from "src/pets/pets.service";
-import { getNextCursor } from "src/common/utils/pagination.util";
-import { CONSULTATION_SELECT } from "./constants";
-import { ConsultationMessagesService } from "src/consultation-messages/consultation-messages.service";
 import { IConsultation } from "./interfaces/consultations.interface";
-import { MessageRole } from "generated/prisma/enums";
 
 @Injectable()
 export class ConsultationsService {

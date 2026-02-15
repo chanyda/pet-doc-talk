@@ -1,12 +1,14 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
-import { ConsultationsService } from "./consultations.service";
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { User } from "@/common/decorators/user.decorator";
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+
+import { ConsultationsService } from "./consultations.service";
 import { CreateConsultationDto } from "./dtos/requests/create-consultation.dto";
 import { ConsultationDto } from "./dtos/responses/consultation.dto";
 import { MyConsultationListResponseDto } from "./dtos/responses/my-consultation-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
 
 @ApiTags("consultations")
 @Auth()

@@ -1,19 +1,22 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+
+import { CommentGetPayload } from "generated/prisma/models";
+
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { PostsService } from "@/posts/posts.service";
+import { UsersService } from "@/users/users.service";
+
 import { CommentsRepository } from "./comments.repository";
+import { COMMENT_BASE_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
-import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
-import { UsersService } from "src/users/users.service";
-import { PostsService } from "src/posts/posts.service";
-import { CommentGetPayload } from "generated/prisma/models";
-import { COMMENT_BASE_SELECT, COMMENT_SELECT, CommentSelect, MY_COMMENT_SELECT, MyCommentSelect } from "./constants";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { CommentItemDto } from "./dtos/responses/comment-item.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
-import { CommentItemDto } from "./dtos/responses/comment-item.dto";
-import { getNextCursor } from "src/common/utils/pagination.util";
-import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
+import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { MyCommentItemDto } from "./dtos/responses/my-comment-item.dto";
+import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
 
 @Injectable()
 export class CommentsService {

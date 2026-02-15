@@ -1,12 +1,13 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
-import { ConfigService } from "@nestjs/config";
-import { ConfigType } from "./types/config.type";
-import helmet from "helmet";
 import { ValidationPipe } from "@nestjs/common";
-import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
+import { ConfigService } from "@nestjs/config";
+import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+
+import { AppModule } from "./app.module";
+import { LoggingInterceptor } from "./common/interceptors/logging.interceptor";
+import { ConfigType } from "./types/config.type";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);

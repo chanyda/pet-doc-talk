@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { UsersRepository } from "./users.repository";
-import { CreateUserDto } from "./dtos/requests/create-user.dto";
-import { UpdateUserDto } from "./dtos/requests/update-user.dto";
-import { IUser } from "./interfaces/users.interface";
-import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
-import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
+
 import { UserGetPayload } from "generated/prisma/models";
+
 import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
+import { CreateUserDto } from "./dtos/requests/create-user.dto";
+import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
+import { UpdateUserDto } from "./dtos/requests/update-user.dto";
+import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
+import { IUser } from "./interfaces/users.interface";
+import { UsersRepository } from "./users.repository";
 
 @Injectable()
 export class UsersService {

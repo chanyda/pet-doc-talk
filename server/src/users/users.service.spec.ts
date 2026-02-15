@@ -1,11 +1,13 @@
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+
+import { LoginFrom } from "generated/prisma/enums";
+import { UserGetPayload } from "generated/prisma/models";
+
+import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
+import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { LoginFrom } from "generated/prisma/enums";
-import { USER_PROFILE_SELECT, UserProfileSelect } from "./constants";
-import { UserGetPayload } from "generated/prisma/models";
-import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
 
 jest.mock("@nestjs-cls/transactional", () => ({
     Transactional: () => (_: any, __: string, descriptor: PropertyDescriptor) => {

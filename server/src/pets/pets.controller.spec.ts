@@ -1,10 +1,13 @@
-import { AuthGuard } from "src/auth/guards/auth.guard";
+import { NotFoundException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+import { Decimal } from "@prisma/client/runtime/index-browser";
+
+import { PetGender, PetType } from "generated/prisma/enums";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+
 import { PetsController } from "./pets.controller";
 import { PetsService } from "./pets.service";
-import { Test, TestingModule } from "@nestjs/testing";
-import { NotFoundException } from "@nestjs/common";
-import { PetGender, PetType } from "generated/prisma/enums";
-import { Decimal } from "@prisma/client/runtime/index-browser";
 
 describe("PetsController", () => {
     let petsController: PetsController;

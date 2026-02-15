@@ -1,8 +1,10 @@
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
-import { AuthGuard } from "src/auth/guards/auth.guard";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
 
 describe("UsersController", () => {
     let usersController: UsersController;

@@ -1,12 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { IUsersRepository } from "./interfaces/users.repository.interface";
+import { TransactionHost } from "@nestjs-cls/transactional";
+import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
+import { UserGetPayload, UserSelect } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
 import { CreateUserDto } from "./dtos/requests/create-user.dto";
 import { UpdateUserDto } from "./dtos/requests/update-user.dto";
 import { IUser } from "./interfaces/users.interface";
-import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
-import { TransactionHost } from "@nestjs-cls/transactional";
-import { PrismaService } from "src/prisma/prisma.service";
-import { UserGetPayload, UserSelect } from "generated/prisma/models";
+import { IUsersRepository } from "./interfaces/users.repository.interface";
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {

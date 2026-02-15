@@ -1,6 +1,7 @@
 import { createParamDecorator, ExecutionContext, UnauthorizedException } from "@nestjs/common";
-import { JwtPayload } from "src/types/auth.type";
-import { AuthRequest } from "src/types/request.type";
+
+import { JwtPayload } from "@/types/auth.type";
+import { AuthRequest } from "@/types/request.type";
 
 export const User = createParamDecorator((data: keyof JwtPayload, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest<AuthRequest>();

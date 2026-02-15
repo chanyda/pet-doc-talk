@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PetsRepository } from "./pets.repository";
+
+import { UsersService } from "@/users/users.service";
+
+import { PET_DETAIL_SELECT } from "./constants";
 import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
-import { UsersService } from "src/users/users.service";
-import { PET_DETAIL_SELECT } from "./constants";
 import { PetDetailDto } from "./dtos/responses/pet-detail-dto";
 import { IPet } from "./interfaces/pets.interface";
+import { PetsRepository } from "./pets.repository";
 
 @Injectable()
 export class PetsService {

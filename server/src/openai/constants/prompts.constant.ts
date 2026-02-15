@@ -1,5 +1,5 @@
-import { getAgeDisplay } from "src/common/utils/date.util";
-import { PetDetailDto } from "src/pets/dtos/responses/pet-detail-dto";
+import { getAgeDisplay } from "@/common/utils/date.util";
+import { PetDetailDto } from "@/pets/dtos/responses/pet-detail-dto";
 
 export const getConsultationPrompt = (pet: PetDetailDto): string => {
     return `Pet Information:

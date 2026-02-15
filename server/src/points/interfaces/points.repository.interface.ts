@@ -1,6 +1,7 @@
-import { PointSelect } from "generated/prisma/models";
-import { IPoint, IPointHistory } from "./point.interface";
 import { PointAction, PointSource } from "generated/prisma/enums";
+import { PointSelect } from "generated/prisma/models";
+
+import { IPoint, IPointHistory } from "./point.interface";
 
 export interface IPointsRepository {
     findByUserId(userId: number, select?: PointSelect): Promise<IPoint | null>;

@@ -6,13 +6,15 @@ import {
     NotFoundException,
     UnauthorizedException,
 } from "@nestjs/common";
-import { firstValueFrom } from "rxjs";
-import { isAxiosError } from "axios";
-import { KakaoGetUserInformationResponse, KakaoOAuthTokenResponse } from "../types/auth.type";
 import { ConfigService } from "@nestjs/config";
-import { ConfigType } from "src/types/config.type";
-import { AuthenticateResponseDto } from "./dtos/responses/authenticate-response.dto";
+import { isAxiosError } from "axios";
+import { firstValueFrom } from "rxjs";
+
+import { ConfigType } from "@/types/config.type";
+
+import { KakaoGetUserInformationResponse, KakaoOAuthTokenResponse } from "../types/auth.type";
 import { KAKAO_API } from "./constants";
+import { AuthenticateResponseDto } from "./dtos/responses/authenticate-response.dto";
 
 @Injectable()
 export class AuthKakaoService {

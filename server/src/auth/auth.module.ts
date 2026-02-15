@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 
-import { AuthService } from "./auth.service";
+import { PointsModule } from "@/points/points.module";
+import { UsersModule } from "@/users/users.module";
+
 import { AuthController } from "./auth.controller";
-import { UsersModule } from "src/users/users.module";
-import { PointsModule } from "src/points/points.module";
+import { AuthService } from "./auth.service";
 
 @Module({
     imports: [

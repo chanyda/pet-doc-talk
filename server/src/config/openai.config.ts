@@ -1,5 +1,6 @@
 import { registerAs } from "@nestjs/config";
-import { OpenaiConfigType } from "src/types/config.type";
+
+import { OpenaiConfigType } from "@/types/config.type";
 
 export default registerAs<OpenaiConfigType>("openai", () => ({
     apiKey: process.env.OPENAI_API_KEY || "",

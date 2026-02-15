@@ -1,12 +1,15 @@
-import { Test, TestingModule } from "@nestjs/testing";
+import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { UsersService } from "src/users/users.service";
-import { AuthService } from "./auth.service";
-import { BadRequestException, UnauthorizedException } from "@nestjs/common";
+import { Test, TestingModule } from "@nestjs/testing";
+
 import { LoginFrom, PointSource } from "generated/prisma/enums";
-import { PointsService } from "src/points/points.service";
-import { POINT_POLICY } from "src/points/constants";
+
+import { POINT_POLICY } from "@/points/constants";
+import { PointsService } from "@/points/points.service";
+import { UsersService } from "@/users/users.service";
+
+import { AuthService } from "./auth.service";
 
 // @Transactional() 데코레이터 모킹 (원래 함수를 그대로 반환하도록 함)
 jest.mock("@nestjs-cls/transactional", () => ({

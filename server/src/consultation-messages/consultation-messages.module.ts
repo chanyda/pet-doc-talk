@@ -1,11 +1,13 @@
-import { Module, forwardRef } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
+
+import { ConsultationConversationsModule } from "@/consultation-conversations/consultation-conversations.module";
+import { ConsultationsModule } from "@/consultations/consultations.module";
+import { PetsModule } from "@/pets/pets.module";
+import { PointsModule } from "@/points/points.module";
+
 import { ConsultationMessagesController } from "./consultation-messages.controller";
-import { ConsultationMessagesService } from "./consultation-messages.service";
 import { ConsultationMessagesRepository } from "./consultation-messages.repository";
-import { ConsultationsModule } from "src/consultations/consultations.module";
-import { ConsultationConversationsModule } from "src/consultation-conversations/consultation-conversations.module";
-import { PetsModule } from "src/pets/pets.module";
-import { PointsModule } from "src/points/points.module";
+import { ConsultationMessagesService } from "./consultation-messages.service";
 
 @Module({
     imports: [forwardRef(() => ConsultationsModule), ConsultationConversationsModule, PetsModule, PointsModule],

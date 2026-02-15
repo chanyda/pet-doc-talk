@@ -1,27 +1,29 @@
 import {
-    Controller,
-    Post,
-    Get,
     Body,
-    Param,
-    Query,
-    ParseIntPipe,
-    Sse,
+    Controller,
+    Get,
     HttpCode,
     HttpStatus,
+    Param,
+    ParseIntPipe,
+    Post,
+    Query,
     Res,
+    Sse,
 } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiForbiddenResponse } from "@nestjs/swagger";
-import { Observable } from "rxjs";
 import { MessageEvent } from "@nestjs/common";
+import { ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { Response } from "express";
+import { Observable } from "rxjs";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { User } from "@/common/decorators/user.decorator";
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+
 import { ConsultationMessagesService } from "./consultation-messages.service";
 import { SendMessageDto } from "./dtos/requests/send-message.dto";
 import { MessageListResponseDto } from "./dtos/responses/message-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
-import { Auth } from "src/common/decorators/auth.decorator";
-import { User } from "src/common/decorators/user.decorator";
-import { Throttle } from "@nestjs/throttler";
-import { Response } from "express";
 
 @ApiTags("Consultation Messages")
 @Auth()

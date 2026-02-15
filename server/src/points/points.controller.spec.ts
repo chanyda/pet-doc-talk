@@ -1,7 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+
 import { PointsController } from "./points.controller";
 import { PointsService } from "./points.service";
-import { AuthGuard } from "src/auth/guards/auth.guard";
 
 describe("PointsController", () => {
     let pointsController: PointsController;

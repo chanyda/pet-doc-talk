@@ -1,10 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { extractTokenFromCookie } from "src/common/utils/auth.util";
-import { JwtPayload } from "src/types/auth.type";
-import { ConfigType } from "src/types/config.type";
-import { AuthRequest } from "src/types/request.type";
+
+import { extractTokenFromCookie } from "@/common/utils/auth.util";
+import { JwtPayload } from "@/types/auth.type";
+import { ConfigType } from "@/types/config.type";
+import { AuthRequest } from "@/types/request.type";
 
 @Injectable()
 export class LogoutGuard implements CanActivate {

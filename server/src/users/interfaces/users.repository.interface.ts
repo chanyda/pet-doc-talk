@@ -1,4 +1,5 @@
 import { UserGetPayload, UserSelect } from "generated/prisma/models";
+
 import { CreateUserDto } from "../dtos/requests/create-user.dto";
 import { UpdateUserDto } from "../dtos/requests/update-user.dto";
 import { IUser } from "./users.interface";

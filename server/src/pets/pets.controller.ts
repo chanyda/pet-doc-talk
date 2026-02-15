@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
-import { PetsService } from "./pets.service";
 import { ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { User } from "@/common/decorators/user.decorator";
+
 import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
 import { PetDetailDto } from "./dtos/responses/pet-detail-dto";
+import { PetsService } from "./pets.service";
 
 @ApiTags("pets")
 @Auth()

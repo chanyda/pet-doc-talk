@@ -1,5 +1,6 @@
-import { IsEmail, IsEnum, IsString, MaxLength, MinLength } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsEnum, IsString, MaxLength, MinLength } from "class-validator";
+
 import { LoginFrom } from "generated/prisma/enums";
 
 export class LoginDto {

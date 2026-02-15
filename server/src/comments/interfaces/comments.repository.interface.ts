@@ -1,8 +1,9 @@
+import { CommentGetPayload, CommentWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
 import { CommentFindManyArgs, CommentSelect } from "generated/prisma/models";
+
 import { CreateCommentDto } from "../dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "../dtos/requests/update-comment.dto";
 import { IComment } from "./comments.interface";
-import { CommentGetPayload, CommentWhereInput, SelectSubset } from "generated/prisma/internal/prismaNamespace";
 
 export type FindManyAndCountResult<T extends CommentFindManyArgs> = {
     comments: CommentGetPayload<T>[];

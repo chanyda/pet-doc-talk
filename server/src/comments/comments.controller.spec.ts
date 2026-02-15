@@ -1,9 +1,11 @@
+import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+import { getNextCursor } from "@/common/utils/pagination.util";
+
 import { CommentsController } from "./comments.controller";
 import { CommentsService } from "./comments.service";
-import { AuthGuard } from "src/auth/guards/auth.guard";
-import { BadRequestException, ForbiddenException, NotFoundException } from "@nestjs/common";
-import { getNextCursor } from "src/common/utils/pagination.util";
 
 describe("CommentsController", () => {
     let commentsController: CommentsController;

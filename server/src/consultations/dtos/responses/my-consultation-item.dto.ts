@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
 import { PetType } from "generated/prisma/enums";
 
 class ConsultationPetDto {

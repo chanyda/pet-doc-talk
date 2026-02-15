@@ -1,10 +1,12 @@
 import { Module } from "@nestjs/common";
-import { PrismaModule } from "src/prisma/prisma.module";
+
+import { CategoriesModule } from "@/categories/categories.module";
+import { PrismaModule } from "@/prisma/prisma.module";
+import { UsersModule } from "@/users/users.module";
+
 import { PostsController } from "./posts.controller";
-import { PostsService } from "./posts.service";
 import { PostsRepository } from "./posts.repository";
-import { UsersModule } from "src/users/users.module";
-import { CategoriesModule } from "src/categories/categories.module";
+import { PostsService } from "./posts.service";
 
 @Module({
     imports: [PrismaModule, UsersModule, CategoriesModule],

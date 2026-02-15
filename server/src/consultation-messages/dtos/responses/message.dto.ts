@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+
 import { MessageRole } from "generated/prisma/enums";
 
 export class MessageDto {

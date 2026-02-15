@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
-import { PostsService } from "./posts.service";
 import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
@@ -8,16 +7,19 @@ import {
     ApiOkResponse,
     ApiTags,
 } from "@nestjs/swagger";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { Public } from "@/common/decorators/public.decorator";
+import { User } from "@/common/decorators/user.decorator";
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
-import { UpdatePostDto } from "./dtos/requests/update-post.dto";
-import { PostResponseDto } from "./dtos/responses/post-response.dto";
-import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
-import { Public } from "src/common/decorators/public.decorator";
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
+import { UpdatePostDto } from "./dtos/requests/update-post.dto";
+import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
 import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+import { PostResponseDto } from "./dtos/responses/post-response.dto";
+import { PostsService } from "./posts.service";
 
 @ApiTags("posts")
 @Auth()

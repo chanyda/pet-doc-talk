@@ -1,5 +1,6 @@
 import { createParamDecorator, ExecutionContext, UnauthorizedException } from "@nestjs/common";
-import { AuthRequest } from "src/types/request.type";
+
+import { AuthRequest } from "@/types/request.type";
 
 export const Cookies = createParamDecorator((data: string, ctx: ExecutionContext): string | Record<string, string> => {
     const request = ctx.switchToHttp().getRequest<AuthRequest>();

@@ -1,10 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from "@nestjs/common";
-import { UsersService } from "./users.service";
 import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { User } from "@/common/decorators/user.decorator";
+
 import { UpdateProfileDto } from "./dtos/requests/update-profile-dto";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
+import { FindProfileResponseDto } from "./dtos/responses/find-profile-response.dto";
+import { UsersService } from "./users.service";
 
 @ApiTags("users")
 @Auth()

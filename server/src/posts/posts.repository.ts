@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
-import { PrismaService } from "src/prisma/prisma.service";
-import { FindManyAndCountResult, IPostsRepository } from "./interfaces/posts.repository.interface";
+import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
+import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
 import { CreatePostDto } from "./dtos/requests/create-post.dto";
 import { UpdatePostDto } from "./dtos/requests/update-post.dto";
 import { IPost } from "./interfaces/posts.interface";
-import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
-import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
+import { FindManyAndCountResult, IPostsRepository } from "./interfaces/posts.repository.interface";
 
 @Injectable()
 export class PostsRepository implements IPostsRepository {

@@ -1,5 +1,6 @@
 import { MessageRole } from "generated/prisma/enums";
-import { IMessageContext } from "src/consultation-messages/interfaces/consultation-messages.repository.interface";
+
+import { IMessageContext } from "@/consultation-messages/interfaces/consultation-messages.repository.interface";
 
 export interface IStreamChunk {
     type: "delta" | "completed";

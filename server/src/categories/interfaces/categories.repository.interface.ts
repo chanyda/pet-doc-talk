@@ -1,4 +1,5 @@
 import { CategorySelect } from "generated/prisma/models";
+
 import { ICategory } from "./categories.interface";
 
 export interface ICategoriesRepository {

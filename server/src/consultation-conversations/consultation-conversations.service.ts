@@ -1,8 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Transactional } from "@nestjs-cls/transactional";
+
+import { OpenAIService } from "@/openai/openai.service";
+
 import { ConsultationConversationsRepository } from "./consultation-conversations.repository";
 import { IConsultationConversation } from "./interfaces/consultation-conversations.interface";
-import { OpenAIService } from "src/openai/openai.service";
 
 @Injectable()
 export class ConsultationConversationsService {

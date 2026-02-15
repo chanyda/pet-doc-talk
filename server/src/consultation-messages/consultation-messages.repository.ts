@@ -1,6 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
+import {
+    ConsultationMessageGetPayload,
+    ConsultationMessageWhereInput,
+    SelectSubset,
+} from "generated/prisma/internal/prismaNamespace";
+import { ConsultationMessageFindManyArgs } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
 import { IConsultationMessage } from "./interfaces/consultation-messages.interface";
 import {
     FindManyAndCountResult,
@@ -8,13 +18,6 @@ import {
     ICreateMessageData,
     IMessageContext,
 } from "./interfaces/consultation-messages.repository.interface";
-import { PrismaService } from "src/prisma/prisma.service";
-import { ConsultationMessageFindManyArgs } from "generated/prisma/models";
-import {
-    ConsultationMessageGetPayload,
-    ConsultationMessageWhereInput,
-    SelectSubset,
-} from "generated/prisma/internal/prismaNamespace";
 
 @Injectable()
 export class ConsultationMessagesRepository implements IConsultationMessagesRepository {

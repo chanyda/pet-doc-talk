@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
 import { PostSummaryDto } from "./post-summary-dto";
 
 export class PostListResponseDto {

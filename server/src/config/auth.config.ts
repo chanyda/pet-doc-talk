@@ -1,6 +1,7 @@
 import { registerAs } from "@nestjs/config";
-import { AuthConfigType } from "src/types/config.type";
 import type { StringValue } from "ms";
+
+import { AuthConfigType } from "@/types/config.type";
 
 export default registerAs<AuthConfigType>("auth", () => ({
     secretKey: process.env.JWT_SECRET_KEY || "",

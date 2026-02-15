@@ -1,19 +1,22 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { PostsRepository } from "./posts.repository";
-import { CreatePostDto } from "./dtos/requests/create-post.dto";
-import { UpdatePostDto } from "./dtos/requests/update-post.dto";
-import { PostResponseDto } from "./dtos/responses/post-response.dto";
-import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
-import { UsersService } from "src/users/users.service";
-import { CategoriesService } from "src/categories/categories.service";
-import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
-import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
+
 import { PostGetPayload, PostOrderByWithRelationInput, PostWhereInput } from "generated/prisma/models";
-import { PostOrderBy } from "./posts.enums";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
+
+import { CategoriesService } from "@/categories/categories.service";
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+import { getNextCursor } from "@/common/utils/pagination.util";
+import { UsersService } from "@/users/users.service";
+
 import { POST_DETAIL_SELECT, POST_SUMMARY_SELECT, PostSummarySelect } from "./constants";
-import { getNextCursor } from "src/common/utils/pagination.util";
+import { CreatePostDto } from "./dtos/requests/create-post.dto";
+import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
+import { UpdatePostDto } from "./dtos/requests/update-post.dto";
+import { PostDetailResponseDto } from "./dtos/responses/post-detail-response.dto";
+import { PostListResponseDto } from "./dtos/responses/post-list-response.dto";
+import { PostResponseDto } from "./dtos/responses/post-response.dto";
 import { PostSummaryDto } from "./dtos/responses/post-summary-dto";
+import { PostOrderBy } from "./posts.enums";
+import { PostsRepository } from "./posts.repository";
 
 @Injectable()
 export class PostsService {

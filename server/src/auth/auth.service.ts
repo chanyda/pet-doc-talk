@@ -1,15 +1,18 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { LoginDto } from "./dtos/requests/login.dto";
-import { UsersService } from "src/users/users.service";
-import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { PointsService } from "src/points/points.service";
-import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/login-response.dto";
-import { ConfigType } from "src/types/config.type";
-import { nanoid } from "nanoid";
+import { JwtService } from "@nestjs/jwt";
 import { Transactional } from "@nestjs-cls/transactional";
-import { JwtPayload } from "src/types/auth.type";
+import { nanoid } from "nanoid";
+
 import { PointSource } from "generated/prisma/enums";
+
+import { PointsService } from "@/points/points.service";
+import { JwtPayload } from "@/types/auth.type";
+import { ConfigType } from "@/types/config.type";
+import { UsersService } from "@/users/users.service";
+
+import { LoginDto } from "./dtos/requests/login.dto";
+import { GenerateTokenResponseDto, LoginResponseDto } from "./dtos/responses/login-response.dto";
 
 @Injectable()
 export class AuthService {

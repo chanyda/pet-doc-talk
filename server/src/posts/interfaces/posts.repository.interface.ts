@@ -1,8 +1,9 @@
+import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
 import { PostFindManyArgs, PostGetPayload, PostSelect } from "generated/prisma/models";
+
 import { CreatePostDto } from "../dtos/requests/create-post.dto";
 import { UpdatePostDto } from "../dtos/requests/update-post.dto";
 import { IPost } from "./posts.interface";
-import { SelectSubset } from "generated/prisma/internal/prismaNamespace";
 
 export type FindManyAndCountResult<T extends PostFindManyArgs> = {
     posts: PostGetPayload<T>[];

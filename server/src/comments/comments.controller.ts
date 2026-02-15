@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
-import { CommentsService } from "./comments.service";
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
@@ -9,15 +8,18 @@ import {
     ApiOkResponse,
     ApiTags,
 } from "@nestjs/swagger";
+
+import { Auth } from "@/common/decorators/auth.decorator";
+import { Public } from "@/common/decorators/public.decorator";
+import { User } from "@/common/decorators/user.decorator";
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+
+import { CommentsService } from "./comments.service";
 import { CreateCommentDto } from "./dtos/requests/create-comment.dto";
 import { UpdateCommentDto } from "./dtos/requests/update-comment.dto";
-import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { CommentListResponseDto } from "./dtos/responses/comment-list-response.dto";
-import { User } from "src/common/decorators/user.decorator";
-import { Auth } from "src/common/decorators/auth.decorator";
-import { Public } from "src/common/decorators/public.decorator";
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { CommentReplyListResponseDto } from "./dtos/responses/comment-reply-list-response.dto";
+import { CommentResponseDto } from "./dtos/responses/comment-response.dto";
 import { MyCommentListResponseDto } from "./dtos/responses/my-comment-list-response.dto";
 
 @ApiTags("comments")

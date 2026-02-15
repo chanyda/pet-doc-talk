@@ -1,10 +1,12 @@
-import { PostsController } from "./posts.controller";
-import { PostsService } from "./posts.service";
-import { Test, TestingModule } from "@nestjs/testing";
-import { AuthGuard } from "src/auth/guards/auth.guard";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
-import { PostOrderBy } from "./posts.enums";
+import { Test, TestingModule } from "@nestjs/testing";
+
+import { AuthGuard } from "@/auth/guards/auth.guard";
+
 import { FindPostListQueryDto } from "./dtos/requests/find-post-list-query.dto";
+import { PostsController } from "./posts.controller";
+import { PostOrderBy } from "./posts.enums";
+import { PostsService } from "./posts.service";
 
 describe("PostsController", () => {
     let postsController: PostsController;

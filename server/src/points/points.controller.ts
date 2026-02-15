@@ -1,10 +1,11 @@
 import { Controller, Get, HttpCode, HttpStatus } from "@nestjs/common";
-import { ApiTags, ApiOkResponse } from "@nestjs/swagger";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 
-import { PointsService } from "./points.service";
-import { Auth } from "src/common/decorators/auth.decorator";
-import { User } from "src/common/decorators/user.decorator";
+import { Auth } from "@/common/decorators/auth.decorator";
+import { User } from "@/common/decorators/user.decorator";
+
 import { MyPointItemDto } from "./dtos/responses/my-point-item.dto";
+import { PointsService } from "./points.service";
 
 @ApiTags("points")
 @Auth()

@@ -1,12 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
 import { TransactionHost } from "@nestjs-cls/transactional";
-import { PrismaService } from "src/prisma/prisma.service";
-import { IPetsRepository } from "./interfaces/pets.repository.interface";
+import { TransactionalAdapterPrisma } from "@nestjs-cls/transactional-adapter-prisma";
+
+import { PetSelect } from "generated/prisma/models";
+
+import { PrismaService } from "@/prisma/prisma.service";
+
 import { CreatePetDto } from "./dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "./dtos/requests/update-pet.dto";
 import { IPet } from "./interfaces/pets.interface";
-import { PetSelect } from "generated/prisma/models";
+import { IPetsRepository } from "./interfaces/pets.repository.interface";
 
 @Injectable()
 export class PetsRepository implements IPetsRepository {

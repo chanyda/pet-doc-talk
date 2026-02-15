@@ -1,4 +1,5 @@
 import { PetSelect } from "generated/prisma/models";
+
 import { CreatePetDto } from "../dtos/requests/create-pet.dto";
 import { UpdatePetDto } from "../dtos/requests/update-pet.dto";
 import { IPet } from "./pets.interface";

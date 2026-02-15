@@ -1,7 +1,8 @@
-import { PaginationQueryDto } from "src/common/dtos/requests/pagination-query.dto";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsInt, IsOptional, IsString, MaxLength, Min } from "class-validator";
-import { PostOrderBy } from "src/posts/posts.enums";
+
+import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
+import { PostOrderBy } from "@/posts/posts.enums";
 
 export class FindPostListQueryDto extends PaginationQueryDto {
     @ApiPropertyOptional({ description: "The category ID of post.", minimum: 1 })
