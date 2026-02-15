@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+} from "@nestjs/common";
 import {
     ApiBadRequestResponse,
     ApiCreatedResponse,
@@ -33,7 +45,10 @@ export class CommentsController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Get comment list successful.", type: CommentListResponseDto })
     @ApiNotFoundResponse({ description: "Post not exists." })
-    findComments(@Param("postId") postId: number, @Query() query: PaginationQueryDto): Promise<CommentListResponseDto> {
+    findComments(
+        @Param("postId", ParseIntPipe) postId: number,
+        @Query() query: PaginationQueryDto,
+    ): Promise<CommentListResponseDto> {
         return this.commentsService.findComments(postId, query);
     }
 
@@ -43,7 +58,7 @@ export class CommentsController {
     @ApiOkResponse({ description: "Get comment reply list successful.", type: CommentReplyListResponseDto })
     @ApiNotFoundResponse({ description: "Parent comment not exists." })
     findReplies(
-        @Param("commentId") commentId: number,
+        @Param("commentId", ParseIntPipe) commentId: number,
         @Query() query: PaginationQueryDto,
     ): Promise<CommentReplyListResponseDto> {
         return this.commentsService.findReplies(commentId, query);
@@ -67,7 +82,7 @@ export class CommentsController {
     })
     @ApiNotFoundResponse({ description: "Post, User, Parent comment, or Mention user not exists." })
     create(
-        @Param("postId") postId: number,
+        @Param("postId", ParseIntPipe) postId: number,
         @User("userId") userId: number,
         @Body() createCommentDto: CreateCommentDto,
     ): Promise<CommentResponseDto> {
@@ -81,7 +96,7 @@ export class CommentsController {
     @ApiForbiddenResponse({ description: "You do not have permission to update this comment." })
     @ApiNotFoundResponse({ description: "Comment not exists." })
     update(
-        @Param("id") id: number,
+        @Param("id", ParseIntPipe) id: number,
         @User("userId") userId: number,
         @Body() updateCommentDto: UpdateCommentDto,
     ): Promise<CommentResponseDto> {
@@ -94,7 +109,7 @@ export class CommentsController {
     @ApiBadRequestResponse({ description: "Comment already deleted." })
     @ApiForbiddenResponse({ description: "You do not have permission to delete this comment." })
     @ApiNotFoundResponse({ description: "Comment not exists." })
-    remove(@Param("id") id: number, @User("userId") userId: number): Promise<void> {
+    remove(@Param("id", ParseIntPipe) id: number, @User("userId") userId: number): Promise<void> {
         return this.commentsService.remove(id, userId);
     }
 }

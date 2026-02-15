@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
 import { ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 
 import { Auth } from "@/common/decorators/auth.decorator";
@@ -26,7 +26,7 @@ export class PetsController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ description: "Find pet successful.", type: PetDetailDto })
     @ApiNotFoundResponse({ description: "Pet not exists." })
-    findById(@User("userId") userId: number, @Param("id") petId: number): Promise<PetDetailDto> {
+    findById(@User("userId") userId: number, @Param("id", ParseIntPipe) petId: number): Promise<PetDetailDto> {
         return this.petsService.findById(petId, userId);
     }
 
@@ -44,7 +44,7 @@ export class PetsController {
     @ApiNotFoundResponse({ description: "Pet not exists." })
     update(
         @User("userId") userId: number,
-        @Param("id") petId: number,
+        @Param("id", ParseIntPipe) petId: number,
         @Body() updatePetDto: UpdatePetDto,
     ): Promise<PetDetailDto> {
         return this.petsService.update(petId, userId, updatePetDto);
@@ -54,7 +54,7 @@ export class PetsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiNoContentResponse({ description: "Delete pet successful." })
     @ApiNotFoundResponse({ description: "Pet not exists." })
-    remove(@User("userId") userId: number, @Param("id") petId: number): Promise<void> {
+    remove(@User("userId") userId: number, @Param("id", ParseIntPipe) petId: number): Promise<void> {
         return this.petsService.remove(petId, userId);
     }
 }

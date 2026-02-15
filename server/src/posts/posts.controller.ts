@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+} from "@nestjs/common";
 import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
@@ -52,7 +64,7 @@ export class PostsController {
     @ApiOkResponse({ description: "Find post successful.", type: PostDetailResponseDto })
     @ApiNotFoundResponse({ description: "Post not exists." })
     // TODO: 좋아요 기능 추가 시 userId를 받아서 로그인한 사용자가 좋아요를 누른 게시글인지 보여줘야함
-    findById(@Param("id") postId: number): Promise<PostDetailResponseDto> {
+    findById(@Param("id", ParseIntPipe) postId: number): Promise<PostDetailResponseDto> {
         return this.postsService.findById(postId);
     }
 
@@ -70,7 +82,7 @@ export class PostsController {
     @ApiNotFoundResponse({ description: "Post or Category not exists." })
     @ApiForbiddenResponse({ description: "You do not have permission to update this post." })
     update(
-        @Param("id") postId: number,
+        @Param("id", ParseIntPipe) postId: number,
         @User("userId") userId: number,
         @Body() updatePostDto: UpdatePostDto,
     ): Promise<PostResponseDto> {
@@ -82,7 +94,7 @@ export class PostsController {
     @ApiNoContentResponse({ description: "Delete post successful." })
     @ApiNotFoundResponse({ description: "Post not exists." })
     @ApiForbiddenResponse({ description: "You do not have permission to delete this post." })
-    remove(@Param("id") postId: number, @User("userId") userId: number): Promise<void> {
+    remove(@Param("id", ParseIntPipe) postId: number, @User("userId") userId: number): Promise<void> {
         return this.postsService.remove(postId, userId);
     }
 }
