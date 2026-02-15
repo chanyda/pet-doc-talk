@@ -73,7 +73,6 @@ export class ConsultationMessagesService {
         return this.consultationMessagesRepository.create(consultationId, data);
     }
 
-    @Transactional()
     async sendMessageStream(
         userId: number,
         consultationId: number,
@@ -108,9 +107,10 @@ export class ConsultationMessagesService {
 
         const abortController = new AbortController();
 
+        const onClose = () => abortController.abort();
         res.on("close", () => {
             console.log("Client Abort.");
-            abortController.abort();
+            onClose();
         });
 
         return new Observable((subscriber: Subscriber<MessageEvent>) => {
@@ -139,7 +139,10 @@ export class ConsultationMessagesService {
                     }
                 });
 
-            return () => abortController.abort();
+            return () => {
+                res.removeListener("close", onClose);
+                abortController.abort();
+            };
         });
     }
 

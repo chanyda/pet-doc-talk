@@ -97,6 +97,7 @@ export function Chat({ consultationId }: ChatProps) {
             setMessages([]);
             setStreamingContent(null);
             setCheckListAnswers({});
+            abortControllerRef.current?.abort();
         };
     }, [consultationId, fetchMessages]);
 
