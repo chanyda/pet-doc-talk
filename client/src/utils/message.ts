@@ -17,7 +17,11 @@ export function parseAIMessageContent(message: Message): AIMessageContent | null
         }
 
         const answer = typeof parsed.answer === "string" ? parsed.answer : "";
-        const checkList = Array.isArray(parsed.checkList) ? parsed.checkList : [];
+        const checkList: CheckListItem[] = Array.isArray(parsed.checkList)
+            ? parsed.checkList.filter(
+                  (item: CheckListItem) => item.question?.trim() && item.status && item.status.length > 0,
+              )
+            : [];
 
         // answer도 checkList도 없으면 AI 메시지 형식이 아닌 것으로 간주
         if (!answer && checkList.length === 0) {
