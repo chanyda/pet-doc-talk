@@ -8,16 +8,19 @@ import { ClsModule } from "nestjs-cls";
 import { AuthModule } from "./auth/auth.module";
 import { AuthService } from "./auth/auth.service";
 import { AuthKakaoModule } from "./auth-kakao/auth-kakao.module";
+import { AwsModule } from "./aws/aws.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { CommentsModule } from "./comments/comments.module";
 import appConfig from "./config/app.config";
 import authConfig from "./config/auth.config";
+import awsConfig from "./config/aws.config";
 import openaiConfig from "./config/openai.config";
 import prismaConfig from "./config/prisma.config";
 import { validate } from "./config/validation/env.validation";
 import { ConsultationConversationsModule } from "./consultation-conversations/consultation-conversations.module";
 import { ConsultationMessagesModule } from "./consultation-messages/consultation-messages.module";
 import { ConsultationsModule } from "./consultations/consultations.module";
+import { ImagesModule } from "./images/images.module";
 import { OpenAIModule } from "./openai/openai.module";
 import { PetsModule } from "./pets/pets.module";
 import { PointsModule } from "./points/points.module";
@@ -36,7 +39,7 @@ import { UsersModule } from "./users/users.module";
         ]),
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [appConfig, prismaConfig, authConfig, openaiConfig],
+            load: [appConfig, prismaConfig, authConfig, openaiConfig, awsConfig],
             envFilePath: ".env",
             validate,
         }),
@@ -64,6 +67,8 @@ import { UsersModule } from "./users/users.module";
         ConsultationConversationsModule,
         ConsultationMessagesModule,
         PointsModule,
+        AwsModule,
+        ImagesModule,
     ],
     providers: [AuthService],
 })
