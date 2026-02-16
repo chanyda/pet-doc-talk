@@ -1,4 +1,4 @@
-import { NotFoundException } from "@nestjs/common";
+import { ForbiddenException, Logger, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { PetType } from "generated/prisma/enums";
@@ -15,6 +15,7 @@ describe("ConsultationsController", () => {
 
     let findMyConsultationsSpy: jest.SpyInstance;
     let createSpy: jest.SpyInstance;
+    let deleteSpy: jest.SpyInstance;
 
     const TEST_CONSULTATION_ID = 1;
     const TEST_USER_ID = 1;
@@ -29,6 +30,7 @@ describe("ConsultationsController", () => {
                     useValue: {
                         create: jest.fn(),
                         findMyConsultations: jest.fn(),
+                        delete: jest.fn(),
                     },
                 },
             ],
@@ -37,11 +39,14 @@ describe("ConsultationsController", () => {
             .useValue({ canActivate: jest.fn(() => true) })
             .compile();
 
+        jest.spyOn(Logger.prototype, "error").mockImplementation();
+
         consultationsController = moduleRef.get(ConsultationsController);
         consultationsService = moduleRef.get(ConsultationsService);
 
         findMyConsultationsSpy = jest.spyOn(consultationsService, "findMyConsultations");
         createSpy = jest.spyOn(consultationsService, "create");
+        deleteSpy = jest.spyOn(consultationsService, "delete");
     });
 
     afterEach(() => {
@@ -148,6 +153,44 @@ describe("ConsultationsController", () => {
             );
             expect(createSpy).toHaveBeenCalledWith(TEST_USER_ID, createConsultationDto);
             expect(createSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("delete", () => {
+        describe("상담 삭제 성공", () => {
+            it("상담 삭제를 성공한다.", async () => {
+                deleteSpy.mockResolvedValue(undefined);
+
+                const result = await consultationsController.delete(TEST_USER_ID, TEST_CONSULTATION_ID);
+
+                expect(result).toBeUndefined();
+                expect(deleteSpy).toHaveBeenCalledWith(TEST_USER_ID, TEST_CONSULTATION_ID);
+                expect(deleteSpy).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe("상담 삭제 실패", () => {
+            it("consultationId가 DB에 존재하지 않아서 오류를 반환한다.", async () => {
+                deleteSpy.mockRejectedValue(new NotFoundException("Consultation not exists."));
+
+                await expect(consultationsController.delete(TEST_USER_ID, TEST_CONSULTATION_ID)).rejects.toThrow(
+                    new NotFoundException("Consultation not exists."),
+                );
+                expect(deleteSpy).toHaveBeenCalledWith(TEST_USER_ID, TEST_CONSULTATION_ID);
+                expect(deleteSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("삭제하려는 consultationId가 내가 생성한 consultation이 아니라서 오류를 반환한다.", async () => {
+                deleteSpy.mockRejectedValue(
+                    new ForbiddenException("You do not have permission to delete this consultation."),
+                );
+
+                await expect(consultationsController.delete(TEST_USER_ID, TEST_CONSULTATION_ID)).rejects.toThrow(
+                    new ForbiddenException("You do not have permission to delete this consultation."),
+                );
+                expect(deleteSpy).toHaveBeenCalledWith(TEST_USER_ID, TEST_CONSULTATION_ID);
+                expect(deleteSpy).toHaveBeenCalledTimes(1);
+            });
         });
     });
 });
