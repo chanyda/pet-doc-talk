@@ -1,5 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from "@nestjs/common";
-import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
+import {
+    ApiCreatedResponse,
+    ApiForbiddenResponse,
+    ApiNoContentResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiTags,
+} from "@nestjs/swagger";
 
 import { Auth } from "@/common/decorators/auth.decorator";
 import { User } from "@/common/decorators/user.decorator";
@@ -35,5 +42,17 @@ export class ConsultationsController {
         @Body() createConsultationDto: CreateConsultationDto,
     ): Promise<ConsultationDto> {
         return this.consultationsService.create(userId, createConsultationDto);
+    }
+
+    @Delete(":consultationId")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({ description: "Delete consultation successful." })
+    @ApiNotFoundResponse({ description: "Consultation not exists." })
+    @ApiForbiddenResponse({ description: "You do not have permission to delete this consultation." })
+    delete(
+        @User("userId") userId: number,
+        @Param("consultationId", ParseIntPipe) consultationId: number,
+    ): Promise<void> {
+        return this.consultationsService.delete(userId, consultationId);
     }
 }

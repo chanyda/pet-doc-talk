@@ -1,11 +1,13 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { Transactional } from "@nestjs-cls/transactional";
 
 import { MessageRole } from "generated/prisma/enums";
 
 import { PaginationQueryDto } from "@/common/dtos/requests/pagination-query.dto";
 import { getNextCursor } from "@/common/utils/pagination.util";
+import { ConsultationConversationsService } from "@/consultation-conversations/consultation-conversations.service";
 import { ConsultationMessagesService } from "@/consultation-messages/consultation-messages.service";
+import { OpenAIService } from "@/openai/openai.service";
 import { PetsService } from "@/pets/pets.service";
 
 import { CONSULTATION_SELECT } from "./constants";
@@ -17,11 +19,15 @@ import { IConsultation } from "./interfaces/consultations.interface";
 
 @Injectable()
 export class ConsultationsService {
+    private readonly logger = new Logger(ConsultationsService.name);
+
     constructor(
         private readonly consultationsRepository: ConsultationsRepository,
         private readonly petsService: PetsService,
         @Inject(forwardRef(() => ConsultationMessagesService))
         private readonly messagesService: ConsultationMessagesService,
+        private readonly consultationConversationsService: ConsultationConversationsService,
+        private readonly openaiService: OpenAIService,
     ) {}
 
     async findMyConsultations(userId: number, query: PaginationQueryDto): Promise<MyConsultationListResponseDto> {
@@ -63,5 +69,35 @@ export class ConsultationsService {
         });
 
         return consultation;
+    }
+
+    @Transactional()
+    async delete(userId: number, consultationId: number): Promise<void> {
+        const consultation = await this.findById(consultationId);
+
+        if (!consultation) {
+            throw new NotFoundException("Consultation not exists.");
+        }
+
+        if (consultation.userId !== userId) {
+            throw new ForbiddenException("You do not have permission to delete this consultation.");
+        }
+
+        const conversations = await this.consultationConversationsService.findManyByConsultationId(consultationId);
+        const conversationIds = conversations.map(({ conversationId }) => conversationId);
+
+        await this.consultationsRepository.delete(consultationId);
+
+        // OpenAI 측 conversation 정리
+        // 클라이언트 응답과 무관한 백그라운드 작업이므로 의도적으로 await 하지 않음
+        Promise.allSettled(conversationIds.map((id: string) => this.openaiService.deleteConversation(id)))
+            .then((results) => {
+                results.forEach((result, index) => {
+                    if (result.status === "rejected") {
+                        this.logger.error(`Failed to delete conversation: ${conversationIds[index]}`, result.reason);
+                    }
+                });
+            })
+            .catch(() => {});
     }
 }
