@@ -71,7 +71,6 @@ export class ConsultationsService {
         return consultation;
     }
 
-    @Transactional()
     async delete(userId: number, consultationId: number): Promise<void> {
         const consultation = await this.findById(consultationId);
 
@@ -98,6 +97,8 @@ export class ConsultationsService {
                     }
                 });
             })
-            .catch(() => {});
+            .catch((err) => {
+                this.logger.error("Unexpected error during conversation cleanup.", err);
+            });
     }
 }
