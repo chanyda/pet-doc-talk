@@ -10,10 +10,11 @@ export class UpdateProfileDto {
     @MaxLength(20)
     nickname?: string;
 
-    @ApiPropertyOptional({ type: String })
+    @ApiPropertyOptional({ type: String, description: "The image url of user.", maxLength: 500 })
     @IsOptional()
     @IsUrl({}, { message: "profileImageUrl must be a valid URL" })
     // 빈 값이 들어온 경우 null로 업데이트 되도록 함
     @Transform(({ value }: { value: string }) => (value === "" ? null : value))
+    @MaxLength(500)
     profileImageUrl?: string | null;
 }

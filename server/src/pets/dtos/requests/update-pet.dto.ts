@@ -60,8 +60,8 @@ export class UpdatePetDto {
 
     @ApiPropertyOptional({ description: "The image URL of pet.", maxLength: 500 })
     @IsOptional()
-    @Transform(({ value }: { value: string }) => (value === "" ? null : value))
     @IsUrl({}, { message: "imageUrl must be a valid URL" })
+    @Transform(({ value }: { value: string }) => (value === "" ? null : value))
     @MaxLength(500)
     imageUrl?: string | null;
 }
