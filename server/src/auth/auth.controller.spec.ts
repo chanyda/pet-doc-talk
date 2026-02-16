@@ -1,4 +1,4 @@
-import { UnauthorizedException } from "@nestjs/common";
+import { Logger, UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { Response } from "express";
 
@@ -42,7 +42,7 @@ describe("AuthController", () => {
             .useValue({ canActivate: jest.fn(() => true) })
             .compile();
 
-        jest.spyOn(console, "error").mockImplementation(jest.fn());
+        jest.spyOn(Logger.prototype, "error").mockImplementation();
 
         authController = moduleRef.get(AuthController);
         authService = moduleRef.get(AuthService);

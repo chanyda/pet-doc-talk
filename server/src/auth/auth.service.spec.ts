@@ -1,4 +1,4 @@
-import { BadRequestException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Logger, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
@@ -86,7 +86,7 @@ describe("AuthService", () => {
             ],
         }).compile();
 
-        jest.spyOn(console, "error").mockImplementation(jest.fn());
+        jest.spyOn(Logger.prototype, "error").mockImplementation();
 
         authService = moduleRef.get(AuthService);
         userService = moduleRef.get(UsersService);
