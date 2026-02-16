@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
+import { ConversationDeletedResource } from "openai/resources/conversations/conversations";
 import { EasyInputMessage, ResponseUsage } from "openai/resources/responses/responses";
 import { ResponsesModel } from "openai/resources/shared";
 import { get_encoding, Tiktoken } from "tiktoken";
@@ -92,5 +93,9 @@ export class OpenAIService {
                 };
             }
         }
+    }
+
+    async deleteConversation(conversationId: string): Promise<ConversationDeletedResource> {
+        return await this.openai.conversations.delete(conversationId);
     }
 }
