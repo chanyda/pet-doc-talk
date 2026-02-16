@@ -25,9 +25,18 @@ export type OpenaiConfigType = {
     model: ResponsesModel;
 };
 
+export type AwsConfigType = {
+    accessKeyId: string;
+    secretAccessKey: string;
+    region: string;
+    s3BucketName: string;
+    staticDomain: string;
+};
+
 export type ConfigType = {
     app: AppConfigType;
     prisma: PrismaConfigType;
     auth: AuthConfigType;
     openai: OpenaiConfigType;
+    aws: AwsConfigType;
 };
