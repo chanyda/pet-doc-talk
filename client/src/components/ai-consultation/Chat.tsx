@@ -2,12 +2,15 @@
 
 import { notFound, useRouter } from "next/navigation";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
+import DeleteIcon from "public/icons/delete-icon.svg";
 import SendIcon from "public/icons/send-icon.svg";
 import StopIcon from "public/icons/stop-icon.svg";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import { DEFAULT_MESSAGE_LIMIT } from "@/constants/common";
+import { useConfirm } from "@/hooks/useConfirm";
 import * as api from "@/lib/api";
 import { usePointStore } from "@/store/pointStore";
 
@@ -24,6 +27,7 @@ export function Chat({ consultationId }: ChatProps) {
     const router = useRouter();
 
     const { points, fetchPoints, decrement: decrementPoint } = usePointStore();
+    const { confirmState, confirm } = useConfirm();
 
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
@@ -298,6 +302,26 @@ export function Chat({ consultationId }: ChatProps) {
         }
     };
 
+    const handleDelete = async () => {
+        const confirmed = await confirm({
+            title: "상담 삭제",
+            message: "이 상담을 삭제하시겠습니까? 삭제된 상담은 복구할 수 없습니다.",
+            confirmText: "삭제",
+            cancelText: "취소",
+            variant: "danger",
+        });
+
+        if (!confirmed) return;
+
+        try {
+            await api.deleteConsultation(consultationId);
+            toast.success("상담이 삭제되었습니다.");
+            router.push("/ai-consultation");
+        } catch {
+            toast.error("상담 삭제에 실패했습니다.");
+        }
+    };
+
     const handleAbort = () => {
         if (!abortControllerRef.current) return;
         abortControllerRef.current.abort();
@@ -323,6 +347,18 @@ export function Chat({ consultationId }: ChatProps) {
 
     return (
         <div className="flex flex-col h-screen bg-gray-50">
+            {confirmState && (
+                <ConfirmModal
+                    isOpen={confirmState.isOpen}
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmText={confirmState.confirmText}
+                    cancelText={confirmState.cancelText}
+                    variant={confirmState.variant}
+                    onConfirm={confirmState.onConfirm}
+                    onCancel={confirmState.onCancel}
+                />
+            )}
             <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center gap-3">
                 <button
                     onClick={() => router.push("/ai-consultation")}
@@ -337,6 +373,13 @@ export function Chat({ consultationId }: ChatProps) {
                     <span className="text-sm text-gray-600">포인트</span>
                     <span className="text-lg font-bold text-pink-500">{points}</span>
                 </div>
+                <button
+                    onClick={handleDelete}
+                    disabled={isStreaming}
+                    className="w-10 h-10 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                    title="상담 삭제">
+                    <DeleteIcon />
+                </button>
             </div>
             <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
                 <div ref={observerTarget} style={{ height: "1px" }} />

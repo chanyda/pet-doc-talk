@@ -194,6 +194,10 @@ export async function createConsultation(body: CreateConsultationBody): Promise<
     return apiClient.post<Consultation>("/consultations", body);
 }
 
+export async function deleteConsultation(consultationId: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete<void>(`/consultations/${consultationId}`);
+}
+
 export async function getMessages(
     consultationId: number,
     params: PaginationQuery,
