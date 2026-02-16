@@ -53,4 +53,8 @@ export class ConsultationsRepository implements IConsultationsRepository {
             select,
         });
     }
+
+    async delete(id: number): Promise<void> {
+        await this.txHost.tx.consultation.delete({ where: { id } });
+    }
 }

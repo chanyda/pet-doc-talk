@@ -23,4 +23,5 @@ export interface IConsultationsRepository {
         createConsultationDto: CreateConsultationDto,
         select?: ConsultationSelect,
     ): Promise<IConsultation>;
+    delete(id: number): Promise<void>;
 }
