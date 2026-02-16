@@ -23,6 +23,10 @@ export class ConsultationConversationsService {
         return this.consultationConversationsRepository.findActiveByConsultationId(consultationId);
     }
 
+    async findManyByConsultationId(consultationId: number): Promise<IConsultationConversation[]> {
+        return this.consultationConversationsRepository.findManyByConsultationId(consultationId);
+    }
+
     @Transactional()
     async incrementTokens(conversationId: number, inputToken: number, outputToken: number): Promise<void> {
         return this.consultationConversationsRepository.incrementTokens(conversationId, inputToken, outputToken);

@@ -35,6 +35,12 @@ export class ConsultationConversationsRepository implements IConsultationConvers
         });
     }
 
+    async findManyByConsultationId(consultationId: number): Promise<IConsultationConversation[]> {
+        return this.txHost.tx.consultationConversation.findMany({
+            where: { consultationId },
+        });
+    }
+
     async incrementTokens(conversationId: number, inputTokens: number, outputTokens: number): Promise<void> {
         await this.txHost.tx.consultationConversation.update({
             where: { id: conversationId },
