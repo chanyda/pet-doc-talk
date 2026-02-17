@@ -5,9 +5,11 @@ import { ImageFolderType } from "@/constants/image";
 import { getImageUploadUrl, uploadImageToS3 } from "@/lib/api";
 
 export function useImageUpload(initialImage: string | null = null) {
-    const [imagePreview, setImagePreview] = useState<string | null>(initialImage);
+    const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const imagePreview = imageFile ? selectedImagePreview : initialImage;
 
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -22,7 +24,7 @@ export function useImageUpload(initialImage: string | null = null) {
 
         setImageFile(file);
         const reader = new FileReader();
-        reader.onloadend = () => setImagePreview(reader.result as string);
+        reader.onloadend = () => setSelectedImagePreview(reader.result as string);
         reader.readAsDataURL(file);
     };
 
@@ -36,8 +38,8 @@ export function useImageUpload(initialImage: string | null = null) {
         return data.imageUrl;
     };
 
-    const resetImage = (image: string | null) => {
-        setImagePreview(image);
+    const resetImage = () => {
+        setSelectedImagePreview(null);
         setImageFile(null);
     };
 

@@ -64,7 +64,7 @@ export function ProfileEditModal({
 
     const handleClose = () => {
         setNickname(currentNickname);
-        resetImage(currentImage);
+        resetImage();
         setNicknameErrorMessage(null);
         onClose();
     };

@@ -97,7 +97,7 @@ export function PetRegistrationModal({
     const handleClose = () => {
         setStep(PET_REGISTRATION_STEP.BASIC_INFO);
         setFormData(initialFormData);
-        resetImage(initialFormData.imageUrl ?? null);
+        resetImage();
         onClose();
     };
 
