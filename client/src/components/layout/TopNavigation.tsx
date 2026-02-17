@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import ArrowDownIcon from "public/icons/arrow-down-icon.svg";
@@ -46,10 +47,8 @@ export function TopNavigation() {
         <nav className="bg-white border-b border-gray-100 sticky top-0 z-20">
             <div className="max-w-6xl mx-auto px-6">
                 <div className="flex items-center justify-between h-16">
-                    <Link href="/" className="flex items-center">
-                        <h1 className="text-xl" style={{ color: "var(--brand-pink)" }}>
-                            🐾 펫케어
-                        </h1>
+                    <Link href="/" className="relative flex items-center h-16 w-40">
+                        <Image src="/images/logo.png" alt="logo" fill className="object-contain object-left" />
                     </Link>
                     <div className="flex items-center gap-1">
                         {tabs.map((tab) => {
