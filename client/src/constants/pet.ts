@@ -305,3 +305,10 @@ export const catBreeds = [
     "히말라얀",
     "하이랜더",
 ] as const;
+
+export const PET_REGISTRATION_STEP = {
+    BASIC_INFO: 1,
+    DETAIL_INFO: 2,
+} as const;
+
+export type PetRegistrationStepType = (typeof PET_REGISTRATION_STEP)[keyof typeof PET_REGISTRATION_STEP];

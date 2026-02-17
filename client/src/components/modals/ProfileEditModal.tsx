@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import CancelIcon from "public/icons/cancel-icon.svg";
 import UploadIcon from "public/icons/upload-icon.svg";
-import { useRef, useState } from "react";
+import { useState } from "react";
+
+import { IMAGE_FOLDER } from "@/constants/image";
+import { useImageUpload } from "@/hooks/useImageUpload";
 
 interface ProfileEditModalProps {
     isOpen: boolean;
@@ -20,50 +24,10 @@ export function ProfileEditModal({
     currentImage = null,
 }: ProfileEditModalProps) {
     const [nickname, setNickname] = useState<string>(currentNickname);
-    // TODO: 이미지 업로드 처리
-    const [imagePreview, setImagePreview] = useState<string | null>(currentImage);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleImageSelect = (file: File) => {
-        if (file && file.type.startsWith("image/")) {
-            setImageFile(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            handleImageSelect(file);
-        }
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-            handleImageSelect(file);
-        }
-    };
+    const { imagePreview, fileInputRef, handleImageSelect, uploadImage, resetImage } = useImageUpload(currentImage);
 
     const handleSubmit = async () => {
         if (!nickname.trim()) {
@@ -79,8 +43,10 @@ export function ProfileEditModal({
         setNicknameErrorMessage(null);
 
         try {
-            // TODO: 프로필 사진 업로드 처리
-            await onSubmit({ nickname: nickname.trim() });
+            const uploadImageUrl = await uploadImage(IMAGE_FOLDER.PROFILE);
+            const profileImageUrl = uploadImageUrl ?? currentImage;
+
+            await onSubmit({ nickname: nickname.trim(), profileImageUrl });
             handleClose();
         } catch (err: unknown) {
             if (err instanceof Error) {
@@ -98,9 +64,7 @@ export function ProfileEditModal({
 
     const handleClose = () => {
         setNickname(currentNickname);
-        setImagePreview(currentImage);
-        setImageFile(null);
-        setIsDragging(false);
+        resetImage(currentImage);
         setNicknameErrorMessage(null);
         onClose();
     };
@@ -133,16 +97,15 @@ export function ProfileEditModal({
                     </div>
                     <div className="flex flex-col items-center">
                         <div
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
                             onClick={() => fileInputRef.current?.click()}
                             className="relative w-40 h-40 rounded-full cursor-pointer group">
                             {imagePreview ? (
-                                <img
+                                <Image
                                     src={imagePreview}
                                     alt="프로필 미리보기"
-                                    className="w-full h-full object-cover rounded-full border-4 border-pink-200"
+                                    fill
+                                    unoptimized
+                                    className="object-cover rounded-full border-4 border-pink-200"
                                 />
                             ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-pink-100 to-orange-100 rounded-full border-4 border-dashed border-pink-300 flex flex-col items-center justify-center group-hover:border-pink-400 transition-colors gap-1">
@@ -158,14 +121,12 @@ export function ProfileEditModal({
                                 <UploadIcon fill="#ffffff" />
                             </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-3 text-center">
-                            클릭하거나 드래그해서 사진을 업로드하세요
-                        </p>
+                        <p className="text-xs text-gray-500 mt-3 text-center">클릭해서 사진을 업로드하세요.</p>
                         <input
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
-                            onChange={handleFileChange}
+                            onChange={handleImageSelect}
                             className="hidden"
                         />
                     </div>
@@ -213,10 +174,7 @@ export function ProfileEditModal({
                             disabled={!isValid || isLoading}
                             className="flex-1 px-6 py-4 text-white rounded-xl transition-all font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110"
                             style={{
-                                background:
-                                    isValid && !isLoading
-                                        ? "var(--brand-gradient)"
-                                        : "#d1d5db",
+                                background: isValid && !isLoading ? "var(--brand-gradient)" : "#d1d5db",
                             }}>
                             {isLoading ? "저장 중..." : "저장"}
                         </button>

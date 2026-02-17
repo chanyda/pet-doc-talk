@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, isAxiosError } from "axios";
 
+import { ImageFolderType } from "@/constants/image";
 import { useAuthStore } from "@/store/authStore";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -207,4 +208,17 @@ export async function getMessages(
 
 export async function getMyPoints(): Promise<AxiosResponse<PointResponse>> {
     return apiClient.get<PointResponse>("/points/me");
+}
+
+export async function getImageUploadUrl(
+    fileType: string,
+    fileName: string,
+    uploadType: ImageFolderType,
+): Promise<AxiosResponse<{ uploadUrl: string; imageUrl: string }>> {
+    const sanitizedFileName = fileName.replace(/\s+/g, "_");
+    return apiClient.post("/images/uploads", { fileType, fileName: sanitizedFileName, uploadType });
+}
+
+export async function uploadImageToS3(uploadUrl: string, file: File): Promise<void> {
+    await axios.put(uploadUrl, file, { headers: { "Content-Type": file.type } });
 }

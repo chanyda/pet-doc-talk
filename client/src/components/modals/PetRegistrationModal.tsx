@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import ArrowDownIcon from "public/icons/arrow-down-icon.svg";
 import ArrowLeftIcon from "public/icons/arrow-left-icon.svg";
 import ArrowRightIcon from "public/icons/arrow-right-icon.svg";
@@ -8,19 +9,21 @@ import CancelIcon from "public/icons/cancel-icon.svg";
 import CatFaceIcon from "public/icons/cat-face-icon.svg";
 import DogFaceIcon from "public/icons/dog-face-icon.svg";
 import UploadIcon from "public/icons/upload-icon.svg";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import { catBreeds, dogBreeds } from "@/constants/pet";
+import { IMAGE_FOLDER } from "@/constants/image";
+import { catBreeds, dogBreeds, PET_REGISTRATION_STEP, PetRegistrationStepType } from "@/constants/pet";
 import { useOutsideClick } from "@/hooks/useClickOutside";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useImageUpload } from "@/hooks/useImageUpload";
 
 import ConfirmModal from "./ConfirmModal";
 
 interface PetRegistrationModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (petData: PetRegistrationFormData) => void;
+    onSubmit: (petData: PetRegistrationFormData) => Promise<void>;
     onDelete: () => void;
     initialFormData?: Partial<PetRegistrationFormData>;
     isEditMode?: boolean;
@@ -40,41 +43,42 @@ export function PetRegistrationModal({
     isEditMode = false,
 }: PetRegistrationModalProps) {
     const [formData, setFormData] = useState<Partial<PetRegistrationFormData>>(initialFormData);
-    const [step, setStep] = useState<number>(1);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [step, setStep] = useState<PetRegistrationStepType>(PET_REGISTRATION_STEP.BASIC_INFO);
     const [isBreedSelectOpen, setIsBreedSelectOpen] = useState<boolean>(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const { imagePreview, fileInputRef, handleImageSelect, uploadImage, resetImage } = useImageUpload(
+        initialFormData.imageUrl ?? null,
+    );
     const breedDropdownRef = useOutsideClick(() => setIsBreedSelectOpen(false));
     const { confirmState, confirm } = useConfirm();
-
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // TODO: 사진 처리하는 거 추가하기
-        // const file = e.target.files?.[0];
-        // if (file) {
-        //     const reader = new FileReader();
-        //     reader.onloadend = () => {
-        //         const result = reader.result as string;
-        //         setImagePreview(result);
-        //         setFormData({ ...formData, imageUrl: result });
-        //     };
-        //     reader.readAsDataURL(file);
-        // }
-    };
 
     const handleNext = () => {
         if (!formData.name || !formData.type || !formData.gender) {
             toast.warning("필수 항목을 모두 입력해 주세요.");
             return;
         }
-        setStep(2);
+        setStep(PET_REGISTRATION_STEP.DETAIL_INFO);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!formData.breed) {
             toast.warning("품종을 입력해 주세요.");
             return;
         }
-        onSubmit(formData as PetRegistrationFormData);
-        handleClose();
+
+        setIsLoading(true);
+        try {
+            const uploadImageUrl = await uploadImage(IMAGE_FOLDER.PET);
+            const petImageUrl = uploadImageUrl ?? formData.imageUrl;
+
+            await onSubmit({ ...formData, imageUrl: petImageUrl } as PetRegistrationFormData);
+            handleClose();
+        } catch {
+            toast.error("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleDelete = async () => {
@@ -91,8 +95,9 @@ export function PetRegistrationModal({
     };
 
     const handleClose = () => {
-        setStep(1);
+        setStep(PET_REGISTRATION_STEP.BASIC_INFO);
         setFormData(initialFormData);
+        resetImage(initialFormData.imageUrl ?? null);
         onClose();
     };
 
@@ -119,7 +124,7 @@ export function PetRegistrationModal({
                     </div>
                 </div>
                 <div className="p-8">
-                    {step === 1 ? (
+                    {step === PET_REGISTRATION_STEP.BASIC_INFO ? (
                         <div key="step1" className="space-y-8">
                             <div className="text-center mb-8">
                                 <h3 className="text-xl font-bold text-gray-900 mb-3">기본 정보를 알려주세요.</h3>
@@ -134,6 +139,7 @@ export function PetRegistrationModal({
                                     value={formData.name || ""}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     placeholder="예) 뽀미"
+                                    maxLength={100}
                                     className="w-full px-5 py-4 text-base border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
                                 />
                             </div>
@@ -222,7 +228,7 @@ export function PetRegistrationModal({
                         <div key="step2" className="space-y-8">
                             <div className="text-center mb-8">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                                    <span style={{ color: "var(--brand-pink)" }}>{`${formData.name ?? "아이"}`}</span>의 상세
+                                    <span className="text-(--brand-pink)">{`${formData.name ?? "아이"}`}</span>의 상세
                                     정보를 알려주세요.
                                 </h3>
                                 <p className="text-base text-gray-600">더 자세한 정보를 입력해 주세요.</p>
@@ -231,11 +237,13 @@ export function PetRegistrationModal({
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
                                     className="relative w-40 h-40 rounded-full cursor-pointer group">
-                                    {initialFormData.imageUrl ? (
-                                        <img
-                                            src={initialFormData.imageUrl}
+                                    {imagePreview ? (
+                                        <Image
+                                            src={imagePreview}
                                             alt="Preview"
-                                            className="w-full h-full object-cover rounded-full border-4 border-pink-200"
+                                            fill
+                                            unoptimized
+                                            className="object-cover rounded-full border-4 border-pink-200"
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-gradient-to-br from-pink-100 to-orange-100 rounded-full border-4 border-dashed border-pink-300 flex flex-col items-center justify-center group-hover:border-pink-400 transition-colors gap-1">
@@ -251,6 +259,7 @@ export function PetRegistrationModal({
                                         <UploadIcon fill="#ffffff" />
                                     </div>
                                 </div>
+                                <p className="text-xs text-gray-500 mt-3 text-center">클릭해서 사진을 업로드하세요.</p>
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -349,23 +358,21 @@ export function PetRegistrationModal({
                         </div>
                     )}
                     <div className="flex gap-4 mt-10">
-                        {step === 2 && (
+                        {step === PET_REGISTRATION_STEP.DETAIL_INFO && (
                             <button
-                                onClick={() => setStep(1)}
+                                onClick={() => setStep(PET_REGISTRATION_STEP.BASIC_INFO)}
                                 className="px-8 py-4 text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2">
                                 <ArrowLeftIcon width="30px" height="30px" />
                                 <span>이전</span>
                             </button>
                         )}
-                        {step === 1 ? (
+                        {step === PET_REGISTRATION_STEP.BASIC_INFO ? (
                             <button
                                 onClick={handleNext}
                                 disabled={!isStepOneValid}
                                 className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
-                                    background: isStepOneValid
-                                        ? "var(--brand-gradient)"
-                                        : "#d1d5db",
+                                    background: isStepOneValid ? "var(--brand-gradient)" : "#d1d5db",
                                 }}>
                                 <ArrowRightIcon width="30px" height="30px" stroke="#ffffff" />
                                 <span>다음</span>
@@ -373,14 +380,12 @@ export function PetRegistrationModal({
                         ) : (
                             <button
                                 onClick={handleSubmit}
-                                disabled={!isStepTwoValid}
+                                disabled={!isStepTwoValid || isLoading}
                                 className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
                                 style={{
-                                    background: isStepTwoValid
-                                        ? "var(--brand-gradient)"
-                                        : "#d1d5db",
+                                    background: isStepTwoValid && !isLoading ? "var(--brand-gradient)" : "#d1d5db",
                                 }}>
-                                <span>{isEditMode ? "수정 완료" : "등록 완료"}</span>
+                                <span>{isLoading ? "저장 중..." : isEditMode ? "수정 완료" : "등록 완료"}</span>
                             </button>
                         )}
                     </div>

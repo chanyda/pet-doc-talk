@@ -10,7 +10,7 @@ interface FindPostListQuery extends PaginationQuery {
 
 interface UpdateProfileBody {
     nickname?: string;
-    profileImageUrl?: string;
+    profileImageUrl?: string | null;
 }
 
 interface PostListResponse {
