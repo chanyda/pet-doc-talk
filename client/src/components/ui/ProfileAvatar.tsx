@@ -19,8 +19,8 @@ export function ProfileAvatar({ profileImageUrl, nickname, size = "md" }: Profil
     const gradient = getGradientFromNickname(nickname);
 
     return profileImageUrl ? (
-        <div className={`${PROFILE_AVATAR_SIZE_CLASS[size]} rounded-full overflow-hidden flex-shrink-0`}>
-            <Image src={profileImageUrl} alt={nickname} className="w-full h-full object-cover" />
+        <div className={`${PROFILE_AVATAR_SIZE_CLASS[size]} relative rounded-full overflow-hidden flex-shrink-0`}>
+            <Image src={profileImageUrl} alt={nickname} fill className="object-cover" />
         </div>
     ) : (
         <div

@@ -20,8 +20,13 @@ export function ConsultationItem({ consultation, onClick }: ConsultationItemProp
                 <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-pink-100 to-orange-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span>
                         {consultation.pet.imageUrl ? (
-                            <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
-                                <Image src={consultation.pet.imageUrl} alt={consultation.pet.name} />
+                            <div className="relative w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
+                                <Image
+                                    src={consultation.pet.imageUrl}
+                                    alt={consultation.pet.name}
+                                    fill
+                                    className="object-cover"
+                                />
                             </div>
                         ) : (
                             <div

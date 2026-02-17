@@ -44,7 +44,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
         if (scrollContainerRef.current) {
             const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
             setCanScrollLeft(scrollLeft > 0);
-            setCanScrollRight(scrollWidth > clientWidth + 10);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
         }
     };
 
@@ -191,8 +191,8 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                                     )}
                                     <div className="flex items-center gap-3 mb-3">
                                         {pet.imageUrl ? (
-                                            <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
-                                                <Image src={pet.imageUrl} alt={pet.name} />
+                                            <div className="relative w-16 h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
+                                                <Image src={pet.imageUrl} alt={pet.name} fill className="object-cover" />
                                             </div>
                                         ) : (
                                             <div
