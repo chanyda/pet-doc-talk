@@ -215,8 +215,7 @@ export async function getImageUploadUrl(
     fileName: string,
     uploadType: ImageFolderType,
 ): Promise<AxiosResponse<{ uploadUrl: string; imageUrl: string }>> {
-    const sanitizedFileName = fileName.replace(/\s+/g, "_");
-    return apiClient.post("/images/uploads", { fileType, fileName: sanitizedFileName, uploadType });
+    return apiClient.post("/images/uploads", { fileType, fileName, uploadType });
 }
 
 export async function uploadImageToS3(uploadUrl: string, file: File): Promise<void> {
