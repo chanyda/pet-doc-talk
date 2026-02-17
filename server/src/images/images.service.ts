@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import path from "path";
 
 import { AwsService } from "@/aws/aws.service";
 import { ConfigType } from "@/types/config.type";
@@ -22,12 +23,23 @@ export class ImagesService {
         userId: number,
         getImageUploadUrlDto: GetImageUploadUrlDto,
     ): Promise<ImageUploadUrlResponseDto> {
-        // ex) pet/dev/1/filename
-        const key = `${getImageUploadUrlDto.uploadType}/${this.nodeEnv}/${userId}/${getImageUploadUrlDto.fileName}`;
+        const filename = this.sanitizeFileName(getImageUploadUrlDto.fileName);
+        // ex) pet/development/1/filename
+        const key = `${getImageUploadUrlDto.uploadType}/${this.nodeEnv}/${userId}/${filename}`;
 
         const uploadUrl = await this.awsService.generatePresignedUrl(key, getImageUploadUrlDto.fileType);
         const imageUrl = this.awsService.getPublicUrl(key);
 
         return { uploadUrl, imageUrl };
+    }
+
+    private sanitizeFileName(fileName: string): string {
+        const ext = path.extname(fileName);
+        const baseName = path
+            .basename(fileName, ext)
+            .replace(/[^a-zA-Z0-9가-힣_-]/g, "_")
+            .replace(/_+/g, "_")
+            .replace(/^_+|_+$/g, "");
+        return `${baseName || "image"}${ext}`;
     }
 }
