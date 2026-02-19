@@ -71,7 +71,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                         />
                         <div className="flex flex-col min-w-0">
                             <span className="font-medium text-gray-900 truncate">{post.user.nickname}</span>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <span className="truncate">{formatLocalDateTime(post.createdAt)}</span>
                                 <span>•</span>
                                 <span className="whitespace-nowrap">조회 {post.viewCount}</span>
