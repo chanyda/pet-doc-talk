@@ -11,8 +11,10 @@
         "lint": "eslint \"src/**/*.ts\" --fix",
         "start": "nest start",
         "start:dev": "nest start --watch",
+        "start:prod": "pm2 start dist/src/main.js --name pet-doc-talk-server",
         "start:debug": "nest start --debug --watch",
         "migrate:dev": "npx prisma generate && npx prisma migrate dev --name init",
+        "migrate:prod": "npx prisma generate && npx prisma migrate deploy --name init",
         "seed:dev": "npx prisma db seed",
         "test": "jest"
     },
