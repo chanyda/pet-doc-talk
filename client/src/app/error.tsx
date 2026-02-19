@@ -16,7 +16,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                 <div className="space-y-3">
                     <button
                         onClick={reset}
-                        className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all">
+                        className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-3 rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all cursor-pointer">
                         다시 시도
                     </button>
                     <Link

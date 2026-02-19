@@ -71,7 +71,7 @@ export function TopNavigation() {
                             <div className="relative ml-3" ref={profileMenuRef}>
                                 <button
                                     onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                                    className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white transition-all">
+                                    className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white transition-all cursor-pointer">
                                     <ProfileAvatar nickname={user.nickname} size="sm" />
                                     <span className="text-sm font-medium text-gray-700 truncate max-w-20">
                                         {user.nickname}
@@ -103,7 +103,7 @@ export function TopNavigation() {
                                                     setIsProfileMenuOpen(false);
                                                     handleLogout();
                                                 }}
-                                                className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                                className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
                                                 <LogoutIcon stroke="#e7000b" />
                                                 로그아웃
                                             </button>
@@ -126,7 +126,7 @@ export function TopNavigation() {
                     {/* 모바일 햄버거 메뉴 버튼 */}
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="md:hidden p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        className="md:hidden p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                         <MenuIcon stroke="#374151" />
                     </button>
                 </div>
@@ -144,7 +144,7 @@ export function TopNavigation() {
                             <h2 className="text-lg font-bold text-gray-900">메뉴</h2>
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                className="p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                                 <CancelIcon stroke="#374151" />
                             </button>
                         </div>
@@ -203,7 +203,7 @@ export function TopNavigation() {
                                             setIsMobileMenuOpen(false);
                                             handleLogout();
                                         }}
-                                        className="flex items-center gap-2.5 w-full px-4 py-3 text-base text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        className="flex items-center gap-2.5 w-full px-4 py-3 text-base text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer">
                                         <LogoutIcon stroke="#e7000b" />
                                         로그아웃
                                     </button>

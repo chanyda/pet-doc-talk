@@ -55,7 +55,7 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors">
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors cursor-pointer">
                         <ArrowLeftIcon />
                         <span>목록으로</span>
                     </button>
@@ -67,10 +67,10 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                         <ProfileAvatar
                             nickname={post.user.nickname}
                             profileImageUrl={post.user.profileImageUrl}
-                            size="sm"
+                            size="md"
                         />
                         <div className="flex flex-col min-w-0">
-                            <span className="font-medium text-gray-900 text-sm truncate">{post.user.nickname}</span>
+                            <span className="font-medium text-gray-900 truncate">{post.user.nickname}</span>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
                                 <span className="truncate">{formatLocalDateTime(post.createdAt)}</span>
                                 <span>•</span>
@@ -82,14 +82,14 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                         <div className="flex items-center gap-1 shrink-0">
                             <button
                                 onClick={handleEdit}
-                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                                 title="수정">
                                 <EditIcon fill={"#505050"} stroke={"#505050"} />
                                 <span className="hidden md:inline">수정</span>
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                 title="삭제">
                                 <DeleteIcon />
                                 <span className="hidden md:inline">삭제</span>

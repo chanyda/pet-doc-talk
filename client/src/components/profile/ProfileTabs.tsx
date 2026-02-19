@@ -23,7 +23,7 @@ export function ProfileTabs({ activeTab, onTabChange }: ProfileTabsProps) {
                         <button
                             key={tab.id}
                             onClick={() => onTabChange(tab.id)}
-                            className={`flex items-center gap-2 px-4 md:px-6 py-3 rounded-xl whitespace-nowrap transition-all flex-1 md:flex-initial justify-center ${
+                            className={`flex items-center gap-2 px-4 md:px-6 py-3 rounded-xl whitespace-nowrap transition-all flex-1 md:flex-initial justify-center cursor-pointer ${
                                 isActive ? "text-white shadow-lg" : "text-gray-600 hover:bg-gray-50"
                             }`}
                             style={{

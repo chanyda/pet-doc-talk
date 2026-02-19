@@ -233,7 +233,7 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                             setActiveAction({ type: "replying", targetId: comment.id });
                         }
                     }}
-                    className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3">
+                    className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3 cursor-pointer">
                     답글 달기
                 </button>
             </>
@@ -284,7 +284,7 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                     {comment.replyCount > 0 && (
                         <button
                             onClick={() => setShowReplies(!showReplies)}
-                            className="flex items-center gap-2 mt-0.5 text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                            className="flex items-center gap-2 mt-0.5 text-sm text-pink-600 hover:text-pink-700 transition-colors cursor-pointer">
                             {!showReplies && (
                                 <>
                                     <span>답글 {comment.replyCount}개 더보기</span>
@@ -325,13 +325,13 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                                 (repliesNextCursor && replies.length < totalReplyCount ? (
                                     <button
                                         onClick={() => fetchReplies(repliesNextCursor)}
-                                        className="text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                                        className="text-sm text-pink-600 hover:text-pink-700 transition-colors cursor-pointer">
                                         답글 더보기
                                     </button>
                                 ) : (
                                     <button
                                         onClick={() => setShowReplies(false)}
-                                        className="flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 transition-colors">
+                                        className="flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 transition-colors cursor-pointer">
                                         <span>답글 숨기기</span>
                                     </button>
                                 ))}

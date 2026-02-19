@@ -131,7 +131,7 @@ export function ReplyItem({ reply, onReplyToReply, onEdit, onDelete }: ReplyItem
                 </p>
                 <button
                     onClick={() => onReplyToReply({ id: reply.user.id, nickname: reply.user.nickname }, reply.id)}
-                    className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3">
+                    className="text-sm text-gray-500 hover:text-pink-600 transition-colors mb-3 cursor-pointer">
                     답글 달기
                 </button>
             </>

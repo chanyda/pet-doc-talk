@@ -113,7 +113,7 @@ export function PetRegistrationModal({
                     <div className="relative flex items-center justify-center">
                         <button
                             onClick={handleClose}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors">
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors cursor-pointer">
                             <CancelIcon />
                         </button>
                         <div className="text-center">
@@ -152,7 +152,7 @@ export function PetRegistrationModal({
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: "DOG" })}
                                         disabled={isEditMode}
-                                        className={`py-4 rounded-xl border-2 transition-all ${
+                                        className={`py-4 rounded-xl border-2 transition-all cursor-pointer ${
                                             formData.type === "DOG"
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
@@ -166,7 +166,7 @@ export function PetRegistrationModal({
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: "CAT" })}
                                         disabled={isEditMode}
-                                        className={`py-4 rounded-xl border-2 transition-all ${
+                                        className={`py-4 rounded-xl border-2 transition-all cursor-pointer ${
                                             formData.type === "CAT"
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
@@ -186,7 +186,7 @@ export function PetRegistrationModal({
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, gender: "MALE" })}
-                                        className={`flex items-center justify-center gap-3 py-4 rounded-xl border-2 transition-all ${
+                                        className={`flex items-center justify-center gap-3 py-4 rounded-xl border-2 transition-all cursor-pointer ${
                                             formData.gender === "MALE"
                                                 ? "border-blue-400 bg-blue-50"
                                                 : "border-gray-200 hover:border-gray-300"
@@ -196,7 +196,7 @@ export function PetRegistrationModal({
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, gender: "FEMALE" })}
-                                        className={`flex items-center justify-center gap-3 py-4 rounded-xl border-2 transition-all ${
+                                        className={`flex items-center justify-center gap-3 py-4 rounded-xl border-2 transition-all cursor-pointer ${
                                             formData.gender === "FEMALE"
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
@@ -211,7 +211,7 @@ export function PetRegistrationModal({
                                         type="checkbox"
                                         checked={formData.isNeutered ?? false}
                                         onChange={(e) => setFormData({ ...formData, isNeutered: e.target.checked })}
-                                        className="w-6 h-6 text-pink-600 rounded focus:ring-pink-500"
+                                        className="w-6 h-6 text-pink-600 rounded focus:ring-pink-500 cursor-pointer"
                                     />
                                     <div className="flex-1">
                                         <span className="font-medium text-base text-gray-900">중성화 완료</span>
@@ -359,7 +359,7 @@ export function PetRegistrationModal({
                         {step === PET_REGISTRATION_STEP.DETAIL_INFO && (
                             <button
                                 onClick={() => setStep(PET_REGISTRATION_STEP.BASIC_INFO)}
-                                className="px-8 py-4 text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2">
+                                className="px-8 py-4 text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2 cursor-pointer">
                                 <ArrowLeftIcon width="30px" height="30px" />
                                 <span>이전</span>
                             </button>
@@ -368,7 +368,7 @@ export function PetRegistrationModal({
                             <button
                                 onClick={handleNext}
                                 disabled={!isStepOneValid}
-                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
+                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110 cursor-pointer"
                                 style={{
                                     background: isStepOneValid ? "var(--brand-gradient)" : "#d1d5db",
                                 }}>
@@ -379,7 +379,7 @@ export function PetRegistrationModal({
                             <button
                                 onClick={handleSubmit}
                                 disabled={!isStepTwoValid || isLoading}
-                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110"
+                                className="flex-1 px-8 py-4 text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium hover:brightness-110 cursor-pointer"
                                 style={{
                                     background: isStepTwoValid && !isLoading ? "var(--brand-gradient)" : "#d1d5db",
                                 }}>
@@ -391,7 +391,7 @@ export function PetRegistrationModal({
                         <div className="mt-6 text-center">
                             <button
                                 onClick={handleDelete}
-                                className="text-sm text-gray-400 hover:text-red-500 underline transition-colors">
+                                className="text-sm text-gray-400 hover:text-red-500 underline transition-colors cursor-pointer">
                                 이 아이 삭제하기
                             </button>
                         </div>

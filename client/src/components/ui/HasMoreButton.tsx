@@ -9,7 +9,7 @@ export function HasMoreButton({ isLoading, onClick }: HasMoreButtonProps) {
             <button
                 onClick={onClick}
                 disabled={isLoading}
-                className="px-8 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all disabled:opacity-50"
+                className="px-8 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all disabled:opacity-50 cursor-pointer"
                 style={{ color: "var(--brand-pink)" }}>
                 {isLoading ? (
                     <span className="flex items-center gap-2">

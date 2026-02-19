@@ -140,7 +140,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                 </div>
                 <button
                     onClick={handleOpenModal}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-pink-600 hover:bg-pink-50 rounded-lg transition-colors">
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-pink-600 hover:bg-pink-50 rounded-lg transition-colors cursor-pointer">
                     <PlusIcon stroke="#e60076" />
                     <span>추가</span>
                 </button>
@@ -155,7 +155,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                     {canScrollLeft && (
                         <button
                             onClick={() => scroll("left")}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border cursor-pointer"
                             style={{ marginLeft: "-20px" }}>
                             <ArrowLeftIcon width="20px" height="20px" />
                         </button>
@@ -163,7 +163,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                     {canScrollRight && (
                         <button
                             onClick={() => scroll("right")}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors border cursor-pointer"
                             style={{ marginRight: "-20px" }}>
                             <ArrowRightIcon width="20px" height="20px" />
                         </button>
@@ -179,7 +179,7 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                                 <button
                                     key={pet.id}
                                     onClick={() => handlePetClick(pet)}
-                                    className={`shrink-0 w-52 md:w-64 p-3 md:p-4 rounded-2xl bg-linear-to-br from-pink-50 via-purple-50 to-orange-50 border-2 transition-all group relative ${
+                                    className={`shrink-0 w-52 md:w-64 p-3 md:p-4 rounded-2xl bg-linear-to-br from-pink-50 via-purple-50 to-orange-50 border-2 transition-all group relative cursor-pointer ${
                                         isSelected
                                             ? "border-pink-500 shadow-xl"
                                             : "border-pink-200 hover:border-pink-300 hover:shadow-lg"
@@ -192,7 +192,12 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                                     <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
                                         {pet.imageUrl ? (
                                             <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-3 border-white shadow-md shrink-0">
-                                                <Image src={pet.imageUrl} alt={pet.name} fill className="object-cover" />
+                                                <Image
+                                                    src={pet.imageUrl}
+                                                    alt={pet.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
                                             </div>
                                         ) : (
                                             <div
@@ -201,15 +206,25 @@ export function MyPets({ mode = "edit", selectedPetId, onSelectPet }: MyPetsProp
                                                     background: "var(--brand-gradient)",
                                                 }}>
                                                 {pet.type === "CAT" ? (
-                                                    <CatFaceIcon width="26px" height="26px" className="md:w-7.5 md:h-7.5" />
+                                                    <CatFaceIcon
+                                                        width="26px"
+                                                        height="26px"
+                                                        className="md:w-7.5 md:h-7.5"
+                                                    />
                                                 ) : (
-                                                    <DogFaceIcon width="26px" height="26px" className="md:w-7.5 md:h-7.5" />
+                                                    <DogFaceIcon
+                                                        width="26px"
+                                                        height="26px"
+                                                        className="md:w-7.5 md:h-7.5"
+                                                    />
                                                 )}
                                             </div>
                                         )}
                                         <div className="flex-1 text-left min-w-0">
                                             <div className="flex items-center gap-1.5 md:gap-2">
-                                                <h4 className="text-base md:text-lg font-bold text-gray-900 truncate">{pet.name}</h4>
+                                                <h4 className="text-base md:text-lg font-bold text-gray-900 truncate">
+                                                    {pet.name}
+                                                </h4>
                                                 <span
                                                     className={`text-xs px-1.5 md:px-2 py-0.5 rounded-full shrink-0 ${genderStyle(pet.gender)}`}>
                                                     {pet.gender === "FEMALE" ? "♀" : "♂"}

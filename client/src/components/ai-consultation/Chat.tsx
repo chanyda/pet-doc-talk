@@ -362,7 +362,7 @@ export function Chat({ consultationId }: ChatProps) {
             <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 md:py-4 flex items-center gap-2 md:gap-3">
                 <button
                     onClick={() => router.push("/ai-consultation")}
-                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer">
                     <ArrowLeftIcon width="24px" height="24px" className="md:w-[30px] md:h-[30px]" />
                 </button>
                 <div className="flex-1 min-w-0">
@@ -376,7 +376,7 @@ export function Chat({ consultationId }: ChatProps) {
                 <button
                     onClick={handleDelete}
                     disabled={isStreaming}
-                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400 cursor-pointer"
                     title="상담 삭제">
                     <DeleteIcon />
                 </button>
@@ -420,7 +420,10 @@ export function Chat({ consultationId }: ChatProps) {
                             <StopIcon />
                         </StyledButton>
                     ) : (
-                        <StyledButton onClick={() => handleSend()} disabled={!inputValue.trim() || points <= 0} className="shrink-0">
+                        <StyledButton
+                            onClick={() => handleSend()}
+                            disabled={!inputValue.trim() || points <= 0}
+                            className="shrink-0">
                             <SendIcon />
                         </StyledButton>
                     )}

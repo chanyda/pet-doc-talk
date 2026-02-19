@@ -70,7 +70,7 @@ export function MessageInput({
                 {onCancel && (
                     <button
                         onClick={onCancel}
-                        className="text-xs md:text-sm text-gray-500 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-colors px-3 md:px-4 py-2 md:py-2.5 min-h-9">
+                        className="text-xs md:text-sm text-gray-500 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-colors px-3 md:px-4 py-2 md:py-2.5 min-h-9 cursor-pointer">
                         취소
                     </button>
                 )}
@@ -84,7 +84,7 @@ export function MessageInput({
                     <button
                         onClick={onSubmit}
                         disabled={!value.trim() || disabled || isOverLimit}
-                        className="text-xs md:text-sm text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-3 md:px-4 py-2 md:py-2.5 min-h-9"
+                        className="text-xs md:text-sm text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-3 md:px-4 py-2 md:py-2.5 min-h-9 cursor-pointer"
                         style={{ backgroundColor: "var(--brand-pink)" }}>
                         등록
                     </button>

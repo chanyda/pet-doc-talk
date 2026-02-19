@@ -80,7 +80,7 @@ export function ProfileEditModal({
                     <div className="relative flex items-center justify-center">
                         <button
                             onClick={handleClose}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors">
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors cursor-pointer">
                             <CancelIcon />
                         </button>
                         <div className="text-center">
@@ -166,13 +166,13 @@ export function ProfileEditModal({
                         <button
                             onClick={handleClose}
                             disabled={isLoading}
-                            className="flex-1 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium disabled:opacity-50">
+                            className="flex-1 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium disabled:opacity-50 cursor-pointer">
                             취소
                         </button>
                         <button
                             onClick={handleSubmit}
                             disabled={!isValid || isLoading}
-                            className="flex-1 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base text-white rounded-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110"
+                            className="flex-1 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base text-white rounded-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 cursor-pointer"
                             style={{
                                 background: isValid && !isLoading ? "var(--brand-gradient)" : "#d1d5db",
                             }}>

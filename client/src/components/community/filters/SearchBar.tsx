@@ -38,7 +38,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
             />
             <button
                 onClick={handleSearch}
-                className="px-3.5 flex items-center justify-center hover:opacity-90 transition-opacity rounded-r-xl"
+                className="px-3.5 flex items-center justify-center hover:opacity-90 transition-opacity rounded-r-xl cursor-pointer"
                 style={{ background: "var(--brand-gradient)" }}>
                 <SearchIcon width="20px" height="20px" fill="#ffffff" />
             </button>

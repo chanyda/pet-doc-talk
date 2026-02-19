@@ -35,12 +35,12 @@ export default function ConfirmModal({
                 <div className="flex gap-3">
                     <button
                         onClick={onCancel}
-                        className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium">
+                        className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium cursor-pointer">
                         {cancelText}
                     </button>
                     <button
                         onClick={onConfirm}
-                        className={`flex-1 text-white py-3 rounded-lg transition-all font-medium ${variantStyles[variant]}`}>
+                        className={`flex-1 text-white py-3 rounded-lg transition-all font-medium cursor-pointer ${variantStyles[variant]}`}>
                         {confirmText}
                     </button>
                 </div>

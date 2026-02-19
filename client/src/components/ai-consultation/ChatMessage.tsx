@@ -53,7 +53,7 @@ export function ChatMessage({
                                                     <button
                                                         key={optIdx}
                                                         onClick={() => onCheckListSelect(message.id, idx, option)}
-                                                        className={`px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm rounded-full transition-all min-h-9 ${
+                                                        className={`px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm rounded-full transition-all min-h-9 cursor-pointer ${
                                                             isSelected
                                                                 ? "bg-linear-to-r from-pink-500 to-orange-400 text-white border-2 border-pink-500"
                                                                 : "bg-white border border-gray-200 text-gray-600 hover:border-pink-300 hover:bg-pink-50"

@@ -60,7 +60,9 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
                         {reply.mentionUser && (
                             <span className="text-sm text-pink-600 mr-1">@{reply.mentionUser.nickname}</span>
                         )}
-                        <p className="text-sm text-gray-800 mb-2 leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                        <p className="text-sm text-gray-800 mb-2 leading-relaxed whitespace-pre-wrap">
+                            {reply.content}
+                        </p>
                     </>
                 )}
 
@@ -79,14 +81,12 @@ export function Reply({ reply, currentUserId, onEdit, onDelete }: ReplyProps) {
                             <>
                                 <button
                                     onClick={handleEdit}
-                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors">
-                                    {/* <EditIcon /> */}
+                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
                                     <span>수정</span>
                                 </button>
                                 <button
                                     onClick={handleDelete}
-                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors">
-                                    {/* <DeleteIcon /> */}
+                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors cursor-pointer">
                                     <span>삭제</span>
                                 </button>
                             </>

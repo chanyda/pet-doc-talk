@@ -36,7 +36,7 @@ export function PetSelectionModal({ isOpen, onClose, onSelectPet }: PetSelection
                     <div className="relative flex items-center justify-center">
                         <button
                             onClick={onClose}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors">
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors cursor-pointer">
                             <CancelIcon />
                         </button>
                         <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
@@ -66,13 +66,13 @@ export function PetSelectionModal({ isOpen, onClose, onSelectPet }: PetSelection
                     <div className="flex gap-3 mt-6">
                         <button
                             onClick={onClose}
-                            className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
+                            className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium cursor-pointer">
                             취소
                         </button>
                         <button
                             onClick={handleSubmit}
                             disabled={!selectedPetId}
-                            className="flex-1 px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                            className="flex-1 px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
                             style={{
                                 background: selectedPetId
                                     ? "var(--brand-gradient)"
