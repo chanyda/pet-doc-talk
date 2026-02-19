@@ -1,4 +1,4 @@
-export const socialLoginConfigs = [
+export const SOCIAL_LOGIN_CONFIGS = [
     {
         type: "KAKAO",
         imageSrc: "/images/kakao-icon.png",

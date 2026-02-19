@@ -13,7 +13,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { IMAGE_FOLDER } from "@/constants/image";
-import { catBreeds, dogBreeds, PET_REGISTRATION_STEP, PetRegistrationStepType } from "@/constants/pet";
+import { CAT_BREEDS, DOG_BREEDS, PET_REGISTRATION_STEP, PetRegistrationStepType } from "@/constants/pet";
 import { useOutsideClick } from "@/hooks/useClickOutside";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -291,7 +291,7 @@ export function PetRegistrationModal({
                                     </div>
                                     {isBreedSelectOpen && (
                                         <div className="absolute z-10 mt-2 w-full bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                                            {(formData.type === "DOG" ? dogBreeds : catBreeds).map((breed) => (
+                                            {(formData.type === "DOG" ? DOG_BREEDS : CAT_BREEDS).map((breed) => (
                                                 <div
                                                     key={breed}
                                                     onClick={() => {

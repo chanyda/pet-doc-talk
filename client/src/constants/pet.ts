@@ -1,4 +1,4 @@
-export const dogBreeds = [
+export const DOG_BREEDS = [
     "세상에 하나뿐인 믹스",
     "고든 세터",
     "꼬똥 드 툴레아",
@@ -233,7 +233,7 @@ export const dogBreeds = [
     "휘핏",
 ] as const;
 
-export const catBreeds = [
+export const CAT_BREEDS = [
     "세상에 하나뿐인 믹스",
     "노르웨이 숲",
     "네벨룽",
