@@ -27,7 +27,7 @@ export default function AIConsultationHero() {
                         </p>
                         <Link
                             href="/ai-consultation"
-                            className="group bg-white text-pink-600 px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-all shadow-lg inline-flex items-center gap-3">
+                            className="group bg-white text-pink-600 px-6 py-3 md:px-8 md:py-4 rounded-2xl font-bold text-base md:text-lg hover:scale-105 transition-all shadow-lg inline-flex items-center gap-3">
                             <span>상담 시작하기</span>
                         </Link>
                     </div>

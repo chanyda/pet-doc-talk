@@ -62,15 +62,15 @@ export function MessageInput({
                 value={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full resize-none focus:outline-none overflow-hidden px-4 pt-3 pb-1 text-sm leading-relaxed bg-transparent"
-                rows={3}
-                style={{ minHeight: "60px", maxHeight: "200px" }}
+                className="w-full resize-none focus:outline-none overflow-hidden px-3 md:px-4 pt-2.5 md:pt-3 pb-1 text-sm leading-relaxed bg-transparent"
+                rows={1}
+                style={{ minHeight: "44px", maxHeight: "200px" }}
             />
-            <div className="flex items-end justify-end px-3 py-2 gap-1">
+            <div className="flex items-end justify-end px-2.5 md:px-3 py-2 gap-1">
                 {onCancel && (
                     <button
                         onClick={onCancel}
-                        className="text-xs text-gray-500 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-colors px-4 py-2.5">
+                        className="text-xs md:text-sm text-gray-500 rounded-md hover:text-gray-700 hover:bg-gray-100 transition-colors px-3 md:px-4 py-2 md:py-2.5 min-h-9">
                         취소
                     </button>
                 )}
@@ -84,7 +84,7 @@ export function MessageInput({
                     <button
                         onClick={onSubmit}
                         disabled={!value.trim() || disabled || isOverLimit}
-                        className="text-xs text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2.5"
+                        className="text-xs md:text-sm text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed px-3 md:px-4 py-2 md:py-2.5 min-h-9"
                         style={{ backgroundColor: "var(--brand-pink)" }}>
                         등록
                     </button>

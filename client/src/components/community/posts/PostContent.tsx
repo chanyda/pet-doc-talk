@@ -61,43 +61,41 @@ export function PostContent({ post, currentUserId, onBack }: PostContentProps) {
                     </button>
                 )}
                 <CategoryTag category={post.category} />
-                <h1 className="text-3xl font-bold mb-4 mt-3">{post.title}</h1>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span className="flex items-center gap-2">
-                            <ProfileAvatar
-                                nickname={post.user.nickname}
-                                profileImageUrl={post.user.profileImageUrl}
-                                size="sm"
-                            />
-                            <span className="font-medium text-gray-900">{post.user.nickname}</span>
-                        </span>
-                        <span>•</span>
-                        <span>{formatLocalDateTime(post.createdAt)}</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                            <span>조회</span>
-                            {post.viewCount}
-                        </span>
+                <h1 className="text-2xl md:text-3xl font-bold mb-4 mt-3">{post.title}</h1>
+                <div className="flex items-baseline justify-between gap-4 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <ProfileAvatar
+                            nickname={post.user.nickname}
+                            profileImageUrl={post.user.profileImageUrl}
+                            size="sm"
+                        />
+                        <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-gray-900 text-sm truncate">{post.user.nickname}</span>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <span className="truncate">{formatLocalDateTime(post.createdAt)}</span>
+                                <span>•</span>
+                                <span className="whitespace-nowrap">조회 {post.viewCount}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        {isAuthor && (
-                            <>
-                                <button
-                                    onClick={handleEdit}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                                    <EditIcon fill={"#505050"} stroke={"#505050"} />
-                                    <span>수정</span>
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                    <DeleteIcon />
-                                    <span>삭제</span>
-                                </button>
-                            </>
-                        )}
-                    </div>
+                    {isAuthor && (
+                        <div className="flex items-center gap-1 shrink-0">
+                            <button
+                                onClick={handleEdit}
+                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="수정">
+                                <EditIcon fill={"#505050"} stroke={"#505050"} />
+                                <span className="hidden md:inline">수정</span>
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="삭제">
+                                <DeleteIcon />
+                                <span className="hidden md:inline">삭제</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="p-6">

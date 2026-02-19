@@ -22,7 +22,7 @@ export function CommunityFilter({
     return (
         <div className="space-y-4 mb-6">
             <CategoryFilter selectedCategoryId={selectedCategoryId} onCategoryChange={onCategoryChange} />
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <SearchBar value={searchQuery} onChange={onSearchChange} />
                 <SortSelect value={orderBy} onChange={onOrderByChange} />
             </div>

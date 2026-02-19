@@ -54,26 +54,26 @@ export function Profile() {
                     </div>
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-3xl mb-2">{user.name}</h1>
-                    <p className="text-xl text-gray-600 mb-3">@{user.nickname}</p>
+                    <h1 className="text-2xl md:text-3xl mb-2">{user.name}</h1>
+                    <p className="text-lg md:text-xl text-gray-600 mb-3">@{user.nickname}</p>
                     <div className="flex items-center justify-center md:justify-start gap-2 text-gray-600 mb-6">
-                        <span>{user.email}</span>
+                        <span className="text-sm md:text-base">{user.email}</span>
                     </div>
-                    <div className="flex items-center justify-center md:justify-start gap-6 mb-6">
-                        <div className="flex gap-2 text-center">
-                            <div className="text-sm text-gray-600">포인트</div>
+                    <div className="grid grid-cols-2 md:flex md:items-center md:justify-start gap-4 md:gap-6 mb-6">
+                        <div className="flex flex-col md:flex-row gap-1 md:gap-2 text-center md:text-left">
+                            <div className="text-sm text-gray-600 whitespace-nowrap">포인트</div>
                             <div className="text-sm font-bold text-pink-500">{points}</div>
                         </div>
-                        <div className="flex gap-2 text-center">
-                            <div className="text-sm text-gray-600">상담</div>
+                        <div className="flex flex-col md:flex-row gap-1 md:gap-2 text-center md:text-left">
+                            <div className="text-sm text-gray-600 whitespace-nowrap">상담</div>
                             <div className="text-sm font-bold">{user.consultationCount}</div>
                         </div>
-                        <div className="flex gap-2 text-center">
-                            <div className="text-sm text-gray-600">게시글</div>
+                        <div className="flex flex-col md:flex-row gap-1 md:gap-2 text-center md:text-left">
+                            <div className="text-sm text-gray-600 whitespace-nowrap">게시글</div>
                             <div className="text-sm font-bold">{user.postCount}</div>
                         </div>
-                        <div className="flex gap-2 text-center">
-                            <div className="text-sm text-gray-600">댓글</div>
+                        <div className="flex flex-col md:flex-row gap-1 md:gap-2 text-center md:text-left">
+                            <div className="text-sm text-gray-600 whitespace-nowrap">댓글</div>
                             <div className="text-sm font-bold">{user.commentCount}</div>
                         </div>
                     </div>

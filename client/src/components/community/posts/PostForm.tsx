@@ -118,7 +118,7 @@ export function PostForm({ mode, initialData }: PostFormProps) {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="제목을 입력하세요."
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-all ${
+                    className={`w-full px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base border-2 rounded-xl focus:outline-none transition-all ${
                         isTitleOver
                             ? "border-red-300 focus:border-red-400 bg-red-50"
                             : "border-gray-200 focus:border-pink-300 focus:bg-pink-50"
@@ -133,16 +133,16 @@ export function PostForm({ mode, initialData }: PostFormProps) {
             <div className={`text-xs mt-1 text-right ${isContentOver ? "text-red-500" : "text-gray-500"}`}>
                 {content.length}/{POST_CONTENT_LIMIT}
             </div>
-            <div className="flex gap-3 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 md:pt-6 border-t border-gray-200">
                 <button
                     onClick={handleCancel}
-                    className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer">
+                    className="flex-1 px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer">
                     취소
                 </button>
                 <button
                     onClick={handleSubmit}
                     disabled={!isFormValid || isSubmitting}
-                    className="flex-1 px-6 py-3 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg cursor-pointer"
+                    className="flex-1 px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg cursor-pointer"
                     style={{
                         background:
                             isFormValid && !isSubmitting

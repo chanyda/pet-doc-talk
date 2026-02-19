@@ -30,28 +30,28 @@ export function PostItem({ post }: PostItemProps) {
                             <CategoryTag category={post.category} />
                         </div>
                     </div>
-                    <h3 className="text-lg font-semibold mb-3 line-clamp-1">{post.title}</h3>
-                    <div className="flex items-center justify-between mt-auto">
-                        <div className="flex gap-4">
-                            <div className="flex items-center gap-2">
-                                <ProfileAvatar
-                                    nickname={post.user.nickname}
-                                    profileImageUrl={post.user.profileImageUrl}
-                                    size="sm"
-                                />
-                                <span className="text-sm text-gray-700">{post.user.nickname}</span>
-                            </div>
-                            <span className="flex items-center gap-1 text-xs text-gray-500">
-                                {formatPostDate(post.createdAt)}
-                            </span>
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                                <span>조회</span>
-                                <span>{post.viewCount}</span>
-                            </div>
+                    <h3 className="text-base md:text-lg font-semibold mb-3 line-clamp-1">{post.title}</h3>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 mt-auto">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <ProfileAvatar
+                                nickname={post.user.nickname}
+                                profileImageUrl={post.user.profileImageUrl}
+                                size="sm"
+                            />
+                            <span className="text-sm text-gray-700 truncate">{post.user.nickname}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                            <CommentIcon />
-                            <span>{post.commentCount}</span>
+                        <div className="flex items-center justify-between md:justify-start gap-3 md:gap-4 text-xs text-gray-500">
+                            <div className="flex items-center gap-3">
+                                <span>{formatPostDate(post.createdAt)}</span>
+                                <span className="flex items-center gap-1">
+                                    <span>조회</span>
+                                    <span>{post.viewCount}</span>
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-sm">
+                                <CommentIcon />
+                                <span>{post.commentCount}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

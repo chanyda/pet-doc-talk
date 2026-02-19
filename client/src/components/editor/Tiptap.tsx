@@ -19,7 +19,7 @@ export function Tiptap({ onChange, initialContent = "" }: TiptapProps) {
         extensions: [StarterKit],
         editorProps: {
             attributes: {
-                class: "prose max-w-full text-left px-4 py-4 my-6 min-h-[300px] border border-gray-border rounded-lg focus:outline-none",
+                class: "prose max-w-full text-left px-3 md:px-4 py-3 md:py-4 my-4 md:my-6 min-h-[200px] md:min-h-[300px] text-sm md:text-base border border-gray-border rounded-lg focus:outline-none",
             },
         },
         onUpdate: ({ editor }) => {

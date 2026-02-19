@@ -359,24 +359,24 @@ export function Chat({ consultationId }: ChatProps) {
                     onCancel={confirmState.onCancel}
                 />
             )}
-            <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center gap-3">
+            <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 md:py-4 flex items-center gap-2 md:gap-3">
                 <button
                     onClick={() => router.push("/ai-consultation")}
-                    className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
-                    <ArrowLeftIcon width="30px" height="30px" />
+                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+                    <ArrowLeftIcon width="24px" height="24px" className="md:w-[30px] md:h-[30px]" />
                 </button>
-                <div className="flex-1">
-                    <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">AI 상담</h1>
-                    <p className="text-sm text-gray-600">AI 수의사와 상담중</p>
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-base md:text-lg font-semibold text-gray-900">AI 상담</h1>
+                    <p className="text-xs md:text-sm text-gray-600 truncate">AI 수의사와 상담중</p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-50 to-orange-50 rounded-full border border-pink-200">
-                    <span className="text-sm text-gray-600">포인트</span>
-                    <span className="text-lg font-bold text-pink-500">{points}</span>
+                <div className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 bg-linear-to-r from-pink-50 to-orange-50 rounded-full border border-pink-200 shrink-0">
+                    <span className="text-xs md:text-sm text-gray-600 hidden sm:inline">포인트</span>
+                    <span className="text-sm md:text-lg font-bold text-pink-500">{points}</span>
                 </div>
                 <button
                     onClick={handleDelete}
                     disabled={isStreaming}
-                    className="w-10 h-10 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                    className="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full hover:bg-red-50 flex items-center justify-center transition-colors text-gray-400 hover:text-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
                     title="상담 삭제">
                     <DeleteIcon />
                 </button>
@@ -398,8 +398,8 @@ export function Chat({ consultationId }: ChatProps) {
                 {isStreaming && <StreamingMessage content={streamingContent} />}
                 <div ref={messagesEndRef} />
             </div>
-            <div className="bg-white border-t border-gray-200 p-4">
-                <div className="max-w-4xl mx-auto flex gap-3">
+            <div className="bg-white border-t border-gray-200 p-3 md:p-4">
+                <div className="flex gap-2 md:gap-3">
                     <textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
@@ -412,15 +412,15 @@ export function Chat({ consultationId }: ChatProps) {
                         placeholder="메시지를 입력하세요..."
                         disabled={isStreaming}
                         rows={1}
-                        className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-300 resize-none disabled:bg-gray-100"
-                        style={{ minHeight: "48px", maxHeight: "120px" }}
+                        className="flex-1 px-3 md:px-4 py-2.5 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-300 resize-none disabled:bg-gray-100"
+                        style={{ minHeight: "44px", maxHeight: "120px" }}
                     />
                     {isStreaming ? (
-                        <StyledButton onClick={handleAbort}>
+                        <StyledButton onClick={handleAbort} className="shrink-0">
                             <StopIcon />
                         </StyledButton>
                     ) : (
-                        <StyledButton onClick={() => handleSend()} disabled={!inputValue.trim() || points <= 0}>
+                        <StyledButton onClick={() => handleSend()} disabled={!inputValue.trim() || points <= 0} className="shrink-0">
                             <SendIcon />
                         </StyledButton>
                     )}

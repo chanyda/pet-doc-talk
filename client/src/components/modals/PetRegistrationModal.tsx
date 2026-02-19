@@ -191,7 +191,6 @@ export function PetRegistrationModal({
                                                 ? "border-blue-400 bg-blue-50"
                                                 : "border-gray-200 hover:border-gray-300"
                                         }`}>
-                                        <div className="text-3xl leading-none">♂️</div>
                                         <div className="font-medium text-base text-gray-900">남아</div>
                                     </button>
                                     <button
@@ -202,7 +201,6 @@ export function PetRegistrationModal({
                                                 ? "border-pink-400 bg-pink-50"
                                                 : "border-gray-200 hover:border-gray-300"
                                         }`}>
-                                        <div className="text-3xl leading-none">♀️</div>
                                         <div className="font-medium text-base text-gray-900">여아</div>
                                     </button>
                                 </div>
@@ -246,7 +244,7 @@ export function PetRegistrationModal({
                                             className="object-cover rounded-full border-4 border-pink-200"
                                         />
                                     ) : (
-                                        <div className="w-full h-full bg-gradient-to-br from-pink-100 to-orange-100 rounded-full border-4 border-dashed border-pink-300 flex flex-col items-center justify-center group-hover:border-pink-400 transition-colors gap-1">
+                                        <div className="w-full h-full bg-linear-to-br from-pink-100 to-orange-100 rounded-full border-4 border-dashed border-pink-300 flex flex-col items-center justify-center group-hover:border-pink-400 transition-colors gap-1">
                                             <UploadIcon fill="#ff6b9d" width="35px" height="35px" />
                                             <span className="text-sm text-gray-600">사진 (선택)</span>
                                         </div>

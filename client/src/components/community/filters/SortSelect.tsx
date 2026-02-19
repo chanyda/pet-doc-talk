@@ -24,17 +24,17 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
         <div className="relative" ref={actionMenuRef}>
             <button
                 onClick={() => setIsActionMenuOption(!isActionMenuOption)}
-                className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
-                <span className="text-sm text-gray-700">{selectedOption?.label}</span>
+                className="flex items-center justify-between gap-2 min-w-[100px] px-3 md:px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                <span className="text-sm text-gray-700 whitespace-nowrap">{selectedOption?.label}</span>
                 <span className="text-gray-400 text-sm">▼</span>
             </button>
             {isActionMenuOption && (
-                <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10">
+                <div className="absolute right-0 top-full mt-2 min-w-[120px] bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10">
                     {POST_ORDER_BY_OPTIONS.map((option) => (
                         <button
                             key={option.id}
                             onClick={() => handleSelect(option.id)}
-                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
+                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap ${
                                 value === option.id ? "text-pink-600" : "text-gray-700"
                             }`}
                             style={{
