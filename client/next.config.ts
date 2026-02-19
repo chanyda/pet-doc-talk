@@ -8,6 +8,11 @@ module.exports = {
         },
     },
     images: {
-        domains: ["d25h8ttszcbdyj.cloudfront.net"], // TODO: domain생기면 변경 필요
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "d25h8ttszcbdyj.cloudfront.net",
+            },
+        ],
     },
 };
