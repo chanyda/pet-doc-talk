@@ -399,6 +399,17 @@ export function Chat({ consultationId }: ChatProps) {
                 <div ref={messagesEndRef} />
             </div>
             <div className="bg-white border-t border-gray-200 p-3 md:p-4">
+                <div className="mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-xs text-amber-800 leading-relaxed flex items-start gap-2">
+                        <span className="shrink-0 mt-0.5">⚠️</span>
+                        <span>
+                            <strong className="font-semibold">주의:</strong> 펫닥톡의 AI 상담 서비스는 의료 진단을
+                            대체할 수 없습니다. 반려동물의 건강에 심각한 문제가 있거나 응급 상황인 경우 반드시 가까운
+                            동물병원을 방문하시기 바랍니다.
+                        </span>
+                    </p>
+                </div>
+
                 <div className="flex gap-2 md:gap-3">
                     <textarea
                         value={inputValue}
