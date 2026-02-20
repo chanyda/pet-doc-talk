@@ -68,16 +68,20 @@ export class PostsService {
         };
     }
 
-    async findById(postId: number): Promise<PostDetailResponseDto> {
+    async findById(postId: number, currentUserId: number | undefined): Promise<PostDetailResponseDto> {
         const post = await this.postsRepository.findById(postId, POST_DETAIL_SELECT);
 
         if (!post) {
             throw new NotFoundException("Post not exists.");
         }
 
-        // NOTE: 본인의 게시글을 클릭했을 때에도 viewCount를 올릴지 생각해보자. 우선은 클릭하면 viewCount+1 되도록 함
-        const { viewCount: updatedViewCount } = await this.postsRepository.updateViewCount(postId, { viewCount: true });
-        post.viewCount = updatedViewCount;
+        // 비로그인 사용자이거나 내 게시글이 아닌 게시글을 조회한 경우 조회수를 올려준다.
+        if (!currentUserId || post.user.id !== currentUserId) {
+            const { viewCount: updatedViewCount } = await this.postsRepository.updateViewCount(postId, {
+                viewCount: true,
+            });
+            post.viewCount = updatedViewCount;
+        }
 
         return post;
     }

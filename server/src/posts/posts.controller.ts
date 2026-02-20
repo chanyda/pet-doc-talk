@@ -64,8 +64,11 @@ export class PostsController {
     @ApiOkResponse({ description: "Find post successful.", type: PostDetailResponseDto })
     @ApiNotFoundResponse({ description: "Post not exists." })
     // TODO: 좋아요 기능 추가 시 userId를 받아서 로그인한 사용자가 좋아요를 누른 게시글인지 보여줘야함
-    findById(@Param("id", ParseIntPipe) postId: number): Promise<PostDetailResponseDto> {
-        return this.postsService.findById(postId);
+    findById(
+        @Param("id", ParseIntPipe) postId: number,
+        @User("userId") userId: number | undefined,
+    ): Promise<PostDetailResponseDto> {
+        return this.postsService.findById(postId, userId);
     }
 
     @Post()
