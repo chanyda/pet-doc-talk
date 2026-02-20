@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
+import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { AuthProvider } from "@/providers/AuthProvider";
 
 import "./globals.css";
@@ -80,6 +81,7 @@ export default function RootLayout({
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <AuthProvider>
                     {children}
+                    <ConditionalFooter />
                     <Toaster position="top-right" richColors duration={2000} />
                 </AuthProvider>
             </body>
