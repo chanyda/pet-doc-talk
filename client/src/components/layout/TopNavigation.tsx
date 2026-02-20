@@ -40,7 +40,7 @@ export function TopNavigation() {
     const handleLogout = async () => {
         try {
             await api.logout();
-            router.push("/");
+            window.location.href = "/";
         } catch (error) {
             console.error("Logout failed:", error);
         }
