@@ -187,42 +187,74 @@ describe("PostsController", () => {
     });
 
     describe("findById", () => {
-        it("게시글 상세 조회에 성공하여 게시글을 반환한다.", async () => {
-            const post = {
-                id: 1,
-                title: "게시글 제목",
-                content: "게시글 내용",
-                viewCount: 1,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                user: {
-                    id: TEST_USER_ID,
-                    nickname: "Tester",
-                    profileImageUrl: "http://test.com",
-                },
-                category: {
+        describe("게시글 조회 성공", () => {
+            it("로그인 사용자가 게시글 상세 조회에 성공하여 게시글을 반환한다.", async () => {
+                const post = {
                     id: 1,
-                    name: "건강·상담·병원",
-                },
-            };
+                    title: "게시글 제목",
+                    content: "게시글 내용",
+                    viewCount: 1,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: 2,
+                        nickname: "Tester",
+                        profileImageUrl: "http://test.com",
+                    },
+                    category: {
+                        id: 1,
+                        name: "건강·상담·병원",
+                    },
+                };
 
-            findByIdSpy.mockResolvedValue(post);
+                findByIdSpy.mockResolvedValue(post);
 
-            const result = await postsController.findById(TEST_POST_ID);
+                const result = await postsController.findById(TEST_POST_ID, TEST_USER_ID);
 
-            expect(result).toEqual(post);
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                expect(result).toEqual(post);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID);
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+            });
+
+            it("비로그인 사용자가 게시글 상세 조회에 성공하여 게시글을 반환한다.", async () => {
+                const post = {
+                    id: 1,
+                    title: "게시글 제목",
+                    content: "게시글 내용",
+                    viewCount: 1,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: {
+                        id: TEST_USER_ID,
+                        nickname: "Tester",
+                        profileImageUrl: "http://test.com",
+                    },
+                    category: {
+                        id: 1,
+                        name: "건강·상담·병원",
+                    },
+                };
+
+                findByIdSpy.mockResolvedValue(post);
+
+                const result = await postsController.findById(TEST_POST_ID, undefined);
+
+                expect(result).toEqual(post);
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, undefined);
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+            });
         });
 
-        it("조회하려는 id에 대한 게시글을 찾지 못하여 오류를 반환한다.", async () => {
-            findByIdSpy.mockRejectedValue(new NotFoundException("Post not exists."));
+        describe("게시글 조회 실패", () => {
+            it("조회하려는 id에 대한 게시글을 찾지 못하여 오류를 반환한다.", async () => {
+                findByIdSpy.mockRejectedValue(new NotFoundException("Post not exists."));
 
-            await expect(postsController.findById(TEST_POST_ID)).rejects.toThrow(
-                new NotFoundException("Post not exists."),
-            );
-            expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID);
-            expect(findByIdSpy).toHaveBeenCalledTimes(1);
+                await expect(postsController.findById(TEST_POST_ID, TEST_USER_ID)).rejects.toThrow(
+                    new NotFoundException("Post not exists."),
+                );
+                expect(findByIdSpy).toHaveBeenCalledWith(TEST_POST_ID, TEST_USER_ID);
+                expect(findByIdSpy).toHaveBeenCalledTimes(1);
+            });
         });
     });
 
