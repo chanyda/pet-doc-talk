@@ -3,7 +3,7 @@
 import Image from "next/image";
 import CancelIcon from "public/icons/cancel-icon.svg";
 import UploadIcon from "public/icons/upload-icon.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { IMAGE_FOLDER } from "@/constants/image";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -28,6 +28,12 @@ export function ProfileEditModal({
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState<string | null>(null);
 
     const { imagePreview, fileInputRef, handleImageSelect, uploadImage, resetImage } = useImageUpload(currentImage);
+
+    useEffect(() => {
+        if (isOpen) {
+            setNickname(currentNickname);
+        }
+    }, [isOpen, currentNickname]);
 
     const handleSubmit = async () => {
         if (!nickname.trim()) {
@@ -84,16 +90,18 @@ export function ProfileEditModal({
                             <CancelIcon />
                         </button>
                         <div className="text-center">
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-                                프로필 수정
-                            </h2>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-900">프로필 수정</h2>
                         </div>
                     </div>
                 </div>
                 <div className="p-4 md:p-8 space-y-6 md:space-y-8">
                     <div className="text-center">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">프로필을 꾸며보세요.</h3>
-                        <p className="text-sm md:text-base text-gray-600">나를 표현할 수 있는 사진과 닉네임을 설정해주세요.</p>
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
+                            프로필을 꾸며보세요.
+                        </h3>
+                        <p className="text-sm md:text-base text-gray-600">
+                            나를 표현할 수 있는 사진과 닉네임을 설정해주세요.
+                        </p>
                     </div>
                     <div className="flex flex-col items-center">
                         <div
