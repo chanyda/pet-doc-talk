@@ -7,9 +7,9 @@
     --font-size: 16px;
 
     /* Brand Colors */
-    --brand-pink: #FF6B9D;
-    --brand-orange: #FFA07A;
-    --brand-gradient: linear-gradient(135deg, #FF6B9D 0%, #FFA07A 100%);
+    --brand-pink: #ff6b9d;
+    --brand-orange: #ffa07a;
+    --brand-gradient: linear-gradient(135deg, #ff6b9d 0%, #ffa07a 100%);
 
     --background: #ffffff;
     --foreground: oklch(0.145 0 0);
@@ -195,4 +195,16 @@ html {
     overflow-y: scroll;
     /* 최신 브라우저에서 스크롤바 공간만 확보 (더 나은 방법) */
     scrollbar-gutter: stable;
+}
+
+input[type="date"] {
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    appearance: auto;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 1;
+    display: block;
 }
