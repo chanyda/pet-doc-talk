@@ -180,6 +180,14 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
         }
     };
 
+    const getReplyPlaceholder = () => {
+        if (!currentUser) {
+            return "로그인 후 이용해주세요.";
+        }
+
+        return replyTarget ? `@${replyTarget.mentionUser.nickname} 에게 답글 입력...` : "답글을 입력하세요...";
+    };
+
     const handleActionMenuClick = (action: CommentActionMenuClickType) => {
         switch (action) {
             case "reply":
@@ -276,7 +284,8 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                                 onChange={setReplyContent}
                                 onSubmit={handleSubmitReply}
                                 onCancel={handleCancelReply}
-                                placeholder="답글을 입력하세요..."
+                                placeholder={currentUser ? "답글을 입력하세요..." : "로그인 후 이용해주세요."}
+                                disabled={!currentUser}
                                 maxLength={COMMENT_CONTENT_LIMIT}
                             />
                         </div>
@@ -309,11 +318,8 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                                                 onChange={setReplyContent}
                                                 onSubmit={handleSubmitReply}
                                                 onCancel={handleCancelReply}
-                                                placeholder={
-                                                    replyTarget
-                                                        ? `@${replyTarget.mentionUser.nickname} 에게 답글 입력...`
-                                                        : "답글을 입력하세요..."
-                                                }
+                                                placeholder={getReplyPlaceholder()}
+                                                disabled={!currentUser}
                                                 maxLength={COMMENT_CONTENT_LIMIT}
                                             />
                                         </div>
