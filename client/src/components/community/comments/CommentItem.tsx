@@ -129,6 +129,13 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
         setReplyTarget(null);
     };
 
+    const handleHideReplies = () => {
+        setShowReplies(false);
+        cancelAction();
+        setReplyContent("");
+        setReplyTarget(null);
+    };
+
     const handleEditReply = (updatedReply: CommentReply) => {
         setReplies((prev) => prev.map((r) => (r.id === updatedReply.id ? updatedReply : r)));
     };
@@ -336,7 +343,7 @@ export function CommentItem({ comment, postId, onEdit, onDelete, onAddReplyCount
                                     </button>
                                 ) : (
                                     <button
-                                        onClick={() => setShowReplies(false)}
+                                        onClick={handleHideReplies}
                                         className="flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 transition-colors cursor-pointer">
                                         <span>답글 숨기기</span>
                                     </button>
