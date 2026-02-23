@@ -1,4 +1,4 @@
-# PetDocTalk Client
+# pet-doc-talk Client
 
 Next.js 16 기반의 PetDocTalk 프론트엔드 애플리케이션입니다.
 
