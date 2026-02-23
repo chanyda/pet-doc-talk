@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PetDocTalk Client
 
-## Getting Started
+Next.js 16 기반의 PetDocTalk 프론트엔드 애플리케이션입니다.
 
-First, run the development server:
+## 주요 기능
+
+### 인증
+
+- **카카오 로그인**: OAuth 2.0 기반 소셜 로그인
+- **자동 토큰 갱신**: Axios interceptor가 Access Token 만료 시 자동 갱신
+- **로그아웃**: 서버 및 클라이언트 토큰 제거
+
+### AI 상담
+
+- **채팅 UI**: 실시간 메시지 송수신 (SSE 스트리밍)
+- **상담 히스토리**: 과거 상담 내역 조회 (무한 스크롤 지원)
+
+### 커뮤니티
+
+- **게시글 작성/수정/삭제**: TipTap 리치 텍스트 에디터
+- **댓글/대댓글**: 계층형 댓글 시스템
+- **카테고리 필터**: 게시판 카테고리별 조회
+- **커서 페이징**: 더보기 버튼 방식
+
+### 프로필
+
+- **반려동물 관리**: 등록/수정/삭제
+- **닉네임 변경**: 중복 확인 포함
+- **프로필 이미지**: S3 업로드 및 CloudFront 서빙
+
+---
+
+## 빌드 및 배포
+
+### 프로덕션 빌드
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+빌드된 파일은 `.next/` 디렉토리에 생성됩니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 프로덕션 실행
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
--   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
--   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+yarn start:prod
+```
